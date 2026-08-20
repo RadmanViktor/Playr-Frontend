@@ -66,4 +66,17 @@ describe('LoginPage', () => {
       '/register'
     )
   })
+
+  it('shows client-side validation errors and does not call login when fields are empty', async () => {
+    const loginSpy = vi.spyOn(authApi, 'login')
+
+    const user = userEvent.setup()
+    renderLoginPage()
+
+    await user.click(screen.getByRole('button', { name: /log in/i }))
+
+    expect(await screen.findByText(/ERROR: username or email is required/i)).toBeInTheDocument()
+    expect(screen.getByText(/ERROR: password is required/i)).toBeInTheDocument()
+    expect(loginSpy).not.toHaveBeenCalled()
+  })
 })

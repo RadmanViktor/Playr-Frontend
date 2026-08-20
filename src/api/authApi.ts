@@ -28,6 +28,17 @@ async function parseErrorMessage(response: Response, fallback: string): Promise<
     if (body && typeof body.error === 'string') {
       return body.error
     }
+    // ASP.NET Core's automatic model validation returns a ValidationProblemDetails
+    // body shaped like { errors: { FieldName: ["message", ...], ... } } instead of
+    // { error: "..." }. Flatten those field-level messages into one readable string.
+    if (body && body.errors && typeof body.errors === 'object') {
+      const messages = Object.values(body.errors as Record<string, unknown>)
+        .flat()
+        .filter((message): message is string => typeof message === 'string')
+      if (messages.length > 0) {
+        return messages.join(' ')
+      }
+    }
   } catch {
     // ignore parse failures, fall through to fallback
   }
