@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { login, register, getMe, ApiError, API_BASE_URL } from './authApi'
+import { login, register, getMe, API_BASE_URL } from './authApi'
 
 describe('authApi', () => {
   beforeEach(() => {
