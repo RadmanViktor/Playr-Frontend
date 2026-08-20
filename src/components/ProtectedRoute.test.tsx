@@ -50,4 +50,27 @@ describe('ProtectedRoute', () => {
 
     await waitFor(() => expect(screen.getByText('secret dashboard')).toBeInTheDocument())
   })
+
+  it('shows a loading state while the user is being fetched', async () => {
+    localStorage.setItem('playr_token', 'abc123')
+    let resolveGetMe: (value: authApi.UserResponse) => void
+    vi.spyOn(authApi, 'getMe').mockReturnValue(
+      new Promise((resolve) => {
+        resolveGetMe = resolve
+      })
+    )
+
+    renderWithRoute('/')
+
+    expect(screen.getByText('loading_')).toBeInTheDocument()
+
+    resolveGetMe!({
+      id: '1',
+      email: 'a@b.com',
+      username: 'someone',
+      displayName: null,
+    })
+
+    await waitFor(() => expect(screen.getByText('secret dashboard')).toBeInTheDocument())
+  })
 })
