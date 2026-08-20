@@ -75,4 +75,25 @@ describe('RegisterPage', () => {
     renderRegisterPage()
     expect(screen.getByRole('link', { name: /login instead/i })).toHaveAttribute('href', '/login')
   })
+
+  it('shows client-side validation errors and does not call register when fields are invalid', async () => {
+    const registerSpy = vi.spyOn(authApi, 'register')
+
+    const user = userEvent.setup()
+    renderRegisterPage()
+
+    await user.type(screen.getByLabelText(/email/i), 'not-an-email')
+    await user.type(screen.getByLabelText(/^username$/i), 'ab')
+    await user.type(screen.getByLabelText(/password/i), 'short')
+    await user.click(screen.getByRole('button', { name: /register/i }))
+
+    expect(await screen.findByText(/ERROR: enter a valid email address/i)).toBeInTheDocument()
+    expect(
+      screen.getByText(/ERROR: username must be between 3 and 32 characters/i)
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText(/ERROR: password must be at least 8 characters/i)
+    ).toBeInTheDocument()
+    expect(registerSpy).not.toHaveBeenCalled()
+  })
 })

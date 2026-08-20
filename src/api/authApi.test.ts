@@ -75,6 +75,27 @@ describe('authApi', () => {
     })
   })
 
+  it('register flattens ASP.NET Core ValidationProblemDetails errors into a readable message', async () => {
+    ;(fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: false,
+      status: 400,
+      json: async () => ({
+        title: 'One or more validation errors occurred.',
+        status: 400,
+        errors: {
+          Password: ["The field Password must be a string with a minimum length of '8'."],
+          Email: ['The Email field is not a valid e-mail address.'],
+        },
+      }),
+    })
+
+    await expect(register('bad-email', 'someone', 'short')).rejects.toMatchObject({
+      message:
+        "The field Password must be a string with a minimum length of '8'. The Email field is not a valid e-mail address.",
+      status: 400,
+    })
+  })
+
   it('getMe sends the bearer token and returns the current user', async () => {
     const mockUser = { id: '1', email: 'a@b.com', username: 'someone', displayName: null }
     ;(fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
