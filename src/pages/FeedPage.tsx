@@ -1,11 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { PostCard } from '../components/PostCard'
 import { Button } from '../components/ui/Button'
 import { getFeed, type PostFeedItem } from '../api/postsApi'
+import { useAuth } from '../context/AuthContext'
 
 export default function FeedPage() {
   const navigate = useNavigate()
+  const { user } = useAuth()
   const [posts, setPosts] = useState<PostFeedItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -15,6 +17,14 @@ export default function FeedPage() {
       .then(setPosts)
       .catch(() => setError('Failed to load feed.'))
       .finally(() => setIsLoading(false))
+  }, [])
+
+  const handleDelete = useCallback((postId: string) => {
+    setPosts((prev) => prev.filter((p) => p.id !== postId))
+  }, [])
+
+  const handleUpdate = useCallback((updated: PostFeedItem) => {
+    setPosts((prev) => prev.map((p) => (p.id === updated.id ? updated : p)))
   }, [])
 
   return (
@@ -30,7 +40,13 @@ export default function FeedPage() {
         <p className="text-muted">No posts yet — be the first to share!</p>
       )}
       {posts.map((post) => (
-        <PostCard key={post.id} post={post} />
+        <PostCard
+          key={post.id}
+          post={post}
+          currentUserId={user?.id}
+          onDelete={handleDelete}
+          onUpdate={handleUpdate}
+        />
       ))}
     </div>
   )
