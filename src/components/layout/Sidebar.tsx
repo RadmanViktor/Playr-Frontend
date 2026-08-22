@@ -9,12 +9,12 @@ const navItems = [
   { to: '/feed', label: 'Feed', icon: Rss, end: false },
   { to: '/find-players', label: 'Find Players', icon: Users, end: false },
   { to: '/threads', label: 'Threads', icon: MessageSquare, end: false },
-  { to: '/profile', label: 'Profile', icon: User, end: false },
 ]
 
 export function Sidebar() {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const profilePath = user ? `/profile/${user.username}` : '/login'
 
   return (
     <aside className="flex w-64 shrink-0 flex-col gap-6 border-r border-border bg-surface p-4">
@@ -40,6 +40,19 @@ export function Sidebar() {
             {label}
           </NavLink>
         ))}
+        <NavLink
+          to={profilePath}
+          className={({ isActive }) =>
+            `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+              isActive
+                ? 'bg-primary text-white'
+                : 'text-muted hover:bg-surface-raised hover:text-text'
+            }`
+          }
+        >
+          <User className="h-5 w-5" aria-hidden="true" />
+          Profile
+        </NavLink>
       </nav>
 
       <Button className="w-full" onClick={() => navigate('/create-post')}>

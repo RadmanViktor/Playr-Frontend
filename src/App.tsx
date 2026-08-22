@@ -15,6 +15,13 @@ function App() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+
+      {/* Public routes inside AppShell (no auth required) */}
+      <Route element={<AppShell />}>
+        <Route path="/profile/:username" element={<ProfilePage />} />
+      </Route>
+
+      {/* Protected routes inside AppShell */}
       <Route
         element={
           <ProtectedRoute>
@@ -26,7 +33,6 @@ function App() {
         <Route path="/feed" element={<FeedPage />} />
         <Route path="/find-players" element={<FindPlayersPage />} />
         <Route path="/threads" element={<ThreadsPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
         <Route path="/create-post" element={<CreatePostPage />} />
       </Route>
     </Routes>
