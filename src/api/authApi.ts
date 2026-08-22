@@ -1,4 +1,5 @@
-export const API_BASE_URL = 'http://localhost:5258'
+export { API_BASE_URL, ApiError } from './http'
+import { API_BASE_URL, ApiError, parseErrorMessage } from './http'
 
 export interface UserResponse {
   id: string
@@ -10,39 +11,6 @@ export interface UserResponse {
 export interface LoginResponse {
   accessToken: string
   expiresAt: string
-}
-
-export class ApiError extends Error {
-  status: number
-
-  constructor(status: number, message: string) {
-    super(message)
-    this.name = 'ApiError'
-    this.status = status
-  }
-}
-
-async function parseErrorMessage(response: Response, fallback: string): Promise<string> {
-  try {
-    const body = await response.json()
-    if (body && typeof body.error === 'string') {
-      return body.error
-    }
-    // ASP.NET Core's automatic model validation returns a ValidationProblemDetails
-    // body shaped like { errors: { FieldName: ["message", ...], ... } } instead of
-    // { error: "..." }. Flatten those field-level messages into one readable string.
-    if (body && body.errors && typeof body.errors === 'object') {
-      const messages = Object.values(body.errors as Record<string, unknown>)
-        .flat()
-        .filter((message): message is string => typeof message === 'string')
-      if (messages.length > 0) {
-        return messages.join(' ')
-      }
-    }
-  } catch {
-    // ignore parse failures, fall through to fallback
-  }
-  return fallback
 }
 
 export async function register(

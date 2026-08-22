@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { Home, Rss, Users, MessageSquare, User, Plus } from 'lucide-react'
 import { Button } from '../ui/Button'
 import { Avatar } from '../ui/Avatar'
@@ -14,6 +14,7 @@ const navItems = [
 
 export function Sidebar() {
   const { user } = useAuth()
+  const navigate = useNavigate()
 
   return (
     <aside className="flex w-64 shrink-0 flex-col gap-6 border-r border-border bg-surface p-4">
@@ -41,7 +42,7 @@ export function Sidebar() {
         ))}
       </nav>
 
-      <Button className="w-full">
+      <Button className="w-full" onClick={() => navigate('/create-post')}>
         <Plus className="h-4 w-4" aria-hidden="true" />
         Create Post
       </Button>
