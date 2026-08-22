@@ -1,30 +1,30 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { ProfileHeader } from '../components/ProfileHeader'
-import { EditProfileForm } from '../components/EditProfileForm'
 import { PostCard } from '../components/PostCard'
 import { getProfile, getProfilePosts, type ProfileData } from '../api/profilesApi'
 import { type PostFeedItem } from '../api/postsApi'
 import { ApiError } from '../api/http'
 import { useAuth } from '../context/AuthContext'
+import { Button } from '../components/ui/Button'
+import { Settings } from 'lucide-react'
 
 export default function ProfilePage() {
   const { username } = useParams<{ username: string }>()
-  const { user, token } = useAuth()
+  const { user } = useAuth()
+  const navigate = useNavigate()
 
   const [profile, setProfile] = useState<ProfileData | null>(null)
   const [posts, setPosts] = useState<PostFeedItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [isEditing, setIsEditing] = useState(false)
 
   useEffect(() => {
     if (!username) return
     setIsLoading(true)
     setNotFound(false)
     setError(null)
-    setIsEditing(false)
 
     Promise.all([getProfile(username), getProfilePosts(username)])
       .then(([p, ps]) => { setProfile(p); setPosts(ps) })
@@ -46,17 +46,17 @@ export default function ProfilePage() {
     <div className="flex flex-col gap-4">
       <ProfileHeader
         profile={profile}
-        isOwner={isOwner}
-        onEditClick={() => setIsEditing((prev) => !prev)}
+        isOwner={false}
+        onEditClick={() => {}}
       />
 
-      {isEditing && token && (
-        <EditProfileForm
-          profile={profile}
-          token={token}
-          onSave={(updated) => { setProfile(updated); setIsEditing(false) }}
-          onCancel={() => setIsEditing(false)}
-        />
+      {isOwner && (
+        <div className="flex justify-end">
+          <Button variant="secondary" size="sm" onClick={() => navigate('/settings')}>
+            <Settings className="h-4 w-4" aria-hidden="true" />
+            Edit Profile
+          </Button>
+        </div>
       )}
 
       <h2 className="text-lg font-semibold text-text">Posts</h2>

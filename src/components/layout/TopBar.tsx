@@ -100,7 +100,15 @@ export function TopBar() {
         <IconButton aria-label="Messages">
           <Mail className="h-5 w-5" aria-hidden="true" />
         </IconButton>
-        {user && <Avatar alt={user.displayName ?? user.username} status="online" />}
+        {user && (
+          <button
+            onClick={() => navigate(`/profile/${user.username}`)}
+            className="rounded-full focus:outline-none focus:ring-2 focus:ring-primary"
+            aria-label="My profile"
+          >
+            <Avatar alt={user.displayName ?? user.username} status="online" />
+          </button>
+        )}
       </div>
     </header>
   )
