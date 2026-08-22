@@ -1,4 +1,4 @@
-type Size = 'sm' | 'md' | 'lg'
+type Size = 'sm' | 'md' | 'lg' | 'xl'
 type Status = 'online' | 'in-game' | 'offline'
 
 interface AvatarProps {
@@ -12,6 +12,7 @@ const sizeClasses: Record<Size, string> = {
   sm: 'h-8 w-8 text-xs',
   md: 'h-10 w-10 text-sm',
   lg: 'h-12 w-12 text-base',
+  xl: 'h-24 w-24 text-3xl',
 }
 
 const statusColor: Record<Status, string> = {
