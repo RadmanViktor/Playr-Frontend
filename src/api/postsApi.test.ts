@@ -10,7 +10,7 @@ beforeEach(() => { mockFetch.mockReset() })
 const samplePost = {
   id: '1', authorId: 'a1', authorUsername: 'player', authorDisplayName: 'Player',
   authorAvatarUrl: null, gameId: 'g1', gameName: 'Hollow Knight', gameCoverImageUrl: null,
-  textContent: 'Cleared it!', mood: 'Enjoying', createdAt: new Date().toISOString(),
+  textContent: 'Cleared it!', mood: 'Enjoying', createdAt: new Date().toISOString(), likesCount: 0, likedByCurrentUser: false,
 }
 
 describe('createPost', () => {
@@ -77,3 +77,4 @@ describe('deletePost', () => {
     await expect(deletePost('tok', 'p1')).rejects.toBeInstanceOf(ApiError)
   })
 })
+

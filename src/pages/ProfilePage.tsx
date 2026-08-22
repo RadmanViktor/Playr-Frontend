@@ -9,7 +9,7 @@ import { useAuth } from '../context/AuthContext'
 
 export default function ProfilePage() {
   const { username } = useParams<{ username: string }>()
-  const { user } = useAuth()
+  const { user, token } = useAuth()
   const navigate = useNavigate()
 
   const [profile, setProfile] = useState<ProfileData | null>(null)
@@ -24,7 +24,7 @@ export default function ProfilePage() {
     setNotFound(false)
     setError(null)
 
-    Promise.all([getProfile(username), getProfilePosts(username)])
+    Promise.all([getProfile(username), getProfilePosts(username, token)])
       .then(([p, ps]) => { setProfile(p); setPosts(ps) })
       .catch((err) => {
         if (err instanceof ApiError && err.status === 404) setNotFound(true)

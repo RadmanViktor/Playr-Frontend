@@ -12,6 +12,7 @@ const base: PostFeedItem = {
   authorAvatarUrl: null, gameId: 'g1', gameName: 'Elden Ring', gameCoverImageUrl: null,
   textContent: 'Finally beat Radahn!', mood: 'Enjoying',
   createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+  likesCount: 0, likedByCurrentUser: false,
 }
 
 beforeEach(() => { vi.resetAllMocks() })

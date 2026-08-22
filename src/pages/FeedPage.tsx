@@ -5,7 +5,7 @@ import { getGames, type Game } from '../api/gamesApi'
 import { useAuth } from '../context/AuthContext'
 
 export default function FeedPage() {
-  const { user } = useAuth()
+  const { user, token } = useAuth()
   const [posts, setPosts] = useState<PostFeedItem[]>([])
   const [games, setGames] = useState<Game[]>([])
   const [selectedGameId, setSelectedGameId] = useState<string>('all')
@@ -13,7 +13,7 @@ export default function FeedPage() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    Promise.all([getFeed(), getGames()])
+    Promise.all([getFeed(token), getGames()])
       .then(([p, g]) => { setPosts(p); setGames(g) })
       .catch(() => setError('Failed to load feed.'))
       .finally(() => setIsLoading(false))

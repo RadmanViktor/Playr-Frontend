@@ -22,7 +22,7 @@ beforeEach(() => {
   vi.mocked(postsApi.createPost).mockResolvedValue({
     id: 'p1', authorId: 'a', authorUsername: 'player', authorDisplayName: 'Player',
     authorAvatarUrl: null, gameId: 'g1', gameName: 'Hollow Knight', gameCoverImageUrl: null,
-    textContent: 'Hello', mood: null, createdAt: new Date().toISOString(),
+    textContent: 'Hello', mood: null, createdAt: new Date().toISOString(), likesCount: 0, likedByCurrentUser: false,
   })
 })
 
@@ -74,3 +74,4 @@ describe('CreatePostPage', () => {
     await waitFor(() => expect(screen.getByText('Game was not found.')).toBeInTheDocument())
   })
 })
+
