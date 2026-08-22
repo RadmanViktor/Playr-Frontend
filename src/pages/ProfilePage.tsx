@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ProfileHeader } from '../components/ProfileHeader'
-import { PostCard } from '../components/PostCard'
-import { getProfile, getProfilePosts, type ProfileData } from '../api/profilesApi'
-import { type PostFeedItem } from '../api/postsApi'
+import { getProfile, type ProfileData } from '../api/profilesApi'
 import { ApiError } from '../api/http'
 import { useAuth } from '../context/AuthContext'
 import { Button } from '../components/ui/Button'
@@ -15,7 +13,6 @@ export default function ProfilePage() {
   const navigate = useNavigate()
 
   const [profile, setProfile] = useState<ProfileData | null>(null)
-  const [posts, setPosts] = useState<PostFeedItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -26,8 +23,8 @@ export default function ProfilePage() {
     setNotFound(false)
     setError(null)
 
-    Promise.all([getProfile(username), getProfilePosts(username)])
-      .then(([p, ps]) => { setProfile(p); setPosts(ps) })
+    getProfile(username)
+      .then(setProfile)
       .catch((err) => {
         if (err instanceof ApiError && err.status === 404) setNotFound(true)
         else setError('Failed to load profile.')
@@ -57,21 +54,6 @@ export default function ProfilePage() {
             Edit Profile
           </Button>
         </div>
-      )}
-
-      <h2 className="text-lg font-semibold text-text">Posts</h2>
-      {posts.length === 0 ? (
-        <p className="text-muted">No posts yet.</p>
-      ) : (
-        posts.map((post) => (
-          <PostCard
-            key={post.id}
-            post={post}
-            currentUserId={user?.id}
-            onUpdate={(updated) => setPosts((prev) => prev.map((p) => (p.id === updated.id ? updated : p)))}
-            onDelete={(postId) => setPosts((prev) => prev.filter((p) => p.id !== postId))}
-          />
-        ))
       )}
     </div>
   )

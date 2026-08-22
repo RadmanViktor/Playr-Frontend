@@ -1,12 +1,11 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Home, Rss, Users, MessageSquare, Plus } from 'lucide-react'
+import { Home, Users, MessageSquare, Plus } from 'lucide-react'
 import { Button } from '../ui/Button'
 import { Avatar } from '../ui/Avatar'
 import { useAuth } from '../../context/AuthContext'
 
 const navItems = [
   { to: '/', label: 'Home', icon: Home, end: true },
-  { to: '/feed', label: 'Feed', icon: Rss, end: false },
   { to: '/find-players', label: 'Find Players', icon: Users, end: false },
   { to: '/threads', label: 'Threads', icon: MessageSquare, end: false },
 ]
