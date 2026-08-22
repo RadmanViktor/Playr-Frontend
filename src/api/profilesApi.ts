@@ -62,3 +62,19 @@ export async function updateProfile(token: string, data: UpdateProfileData): Pro
   }
   return response.json()
 }
+
+export interface ProfileSearchResult {
+  userId: string
+  username: string
+  displayName: string
+  avatarUrl: string | null
+}
+
+export async function searchProfiles(query: string): Promise<ProfileSearchResult[]> {
+  const response = await fetch(`${API_BASE_URL}/api/profiles/search?q=${encodeURIComponent(query)}`)
+  if (!response.ok) {
+    const message = await parseErrorMessage(response, 'Search failed.')
+    throw new ApiError(response.status, message)
+  }
+  return response.json()
+}
