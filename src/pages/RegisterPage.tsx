@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { TerminalFrame } from '../components/TerminalFrame'
+import { AuthPanel } from '../components/AuthPanel'
+import { Button } from '../components/ui/Button'
 import { useAuth } from '../context/AuthContext'
 import { ApiError } from '../api/authApi'
 import { validateEmail, validatePassword, validateUsername } from '../utils/validation'
@@ -11,6 +12,9 @@ interface FieldErrors {
   username?: string
   password?: string
 }
+
+const inputClass =
+  'rounded-lg border border-border bg-surface-raised px-3 py-2 text-text outline-none focus:border-primary'
 
 export default function RegisterPage() {
   const { register } = useAuth()
@@ -56,66 +60,59 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#0a0e14] px-4">
-      <TerminalFrame title="playr_auth --register">
-        <h1 className="mb-6 text-lg">Create your account_</h1>
+    <div className="flex min-h-screen items-center justify-center bg-bg px-4">
+      <AuthPanel title="Create your PLAYR account">
         <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
-          <label className="flex flex-col gap-1 text-sm">
-            email
+          <label className="flex flex-col gap-1 text-sm text-muted">
+            Email
             <input
               id="email"
               aria-label="email"
               type="email"
-              className="border-b border-[#39ff14] bg-transparent px-1 py-1 text-[#39ff14] outline-none focus:shadow-[0_0_8px_#39ff14]"
+              className={inputClass}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
-            {fieldErrors.email && (
-              <span className="text-orange-400">{`ERROR: ${fieldErrors.email}`}</span>
-            )}
+            {fieldErrors.email && <span className="text-frustrated">{fieldErrors.email}</span>}
           </label>
-          <label className="flex flex-col gap-1 text-sm">
-            username
+          <label className="flex flex-col gap-1 text-sm text-muted">
+            Username
             <input
               id="username"
               aria-label="username"
-              className="border-b border-[#39ff14] bg-transparent px-1 py-1 text-[#39ff14] outline-none focus:shadow-[0_0_8px_#39ff14]"
+              className={inputClass}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
             {fieldErrors.username && (
-              <span className="text-orange-400">{`ERROR: ${fieldErrors.username}`}</span>
+              <span className="text-frustrated">{fieldErrors.username}</span>
             )}
           </label>
-          <label className="flex flex-col gap-1 text-sm">
-            password
+          <label className="flex flex-col gap-1 text-sm text-muted">
+            Password
             <input
               id="password"
               aria-label="password"
               type="password"
-              className="border-b border-[#39ff14] bg-transparent px-1 py-1 text-[#39ff14] outline-none focus:shadow-[0_0_8px_#39ff14]"
+              className={inputClass}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
             {fieldErrors.password && (
-              <span className="text-orange-400">{`ERROR: ${fieldErrors.password}`}</span>
+              <span className="text-frustrated">{fieldErrors.password}</span>
             )}
           </label>
-          {generalError && <p className="text-orange-400">{`ERROR: ${generalError}`}</p>}
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="mt-2 border border-[#39ff14] px-4 py-2 uppercase tracking-wide hover:shadow-[0_0_8px_#39ff14] disabled:opacity-50"
-          >
-            [ Register ]
-          </button>
+          {generalError && <p className="text-frustrated">{generalError}</p>}
+          <Button type="submit" disabled={isSubmitting} className="mt-2 w-full">
+            Register
+          </Button>
         </form>
-        <p className="mt-6 text-sm">
-          <Link to="/login" className="underline">
-            {'> login instead'}
+        <p className="mt-6 text-sm text-muted">
+          <Link to="/login" className="text-primary hover:underline">
+            Login instead
           </Link>
         </p>
-      </TerminalFrame>
+      </AuthPanel>
     </div>
   )
 }

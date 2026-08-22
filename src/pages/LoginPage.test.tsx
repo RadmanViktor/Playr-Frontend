@@ -33,7 +33,7 @@ describe('LoginPage', () => {
     await user.click(screen.getByRole('button', { name: /log in/i }))
 
     await waitFor(() =>
-      expect(screen.getByText(/ERROR: Invalid credentials\./i)).toBeInTheDocument()
+      expect(screen.getByText(/Invalid credentials\./i)).toBeInTheDocument()
     )
   })
 
@@ -75,8 +75,8 @@ describe('LoginPage', () => {
 
     await user.click(screen.getByRole('button', { name: /log in/i }))
 
-    expect(await screen.findByText(/ERROR: username or email is required/i)).toBeInTheDocument()
-    expect(screen.getByText(/ERROR: password is required/i)).toBeInTheDocument()
+    expect(await screen.findByText(/username or email is required/i)).toBeInTheDocument()
+    expect(screen.getByText(/password is required/i)).toBeInTheDocument()
     expect(loginSpy).not.toHaveBeenCalled()
   })
 })
