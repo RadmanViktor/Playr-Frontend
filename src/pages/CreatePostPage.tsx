@@ -43,6 +43,7 @@ export default function CreatePostPage() {
     setSubmitError(null)
 
     const trimmed = text.trim()
+    if (!selectedGameId) { setSubmitError('Please select a game.'); return }
     if (!trimmed) { setTextError('Post text is required.'); return }
     if (trimmed.length > 1000) { setTextError('Post text cannot be longer than 1000 characters.'); return }
 
