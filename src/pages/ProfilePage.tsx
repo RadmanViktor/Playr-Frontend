@@ -6,8 +6,6 @@ import { getProfile, getProfilePosts, type ProfileData } from '../api/profilesAp
 import { type PostFeedItem } from '../api/postsApi'
 import { ApiError } from '../api/http'
 import { useAuth } from '../context/AuthContext'
-import { Button } from '../components/ui/Button'
-import { Settings } from 'lucide-react'
 
 export default function ProfilePage() {
   const { username } = useParams<{ username: string }>()
@@ -46,18 +44,10 @@ export default function ProfilePage() {
     <div className="flex flex-col gap-4">
       <ProfileHeader
         profile={profile}
-        isOwner={false}
-        onEditClick={() => {}}
+        isOwner={isOwner}
+        onEditClick={() => navigate('/settings')}
+        postCount={posts.length}
       />
-
-      {isOwner && (
-        <div className="flex justify-end">
-          <Button variant="secondary" size="sm" onClick={() => navigate('/settings')}>
-            <Settings className="h-4 w-4" aria-hidden="true" />
-            Edit Profile
-          </Button>
-        </div>
-      )}
 
       <h2 className="text-lg font-semibold text-text">Posts</h2>
       {posts.length === 0 ? (

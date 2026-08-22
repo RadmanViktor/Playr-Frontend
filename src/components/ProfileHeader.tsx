@@ -1,4 +1,4 @@
-import { Globe } from 'lucide-react'
+import { Globe, Link as LinkIcon, FileText, Calendar } from 'lucide-react'
 import { Avatar } from './ui/Avatar'
 import { Badge } from './ui/Badge'
 import { Button } from './ui/Button'
@@ -8,64 +8,88 @@ interface ProfileHeaderProps {
   profile: ProfileData
   isOwner: boolean
   onEditClick: () => void
+  postCount?: number
 }
 
-export function ProfileHeader({ profile, isOwner, onEditClick }: ProfileHeaderProps) {
+function formatJoinDate(createdAt: string): string {
+  return new Date(createdAt).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
+}
+
+export function ProfileHeader({ profile, isOwner, onEditClick, postCount = 0 }: ProfileHeaderProps) {
   return (
-    <div className="flex flex-col gap-4 rounded-xl border border-border bg-surface p-6">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-center gap-4">
+    <div className="overflow-hidden rounded-xl border border-border bg-surface">
+      {/* Gradient banner */}
+      <div className="relative h-32 bg-gradient-to-br from-primary/60 via-primary/25 to-surface sm:h-40">
+        <div className="absolute -bottom-12 left-6">
           <Avatar
             src={profile.avatarUrl ?? undefined}
             alt={profile.displayName}
-            size="lg"
+            size="xl"
+            status={isOwner ? 'online' : undefined}
           />
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-4 px-6 pb-6 pt-16">
+        <div className="flex items-start justify-between gap-4">
           <div>
             <h1 className="text-xl font-bold text-text">{profile.displayName}</h1>
             <p className="text-sm text-muted">@{profile.username}</p>
           </div>
+          {isOwner && (
+            <Button variant="secondary" size="sm" onClick={onEditClick}>
+              Edit Profile
+            </Button>
+          )}
         </div>
-        {isOwner && (
-          <Button variant="secondary" size="sm" onClick={onEditClick}>
-            Edit Profile
-          </Button>
+
+        {/* Stats row */}
+        <div className="flex items-center gap-5 text-sm text-muted">
+          <span className="flex items-center gap-1.5">
+            <FileText className="h-4 w-4" aria-hidden="true" />
+            <span className="font-semibold text-text">{postCount}</span> posts
+          </span>
+          {profile.region && (
+            <span className="flex items-center gap-1.5">
+              <Globe className="h-4 w-4" aria-hidden="true" />
+              {profile.region}
+            </span>
+          )}
+          <span className="flex items-center gap-1.5">
+            <Calendar className="h-4 w-4" aria-hidden="true" />
+            Joined {formatJoinDate(profile.createdAt)}
+          </span>
+        </div>
+
+        {profile.bio && (
+          <p className="text-sm text-text leading-relaxed">{profile.bio}</p>
+        )}
+
+        {profile.platforms.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {profile.platforms.map((platform) => (
+              <Badge key={platform} variant="tag">{platform}</Badge>
+            ))}
+          </div>
+        )}
+
+        {Object.entries(profile.externalLinks).length > 0 && (
+          <div className="flex flex-wrap gap-4 border-t border-border pt-4">
+            {Object.entries(profile.externalLinks).map(([key, value]) => (
+              <a
+                key={key}
+                href={value}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 text-sm text-primary hover:underline"
+              >
+                <LinkIcon className="h-3.5 w-3.5" aria-hidden="true" />
+                {key}
+              </a>
+            ))}
+          </div>
         )}
       </div>
-
-      {profile.bio && (
-        <p className="text-sm text-text leading-relaxed">{profile.bio}</p>
-      )}
-
-      {profile.region && (
-        <div className="flex items-center gap-1.5 text-sm text-muted">
-          <Globe className="h-4 w-4" aria-hidden="true" />
-          <span>{profile.region}</span>
-        </div>
-      )}
-
-      {profile.platforms.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {profile.platforms.map((platform) => (
-            <Badge key={platform} variant="tag">{platform}</Badge>
-          ))}
-        </div>
-      )}
-
-      {Object.entries(profile.externalLinks).length > 0 && (
-        <div className="flex flex-col gap-1">
-          {Object.entries(profile.externalLinks).map(([key, value]) => (
-            <a
-              key={key}
-              href={value}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-primary hover:underline"
-            >
-              {key}
-            </a>
-          ))}
-        </div>
-      )}
     </div>
   )
 }
