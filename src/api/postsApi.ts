@@ -43,3 +43,34 @@ export async function getFeed(): Promise<PostFeedItem[]> {
   }
   return response.json()
 }
+
+export async function updatePost(
+  token: string,
+  postId: string,
+  data: { textContent: string; mood?: string | null }
+): Promise<PostFeedItem> {
+  const response = await fetch(`${API_BASE_URL}/api/posts/${postId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  })
+  if (!response.ok) {
+    const message = await parseErrorMessage(response, 'Failed to update post.')
+    throw new ApiError(response.status, message)
+  }
+  return response.json()
+}
+
+export async function deletePost(token: string, postId: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/posts/${postId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (!response.ok) {
+    const message = await parseErrorMessage(response, 'Failed to delete post.')
+    throw new ApiError(response.status, message)
+  }
+}

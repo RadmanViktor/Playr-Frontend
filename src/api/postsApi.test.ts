@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { createPost, getFeed } from './postsApi'
+import { createPost, getFeed, updatePost, deletePost } from './postsApi'
 import { ApiError } from './http'
 
 const mockFetch = vi.fn()
@@ -36,5 +36,44 @@ describe('getFeed', () => {
     const feed = await getFeed()
     expect(feed).toHaveLength(1)
     expect(feed[0].authorUsername).toBe('player')
+  })
+})
+
+describe('updatePost', () => {
+  it('sends PUT with bearer token and returns updated post', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ ...samplePost, textContent: 'Edited!' }) })
+    const result = await updatePost('tok', 'p1', { textContent: 'Edited!', mood: 'Completed' })
+    expect(result.textContent).toBe('Edited!')
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/api/posts/p1'),
+      expect.objectContaining({
+        method: 'PUT',
+        headers: expect.objectContaining({ Authorization: 'Bearer tok' }),
+      })
+    )
+  })
+
+  it('throws ApiError on 403', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 403, json: async () => ({ error: 'You are not allowed to edit this post.' }) })
+    await expect(updatePost('tok', 'p1', { textContent: 'x' })).rejects.toBeInstanceOf(ApiError)
+  })
+})
+
+describe('deletePost', () => {
+  it('sends DELETE with bearer token', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: true, status: 204, json: async () => ({}) })
+    await deletePost('tok', 'p1')
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/api/posts/p1'),
+      expect.objectContaining({
+        method: 'DELETE',
+        headers: expect.objectContaining({ Authorization: 'Bearer tok' }),
+      })
+    )
+  })
+
+  it('throws ApiError on 403', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: false, status: 403, json: async () => ({ error: 'You are not allowed to delete this post.' }) })
+    await expect(deletePost('tok', 'p1')).rejects.toBeInstanceOf(ApiError)
   })
 })
