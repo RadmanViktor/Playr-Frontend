@@ -62,7 +62,7 @@ describe('ProtectedRoute', () => {
 
     renderWithRoute('/')
 
-    expect(screen.getByText('loading_')).toBeInTheDocument()
+    expect(screen.getByText('Loading…')).toBeInTheDocument()
 
     resolveGetMe!({
       id: '1',

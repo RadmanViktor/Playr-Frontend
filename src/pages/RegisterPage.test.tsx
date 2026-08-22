@@ -36,7 +36,7 @@ describe('RegisterPage', () => {
     await user.click(screen.getByRole('button', { name: /register/i }))
 
     await waitFor(() =>
-      expect(screen.getByText(/ERROR: Username already taken\./i)).toBeInTheDocument()
+      expect(screen.getByText(/Username already taken\./i)).toBeInTheDocument()
     )
   })
 
@@ -87,12 +87,12 @@ describe('RegisterPage', () => {
     await user.type(screen.getByLabelText(/password/i), 'short')
     await user.click(screen.getByRole('button', { name: /register/i }))
 
-    expect(await screen.findByText(/ERROR: enter a valid email address/i)).toBeInTheDocument()
+    expect(await screen.findByText(/enter a valid email address/i)).toBeInTheDocument()
     expect(
-      screen.getByText(/ERROR: username must be between 3 and 32 characters/i)
+      screen.getByText(/username must be between 3 and 32 characters/i)
     ).toBeInTheDocument()
     expect(
-      screen.getByText(/ERROR: password must be at least 8 characters/i)
+      screen.getByText(/password must be at least 8 characters/i)
     ).toBeInTheDocument()
     expect(registerSpy).not.toHaveBeenCalled()
   })

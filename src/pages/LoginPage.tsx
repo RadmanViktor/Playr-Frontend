@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { TerminalFrame } from '../components/TerminalFrame'
+import { AuthPanel } from '../components/AuthPanel'
+import { Button } from '../components/ui/Button'
 import { useAuth } from '../context/AuthContext'
 import { ApiError } from '../api/authApi'
 
@@ -9,6 +10,9 @@ interface FieldErrors {
   usernameOrEmail?: string
   password?: string
 }
+
+const inputClass =
+  'rounded-lg border border-border bg-surface-raised px-3 py-2 text-text outline-none focus:border-primary'
 
 export default function LoginPage() {
   const { login } = useAuth()
@@ -53,52 +57,47 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#0a0e14] px-4">
-      <TerminalFrame title="playr_auth --login">
-        <h1 className="mb-6 text-lg">Welcome to Playr_</h1>
+    <div className="flex min-h-screen items-center justify-center bg-bg px-4">
+      <AuthPanel title="Log in to PLAYR">
         <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
-          <label className="flex flex-col gap-1 text-sm">
-            username or email
+          <label className="flex flex-col gap-1 text-sm text-muted">
+            Username or email
             <input
               id="usernameOrEmail"
               aria-label="username or email"
-              className="border-b border-[#39ff14] bg-transparent px-1 py-1 text-[#39ff14] outline-none focus:shadow-[0_0_8px_#39ff14]"
+              className={inputClass}
               value={usernameOrEmail}
               onChange={(e) => setUsernameOrEmail(e.target.value)}
             />
             {fieldErrors.usernameOrEmail && (
-              <span className="text-orange-400">{`ERROR: ${fieldErrors.usernameOrEmail}`}</span>
+              <span className="text-frustrated">{fieldErrors.usernameOrEmail}</span>
             )}
           </label>
-          <label className="flex flex-col gap-1 text-sm">
-            password
+          <label className="flex flex-col gap-1 text-sm text-muted">
+            Password
             <input
               id="password"
               aria-label="password"
               type="password"
-              className="border-b border-[#39ff14] bg-transparent px-1 py-1 text-[#39ff14] outline-none focus:shadow-[0_0_8px_#39ff14]"
+              className={inputClass}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
             {fieldErrors.password && (
-              <span className="text-orange-400">{`ERROR: ${fieldErrors.password}`}</span>
+              <span className="text-frustrated">{fieldErrors.password}</span>
             )}
           </label>
-          {generalError && <p className="text-orange-400">{`ERROR: ${generalError}`}</p>}
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="mt-2 border border-[#39ff14] px-4 py-2 uppercase tracking-wide hover:shadow-[0_0_8px_#39ff14] disabled:opacity-50"
-          >
-            [ Log In ]
-          </button>
+          {generalError && <p className="text-frustrated">{generalError}</p>}
+          <Button type="submit" disabled={isSubmitting} className="mt-2 w-full">
+            Log In
+          </Button>
         </form>
-        <p className="mt-6 text-sm">
-          <Link to="/register" className="underline">
-            {'> register instead'}
+        <p className="mt-6 text-sm text-muted">
+          <Link to="/register" className="text-primary hover:underline">
+            Register instead
           </Link>
         </p>
-      </TerminalFrame>
+      </AuthPanel>
     </div>
   )
 }
