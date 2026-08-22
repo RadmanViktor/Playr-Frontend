@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
 import { Avatar } from './ui/Avatar'
 import { Badge } from './ui/Badge'
 import { Button } from './ui/Button'
@@ -123,11 +124,13 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardPr
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Avatar src={post.authorAvatarUrl ?? undefined} alt={post.authorDisplayName} />
-          <div>
+          <Link to={`/profile/${post.authorUsername}`} className="shrink-0">
+            <Avatar src={post.authorAvatarUrl ?? undefined} alt={post.authorDisplayName} />
+          </Link>
+          <Link to={`/profile/${post.authorUsername}`} className="hover:underline">
             <p className="text-sm font-semibold text-text">{post.authorDisplayName}</p>
             <p className="text-xs text-muted">@{post.authorUsername}</p>
-          </div>
+          </Link>
         </div>
         <div className="flex items-center gap-2">
           {state === 'read' && badge && <Badge variant={badge.variant}>{badge.label}</Badge>}
