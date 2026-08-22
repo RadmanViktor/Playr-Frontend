@@ -7,6 +7,7 @@ import FindPlayersPage from './pages/FindPlayersPage'
 import ThreadsPage from './pages/ThreadsPage'
 import ProfilePage from './pages/ProfilePage'
 import CreatePostPage from './pages/CreatePostPage'
+import SettingsPage from './pages/SettingsPage'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { AppShell } from './components/layout/AppShell'
 
@@ -34,6 +35,7 @@ function App() {
         <Route path="/find-players" element={<FindPlayersPage />} />
         <Route path="/threads" element={<ThreadsPage />} />
         <Route path="/create-post" element={<CreatePostPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
       </Route>
     </Routes>
   )
