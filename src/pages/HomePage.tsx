@@ -8,14 +8,14 @@ import { useAuth } from '../context/AuthContext'
 
 export default function HomePage() {
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user, token } = useAuth()
   const [posts, setPosts] = useState<PostFeedItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!user) return
-    getProfilePosts(user.username)
+    getProfilePosts(user.username, token)
       .then(setPosts)
       .catch(() => setError('Failed to load your posts.'))
       .finally(() => setIsLoading(false))

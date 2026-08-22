@@ -38,8 +38,10 @@ export async function getProfile(username: string): Promise<ProfileData> {
   return response.json()
 }
 
-export async function getProfilePosts(username: string): Promise<PostFeedItem[]> {
-  const response = await fetch(`${API_BASE_URL}/api/profiles/${username}/posts`)
+export async function getProfilePosts(username: string, token?: string | null): Promise<PostFeedItem[]> {
+  const response = await fetch(`${API_BASE_URL}/api/profiles/${username}/posts`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+  })
   if (!response.ok) {
     const message = await parseErrorMessage(response, 'Failed to load posts.')
     throw new ApiError(response.status, message)

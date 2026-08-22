@@ -4,8 +4,8 @@ import { Avatar } from './ui/Avatar'
 import { Badge } from './ui/Badge'
 import { Button } from './ui/Button'
 import { IconButton } from './ui/IconButton'
-import { MoreHorizontal } from 'lucide-react'
-import { updatePost, deletePost } from '../api/postsApi'
+import { MoreHorizontal, Heart } from 'lucide-react'
+import { updatePost, deletePost, toggleLike } from '../api/postsApi'
 import { ApiError } from '../api/http'
 import type { PostFeedItem } from '../api/postsApi'
 import type { ComponentProps } from 'react'
@@ -65,6 +65,9 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardPr
   const [actionError, setActionError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [likesCount, setLikesCount] = useState(post.likesCount)
+  const [liked, setLiked] = useState(post.likedByCurrentUser)
+  const [isLiking, setIsLiking] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
   const isOwner = currentUserId != null && currentUserId === post.authorId
@@ -117,6 +120,25 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardPr
     setEditMood(apiMoodToOption(post.mood))
     setActionError(null)
     setState('editing')
+  }
+
+  async function handleToggleLike() {
+    if (currentUserId == null || isLiking) return
+    setIsLiking(true)
+    const previousLiked = liked
+    const previousCount = likesCount
+    setLiked(!previousLiked)
+    setLikesCount(previousLiked ? previousCount - 1 : previousCount + 1)
+    try {
+      const result = await toggleLike(localStorage.getItem('playr_token') ?? '', post.id)
+      setLiked(result.liked)
+      setLikesCount(result.likesCount)
+    } catch {
+      setLiked(previousLiked)
+      setLikesCount(previousCount)
+    } finally {
+      setIsLiking(false)
+    }
   }
 
   return (
@@ -233,8 +255,22 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardPr
         <p className="text-sm text-text leading-relaxed">{post.textContent}</p>
       )}
 
-      {/* Timestamp (always shown) */}
-      <p className="text-xs text-muted">{formatRelativeTime(post.createdAt)}</p>
+      {/* Timestamp + likes */}
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-muted">{formatRelativeTime(post.createdAt)}</p>
+        <button
+          onClick={handleToggleLike}
+          disabled={currentUserId == null}
+          aria-label={liked ? 'Unlike post' : 'Like post'}
+          aria-pressed={liked}
+          className={`flex items-center gap-1.5 text-xs font-medium transition-colors disabled:cursor-default ${
+            liked ? 'text-frustrated' : 'text-muted hover:text-frustrated'
+          }`}
+        >
+          <Heart className="h-4 w-4" fill={liked ? 'currentColor' : 'none'} aria-hidden="true" />
+          {likesCount > 0 && likesCount}
+        </button>
+      </div>
     </div>
   )
 }
