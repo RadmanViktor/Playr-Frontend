@@ -33,8 +33,14 @@ export function ProfileHeader({ profile, isOwner, onEditClick, postCount = 0 }: 
       <div className="flex flex-col gap-4 px-6 pb-6 pt-16">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-xl font-bold text-text">{profile.displayName}</h1>
-            <p className="text-sm text-muted">@{profile.username}</p>
+            <h1 className="text-xl font-bold text-text">
+              {profile.displayName.toLowerCase() === profile.username.toLowerCase()
+                ? `@${profile.username}`
+                : profile.displayName}
+            </h1>
+            {profile.displayName.toLowerCase() !== profile.username.toLowerCase() && (
+              <p className="text-sm text-muted">@{profile.username}</p>
+            )}
           </div>
           {isOwner && (
             <Button variant="secondary" size="sm" onClick={onEditClick}>
