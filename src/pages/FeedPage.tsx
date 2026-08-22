@@ -39,9 +39,8 @@ export default function FeedPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-text">Feed</h1>
-        {gamesInFeed.length > 0 && (
+      {gamesInFeed.length > 0 && (
+        <div className="flex items-center justify-end">
           <select
             aria-label="Filter by game"
             value={selectedGameId}
@@ -53,8 +52,8 @@ export default function FeedPage() {
               <option key={g.id} value={g.id}>{g.name}</option>
             ))}
           </select>
-        )}
-      </div>
+        </div>
+      )}
 
       {isLoading && <p className="text-muted">Loading…</p>}
       {error && <p className="text-frustrated">{error}</p>}
