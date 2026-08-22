@@ -128,8 +128,14 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardPr
             <Avatar src={post.authorAvatarUrl ?? undefined} alt={post.authorDisplayName} />
           </Link>
           <Link to={`/profile/${post.authorUsername}`} className="hover:underline">
-            <p className="text-sm font-semibold text-text">{post.authorDisplayName}</p>
-            <p className="text-xs text-muted">@{post.authorUsername}</p>
+            <p className="text-sm font-semibold text-text">
+              {post.authorDisplayName.toLowerCase() === post.authorUsername.toLowerCase()
+                ? `@${post.authorUsername}`
+                : post.authorDisplayName}
+            </p>
+            {post.authorDisplayName.toLowerCase() !== post.authorUsername.toLowerCase() && (
+              <p className="text-xs text-muted">@{post.authorUsername}</p>
+            )}
           </Link>
         </div>
         <div className="flex items-center gap-2">
