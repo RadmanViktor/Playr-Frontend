@@ -1,5 +1,5 @@
 import { Globe, Link as LinkIcon, FileText, Calendar } from 'lucide-react'
-import { Avatar } from './ui/Avatar'
+import { Avatar, type AvatarStatus } from './ui/Avatar'
 import { Badge } from './ui/Badge'
 import { Button } from './ui/Button'
 import type { ProfileData } from '../api/profilesApi'
@@ -9,6 +9,13 @@ interface ProfileHeaderProps {
   isOwner: boolean
   onEditClick: () => void
   postCount?: number
+}
+
+const statusAvatarMap: Record<ProfileData['status'], AvatarStatus> = {
+  Online: 'online',
+  LookingForGame: 'looking-for-game',
+  Busy: 'busy',
+  Offline: 'offline',
 }
 
 function formatJoinDate(createdAt: string): string {
@@ -25,7 +32,7 @@ export function ProfileHeader({ profile, isOwner, onEditClick, postCount = 0 }: 
             src={profile.avatarUrl ?? undefined}
             alt={profile.displayName}
             size="xl"
-            status={isOwner ? 'online' : undefined}
+            status={statusAvatarMap[profile.status]}
           />
         </div>
       </div>

@@ -88,7 +88,7 @@ export default function CreatePostPage() {
                 type="button"
                 aria-pressed={selectedMood === mood}
                 onClick={() => setSelectedMood(mood)}
-                className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                className={`rounded-full px-3 py-1 text-xs font-medium transition-colors cursor-pointer ${
                   selectedMood === mood
                     ? 'bg-primary text-white'
                     : 'bg-surface-raised text-muted hover:text-text'

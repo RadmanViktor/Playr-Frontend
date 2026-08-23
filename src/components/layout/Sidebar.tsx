@@ -1,8 +1,12 @@
+import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { Home, Rss, Users, MessageSquare, Plus } from 'lucide-react'
 import { Button } from '../ui/Button'
-import { Avatar } from '../ui/Avatar'
+import { Avatar, type AvatarStatus } from '../ui/Avatar'
+import { StatusModal } from '../ui/StatusModal'
 import { useAuth } from '../../context/AuthContext'
+import { useStatus } from '../../context/StatusContext'
+import type { ProfileStatus } from '../../api/profilesApi'
 
 const navItems = [
   { to: '/', label: 'Home', icon: Home, end: true },
@@ -11,15 +15,56 @@ const navItems = [
   { to: '/threads', label: 'Threads', icon: MessageSquare, end: false },
 ]
 
+const statusAvatarMap: Record<ProfileStatus, AvatarStatus> = {
+  Online: 'online',
+  LookingForGame: 'looking-for-game',
+  Busy: 'busy',
+  Offline: 'offline',
+}
+
+const statusLabelMap: Record<ProfileStatus, string> = {
+  Online: 'Online',
+  LookingForGame: 'Looking for game',
+  Busy: 'Busy',
+  Offline: 'Offline',
+}
+
+const statusTextColorMap: Record<ProfileStatus, string> = {
+  Online: 'text-enjoying',
+  LookingForGame: 'text-need-help',
+  Busy: 'text-frustrated',
+  Offline: 'text-muted',
+}
+
 export function Sidebar() {
   const { user } = useAuth()
+  const { status, lookingForGameName } = useStatus()
   const navigate = useNavigate()
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false)
 
   return (
     <aside className="flex w-64 shrink-0 flex-col gap-6 border-r border-border bg-surface p-4">
       <div className="flex items-center gap-2 px-2">
         <span className="text-2xl font-bold tracking-tight text-primary">PLAYR</span>
       </div>
+
+      {user && (
+        <button
+          type="button"
+          onClick={() => setIsStatusModalOpen(true)}
+          className="flex items-center gap-3 rounded-xl border border-border bg-surface-raised p-3 text-left transition-colors hover:bg-border cursor-pointer"
+        >
+          <Avatar alt={user.displayName ?? user.username} status={statusAvatarMap[status]} />
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold text-text">{user.username}</p>
+            <p className={`truncate text-xs ${statusTextColorMap[status]}`}>
+              {status === 'LookingForGame' && lookingForGameName
+                ? `Looking for ${lookingForGameName}`
+                : statusLabelMap[status]}
+            </p>
+          </div>
+        </button>
+      )}
 
       <nav className="flex flex-col gap-1">
         {navItems.map(({ to, label, icon: Icon, end }) => (
@@ -46,16 +91,6 @@ export function Sidebar() {
         Create Post
       </Button>
 
-      {user && (
-        <div className="flex items-center gap-3 rounded-xl border border-border bg-surface-raised p-3">
-          <Avatar alt={user.displayName ?? user.username} status="online" />
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-text">{user.username}</p>
-            <p className="text-xs text-enjoying">Online</p>
-          </div>
-        </div>
-      )}
-
       <div className="rounded-xl border border-border bg-surface-raised p-4">
         <p className="text-sm font-semibold text-text">Level up your connections.</p>
         <p className="mt-1 text-xs text-muted">
@@ -66,6 +101,8 @@ export function Sidebar() {
       <Button variant="secondary" className="w-full">
         Find Players
       </Button>
+
+      {isStatusModalOpen && <StatusModal onClose={() => setIsStatusModalOpen(false)} />}
     </aside>
   )
 }

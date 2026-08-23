@@ -8,7 +8,7 @@ const profile: ProfileData = {
   userId: 'u1', username: 'nexusnova', displayName: 'NexusNova', bio: 'Gaming is life',
   avatarUrl: null, region: 'EU', languages: ['English', 'Swedish'],
   platforms: ['PC', 'PlayStation'], externalLinks: { Steam: 'https://steamcommunity.com/id/nexusnova' },
-  currentlyPlayingGames: [], lookingForPlayers: false,
+  currentlyPlayingGames: [], status: 'Online' as const, lookingForGameId: null, lookingForGameName: null, lookingForPlayStyle: null,
   createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
 }
 

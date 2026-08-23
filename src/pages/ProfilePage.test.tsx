@@ -14,7 +14,7 @@ vi.mock('../context/AuthContext', () => ({
 const profile: profilesApi.ProfileData = {
   userId: 'u1', username: 'player', displayName: 'Player One', bio: 'My bio',
   avatarUrl: null, region: 'EU', languages: [], platforms: ['PC'],
-  externalLinks: {}, currentlyPlayingGames: [], lookingForPlayers: false,
+  externalLinks: {}, currentlyPlayingGames: [], status: 'Online' as const, lookingForGameId: null, lookingForGameName: null, lookingForPlayStyle: null,
   createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
 }
 

@@ -1,6 +1,9 @@
 import { API_BASE_URL, ApiError, parseErrorMessage } from './http'
 import type { PostFeedItem } from './postsApi'
 
+export type ProfileStatus = 'Online' | 'LookingForGame' | 'Busy' | 'Offline'
+export type PlayStyle = 'Competitive' | 'Chill'
+
 export interface ProfileData {
   userId: string
   username: string
@@ -12,7 +15,10 @@ export interface ProfileData {
   platforms: string[]
   externalLinks: Record<string, string>
   currentlyPlayingGames: string[]
-  lookingForPlayers: boolean
+  status: ProfileStatus
+  lookingForGameId: string | null
+  lookingForGameName: string | null
+  lookingForPlayStyle: PlayStyle | null
   createdAt: string
   updatedAt: string
 }
@@ -26,7 +32,12 @@ export interface UpdateProfileData {
   platforms: string[]
   externalLinks: Record<string, string>
   currentlyPlayingGames: string[]
-  lookingForPlayers: boolean
+}
+
+export interface UpdateStatusData {
+  status: ProfileStatus
+  lookingForGameId?: string | null
+  lookingForPlayStyle?: PlayStyle | null
 }
 
 export async function getProfile(username: string): Promise<ProfileData> {
@@ -60,6 +71,22 @@ export async function updateProfile(token: string, data: UpdateProfileData): Pro
   })
   if (!response.ok) {
     const message = await parseErrorMessage(response, 'Failed to update profile.')
+    throw new ApiError(response.status, message)
+  }
+  return response.json()
+}
+
+export async function updateProfileStatus(token: string, data: UpdateStatusData): Promise<ProfileData> {
+  const response = await fetch(`${API_BASE_URL}/api/profiles/me/status`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  })
+  if (!response.ok) {
+    const message = await parseErrorMessage(response, 'Failed to update status.')
     throw new ApiError(response.status, message)
   }
   return response.json()

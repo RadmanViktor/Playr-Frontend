@@ -4,11 +4,20 @@ import { Bell, Mail } from 'lucide-react'
 import { IconButton } from '../ui/IconButton'
 import { Avatar } from '../ui/Avatar'
 import { useAuth } from '../../context/AuthContext'
+import { useStatus } from '../../context/StatusContext'
 import { searchProfiles, type ProfileSearchResult } from '../../api/profilesApi'
 import { Search } from 'lucide-react'
 
+const statusAvatarMap = {
+  Online: 'online',
+  LookingForGame: 'looking-for-game',
+  Busy: 'busy',
+  Offline: 'offline',
+} as const
+
 export function TopBar() {
   const { user } = useAuth()
+  const { status } = useStatus()
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<ProfileSearchResult[]>([])
@@ -79,7 +88,7 @@ export function TopBar() {
                 <button
                   key={r.userId}
                   onClick={() => handleSelect(r.username)}
-                  className="flex w-full items-center gap-3 px-4 py-2.5 text-left hover:bg-surface-raised transition-colors"
+                  className="flex w-full items-center gap-3 px-4 py-2.5 text-left hover:bg-surface-raised transition-colors cursor-pointer"
                 >
                   <Avatar src={r.avatarUrl ?? undefined} alt={r.displayName} size="sm" />
                   <div>
@@ -103,10 +112,10 @@ export function TopBar() {
         {user && (
           <button
             onClick={() => navigate(`/profile/${user.username}`)}
-            className="rounded-full focus:outline-none focus:ring-2 focus:ring-primary"
+            className="rounded-full focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
             aria-label="My profile"
           >
-            <Avatar alt={user.displayName ?? user.username} status="online" />
+            <Avatar alt={user.displayName ?? user.username} status={statusAvatarMap[status]} />
           </button>
         )}
       </div>

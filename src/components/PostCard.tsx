@@ -173,13 +173,13 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardPr
               {state === 'menu-open' && (
                 <div className="absolute right-0 top-10 z-10 min-w-[120px] rounded-lg border border-border bg-surface-raised shadow-lg">
                   <button
-                    className="w-full px-4 py-2 text-left text-sm text-text hover:bg-border rounded-t-lg"
+                    className="w-full px-4 py-2 text-left text-sm text-text hover:bg-border rounded-t-lg cursor-pointer"
                     onClick={openEdit}
                   >
                     Edit
                   </button>
                   <button
-                    className="w-full px-4 py-2 text-left text-sm text-frustrated hover:bg-border rounded-b-lg"
+                    className="w-full px-4 py-2 text-left text-sm text-frustrated hover:bg-border rounded-b-lg cursor-pointer"
                     onClick={() => { setActionError(null); setState('confirming-delete') }}
                   >
                     Delete
@@ -205,7 +205,7 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardPr
                 type="button"
                 aria-pressed={editMood === mood}
                 onClick={() => setEditMood(mood)}
-                className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                className={`rounded-full px-3 py-1 text-xs font-medium transition-colors cursor-pointer ${
                   editMood === mood ? 'bg-primary text-white' : 'bg-surface-raised text-muted hover:text-text'
                 }`}
               >
@@ -263,7 +263,7 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardPr
           disabled={currentUserId == null}
           aria-label={liked ? 'Unlike post' : 'Like post'}
           aria-pressed={liked}
-          className={`flex items-center gap-1.5 text-xs font-medium transition-colors disabled:cursor-default ${
+          className={`flex items-center gap-1.5 text-xs font-medium transition-colors cursor-pointer disabled:cursor-default ${
             liked ? 'text-frustrated' : 'text-muted hover:text-frustrated'
           }`}
         >

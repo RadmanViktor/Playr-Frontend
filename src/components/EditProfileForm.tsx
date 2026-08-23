@@ -63,7 +63,6 @@ export function EditProfileForm({ profile, token, onSave, onCancel }: EditProfil
         platforms,
         externalLinks,
         currentlyPlayingGames: profile.currentlyPlayingGames,
-        lookingForPlayers: profile.lookingForPlayers,
       })
       onSave(updated)
     } catch (err) {
@@ -114,7 +113,7 @@ export function EditProfileForm({ profile, token, onSave, onCancel }: EditProfil
               type="button"
               aria-pressed={platforms.includes(platform)}
               onClick={() => togglePlatform(platform)}
-              className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+              className={`rounded-full px-3 py-1 text-xs font-medium transition-colors cursor-pointer ${
                 platforms.includes(platform) ? 'bg-primary text-white' : 'bg-surface-raised text-muted hover:text-text'
               }`}
             >

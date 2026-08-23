@@ -8,7 +8,7 @@ interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 export function IconButton({ children, className = '', ...props }: IconButtonProps) {
   return (
     <button
-      className={`flex h-9 w-9 items-center justify-center rounded-lg text-muted transition-colors hover:bg-surface-raised hover:text-text ${className}`}
+      className={`flex h-9 w-9 items-center justify-center rounded-lg text-muted transition-colors cursor-pointer hover:bg-surface-raised hover:text-text ${className}`}
       {...props}
     >
       {children}

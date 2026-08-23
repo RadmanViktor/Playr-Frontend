@@ -11,7 +11,7 @@ const profile: ProfileData = {
   userId: 'u1', username: 'player', displayName: 'Player One', bio: 'Hello',
   avatarUrl: null, region: 'EU', languages: ['English'], platforms: ['PC'],
   externalLinks: { Steam: 'https://steam.com' }, currentlyPlayingGames: [],
-  lookingForPlayers: false, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+  status: 'Online' as const, lookingForGameId: null, lookingForGameName: null, lookingForPlayStyle: null, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
 }
 
 const updated: ProfileData = { ...profile, displayName: 'Updated Name' }

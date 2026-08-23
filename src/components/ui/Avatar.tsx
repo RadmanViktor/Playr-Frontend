@@ -1,11 +1,11 @@
 type Size = 'sm' | 'md' | 'lg' | 'xl'
-type Status = 'online' | 'in-game' | 'offline'
+export type AvatarStatus = 'online' | 'looking-for-game' | 'busy' | 'offline'
 
 interface AvatarProps {
   src?: string
   alt: string
   size?: Size
-  status?: Status
+  status?: AvatarStatus
 }
 
 const sizeClasses: Record<Size, string> = {
@@ -15,9 +15,10 @@ const sizeClasses: Record<Size, string> = {
   xl: 'h-24 w-24 text-3xl',
 }
 
-const statusColor: Record<Status, string> = {
+const statusColor: Record<AvatarStatus, string> = {
   online: 'bg-enjoying',
-  'in-game': 'bg-need-help',
+  'looking-for-game': 'bg-need-help',
+  busy: 'bg-frustrated',
   offline: 'bg-muted',
 }
 

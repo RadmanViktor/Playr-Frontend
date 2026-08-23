@@ -10,6 +10,17 @@ vi.mock('../../context/AuthContext', () => ({
   }),
 }))
 
+vi.mock('../../context/StatusContext', () => ({
+  useStatus: () => ({
+    status: 'Online',
+    lookingForGameId: null,
+    lookingForGameName: null,
+    lookingForPlayStyle: null,
+    isLoading: false,
+    updateStatus: vi.fn(),
+  }),
+}))
+
 function renderSidebar() {
   return render(
     <MemoryRouter>
