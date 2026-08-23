@@ -1,0 +1,112 @@
+import { useState } from 'react'
+import { X } from 'lucide-react'
+import { Button } from './Button'
+import { Avatar } from './Avatar'
+import { useAuth } from '../../context/AuthContext'
+import { sendInvitation } from '../../api/invitationsApi'
+import { ApiError } from '../../api/http'
+
+const MAX_MESSAGE_LENGTH = 500
+
+interface InviteModalProps {
+  recipientUserId: string
+  recipientDisplayName: string
+  recipientAvatarUrl?: string | null
+  onClose: () => void
+  onSent: () => void
+}
+
+export function InviteModal({
+  recipientUserId,
+  recipientDisplayName,
+  recipientAvatarUrl,
+  onClose,
+  onSent,
+}: InviteModalProps) {
+  const { token } = useAuth()
+  const [message, setMessage] = useState('')
+  const [isSending, setIsSending] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function handleSend() {
+    setError(null)
+    const trimmed = message.trim()
+    if (trimmed.length === 0) {
+      setError('Write a short presentation of yourself.')
+      return
+    }
+
+    if (!token) {
+      setError('You must be logged in to send invitations.')
+      return
+    }
+
+    setIsSending(true)
+    try {
+      await sendInvitation(token, recipientUserId, trimmed)
+      onSent()
+      onClose()
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Failed to send invitation. Please try again.')
+    } finally {
+      setIsSending(false)
+    }
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 cursor-pointer"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-md rounded-xl border border-border bg-surface p-5 cursor-default"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-text">Send invitation</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="rounded-lg p-1 text-muted hover:bg-surface-raised hover:text-text cursor-pointer"
+          >
+            <X className="h-5 w-5" aria-hidden="true" />
+          </button>
+        </div>
+
+        <div className="mb-4 flex items-center gap-3">
+          <Avatar src={recipientAvatarUrl ?? undefined} alt={recipientDisplayName} size="md" />
+          <p className="text-sm text-text">
+            Invite <span className="font-medium">{recipientDisplayName}</span> to play
+          </p>
+        </div>
+
+        <label htmlFor="invite-message" className="mb-1 block text-xs font-medium text-muted">
+          Presentation
+        </label>
+        <textarea
+          id="invite-message"
+          value={message}
+          onChange={(event) => setMessage(event.target.value.slice(0, MAX_MESSAGE_LENGTH))}
+          placeholder="Say hi and tell them why you'd like to play together..."
+          rows={4}
+          className="w-full resize-none rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm text-text outline-none placeholder:text-muted focus:border-primary"
+        />
+        <p className="mt-1 text-right text-xs text-muted">
+          {message.length}/{MAX_MESSAGE_LENGTH}
+        </p>
+
+        {error && <p className="mt-2 text-sm text-frustrated">{error}</p>}
+
+        <div className="mt-4 flex justify-end gap-2">
+          <Button variant="secondary" onClick={onClose} disabled={isSending}>
+            Cancel
+          </Button>
+          <Button onClick={handleSend} disabled={isSending}>
+            {isSending ? 'Sending...' : 'Send invitation'}
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}

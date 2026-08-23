@@ -107,3 +107,27 @@ export async function searchProfiles(query: string): Promise<ProfileSearchResult
   }
   return response.json()
 }
+
+export type RelationshipStatus = 'None' | 'InvitePending' | 'Friends'
+
+export interface LookingForGamePlayer {
+  userId: string
+  username: string
+  displayName: string
+  avatarUrl: string | null
+  lookingForGameId: string | null
+  lookingForGameName: string | null
+  lookingForPlayStyle: PlayStyle | null
+  relationshipStatus: RelationshipStatus
+}
+
+export async function getLookingForGamePlayers(token: string): Promise<LookingForGamePlayer[]> {
+  const response = await fetch(`${API_BASE_URL}/api/profiles/looking-for-game`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (!response.ok) {
+    const message = await parseErrorMessage(response, 'Failed to load players.')
+    throw new ApiError(response.status, message)
+  }
+  return response.json()
+}
