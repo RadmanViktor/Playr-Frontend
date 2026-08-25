@@ -5,13 +5,16 @@ import './index.css'
 import App from './App.tsx'
 import { AuthProvider } from './context/AuthContext.tsx'
 import { StatusProvider } from './context/StatusContext.tsx'
+import { ChatProvider } from './context/ChatContext.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
         <StatusProvider>
-          <App />
+          <ChatProvider>
+            <App />
+          </ChatProvider>
         </StatusProvider>
       </AuthProvider>
     </BrowserRouter>

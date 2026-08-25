@@ -15,8 +15,7 @@ import {
 } from '../../api/invitationsApi'
 import { ApiError } from '../../api/http'
 import { Search } from 'lucide-react'
-import { getOrCreateConversation, type Conversation } from '../../api/chatApi'
-import { ChatWindow } from '../ChatWindow'
+import { useChat } from '../../context/ChatContext'
 
 const statusAvatarMap = {
   Online: 'online',
@@ -28,6 +27,7 @@ const statusAvatarMap = {
 export function TopBar() {
   const { user, token } = useAuth()
   const { status } = useStatus()
+  const { openChatWithUser } = useChat()
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<ProfileSearchResult[]>([])
@@ -42,8 +42,6 @@ export function TopBar() {
   const [invitationsLoading, setInvitationsLoading] = useState(false)
   const [invitationsError, setInvitationsError] = useState<string | null>(null)
   const [respondingId, setRespondingId] = useState<string | null>(null)
-  const [activeConversation, setActiveConversation] = useState<Conversation | null>(null)
-  const [chatSuccessMessage, setChatSuccessMessage] = useState<string | null>(null)
   const invitationsRef = useRef<HTMLDivElement>(null)
   const incomingInvitationCount = invitations.length
 
@@ -126,9 +124,9 @@ export function TopBar() {
     try {
       const invitation = await acceptInvitation(token, invitationId)
       setInvitations((prev) => prev.filter((i) => i.id !== invitationId))
-      const conversation = await getOrCreateConversation(token, invitation.senderUserId)
-      setChatSuccessMessage(`You are now connected with ${invitation.senderDisplayName}. Happy gaming! :D`)
-      setActiveConversation(conversation)
+      await openChatWithUser(invitation.senderUserId, {
+        successMessage: `You are now connected with ${invitation.senderDisplayName}. Happy gaming! :D`,
+      })
       setIsInvitationsOpen(false)
     } catch (err) {
       setInvitationsError(err instanceof ApiError ? err.message : 'Failed to accept invitation.')
@@ -151,7 +149,6 @@ export function TopBar() {
   }
 
   return (
-    <>
     <header className="flex items-center gap-4 border-b border-border bg-surface px-6 py-3">
       <div className="relative w-full max-w-md" ref={containerRef}>
         <div className="flex items-center gap-2 rounded-lg border border-border bg-surface-raised px-3 py-2">
@@ -311,16 +308,5 @@ export function TopBar() {
         )}
       </div>
     </header>
-    {activeConversation && (
-      <ChatWindow
-        conversation={activeConversation}
-        successMessage={chatSuccessMessage}
-        onClose={() => {
-          setActiveConversation(null)
-          setChatSuccessMessage(null)
-        }}
-      />
-    )}
-    </>
   )
 }

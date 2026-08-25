@@ -3,19 +3,17 @@ import { useNavigate } from 'react-router-dom'
 import { Card } from '../components/ui/Card'
 import { Avatar } from '../components/ui/Avatar'
 import { Button } from '../components/ui/Button'
-import { ChatWindow } from '../components/ChatWindow'
 import { getFriends, type Friend } from '../api/friendsApi'
-import { getOrCreateConversation, type Conversation } from '../api/chatApi'
 import { useAuth } from '../context/AuthContext'
+import { useChat } from '../context/ChatContext'
 
 export default function FriendsPage() {
   const { token } = useAuth()
+  const { openChatWithUser, error: chatError } = useChat()
   const navigate = useNavigate()
   const [friends, setFriends] = useState<Friend[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [activeConversation, setActiveConversation] = useState<Conversation | null>(null)
-  const [chatError, setChatError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!token) return
@@ -28,14 +26,7 @@ export default function FriendsPage() {
   }, [token])
 
   async function handleOpenChat(friend: Friend) {
-    if (!token) return
-    setChatError(null)
-    try {
-      const conversation = await getOrCreateConversation(token, friend.userId)
-      setActiveConversation(conversation)
-    } catch {
-      setChatError('Failed to open chat.')
-    }
+    await openChatWithUser(friend.userId)
   }
 
   return (
@@ -73,10 +64,6 @@ export default function FriendsPage() {
           </div>
         </Card>
       ))}
-
-      {activeConversation && (
-        <ChatWindow conversation={activeConversation} onClose={() => setActiveConversation(null)} />
-      )}
     </div>
   )
 }

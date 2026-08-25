@@ -92,17 +92,6 @@ export function Sidebar() {
         Create Post
       </Button>
 
-      <div className="rounded-xl border border-border bg-surface-raised p-4">
-        <p className="text-sm font-semibold text-text">Level up your connections.</p>
-        <p className="mt-1 text-xs text-muted">
-          Find teammates, share wins, and build your squad.
-        </p>
-      </div>
-
-      <Button variant="secondary" className="w-full" onClick={() => navigate('/find-players')}>
-        Find Players
-      </Button>
-
       {isStatusModalOpen && <StatusModal onClose={() => setIsStatusModalOpen(false)} />}
     </aside>
   )

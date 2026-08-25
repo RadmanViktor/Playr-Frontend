@@ -60,10 +60,13 @@ export default function FindPlayersPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <Card>
-        <h1 className="mb-1 text-lg font-semibold text-text">Find Players</h1>
-        <p className="text-sm text-muted">Players currently looking for a game.</p>
-      </Card>
+      <div className="mb-2 border-l-4 border-primary pl-4">
+        <p className="mb-1 text-xs font-semibold uppercase tracking-[0.22em] text-primary">Discover your squad</p>
+        <h1 className="text-3xl font-bold tracking-tight text-text">Find Your Party</h1>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
+          Meet new friends, chase new adventures, and find players ready to squad up.
+        </p>
+      </div>
 
       {successMessage && (
         <div className="rounded-xl border border-enjoying/40 bg-enjoying/10 px-4 py-3 text-sm text-enjoying">
@@ -100,8 +103,21 @@ export default function FindPlayersPage() {
                 </div>
               </div>
 
-              <div className="shrink-0">
-                {player.relationshipStatus === 'Friends' && <Badge variant="completed">Friend</Badge>}
+              <div className="flex shrink-0 items-center gap-2">
+                {player.relationshipStatus === 'Friends' && (
+                  <>
+                    <Badge variant="completed">Friend</Badge>
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        setSuccessMessage(null)
+                        setInvitePlayer(player)
+                      }}
+                    >
+                      Invite
+                    </Button>
+                  </>
+                )}
                 {player.relationshipStatus === 'InvitePending' && <Badge variant="tag">Invited</Badge>}
                 {player.relationshipStatus === 'None' && (
                   <Button
