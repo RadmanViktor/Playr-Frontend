@@ -8,6 +8,7 @@ interface ProfileHeaderProps {
   profile: ProfileData
   isOwner: boolean
   onEditClick: () => void
+  onSignOutClick?: () => void
   postCount?: number
 }
 
@@ -22,7 +23,7 @@ function formatJoinDate(createdAt: string): string {
   return new Date(createdAt).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
 }
 
-export function ProfileHeader({ profile, isOwner, onEditClick, postCount = 0 }: ProfileHeaderProps) {
+export function ProfileHeader({ profile, isOwner, onEditClick, onSignOutClick, postCount = 0 }: ProfileHeaderProps) {
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-surface">
       {/* Gradient banner */}
@@ -50,9 +51,16 @@ export function ProfileHeader({ profile, isOwner, onEditClick, postCount = 0 }: 
             )}
           </div>
           {isOwner && (
-            <Button variant="secondary" size="sm" onClick={onEditClick}>
-              Edit Profile
-            </Button>
+            <div className="flex flex-col items-end gap-2">
+              <Button variant="secondary" size="sm" onClick={onEditClick}>
+                Edit Profile
+              </Button>
+              {onSignOutClick && (
+                <Button variant="ghost" size="sm" onClick={onSignOutClick}>
+                  Sign out
+                </Button>
+              )}
+            </div>
           )}
         </div>
 

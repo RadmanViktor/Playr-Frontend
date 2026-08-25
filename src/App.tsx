@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import HomePage from './pages/HomePage'
+import FriendsPage from './pages/FriendsPage'
 import FeedPage from './pages/FeedPage'
 import FindPlayersPage from './pages/FindPlayersPage'
 import ThreadsPage from './pages/ThreadsPage'
@@ -31,6 +32,7 @@ function App() {
         }
       >
         <Route index element={<HomePage />} />
+        <Route path="/friends" element={<FriendsPage />} />
         <Route path="/feed" element={<FeedPage />} />
         <Route path="/find-players" element={<FindPlayersPage />} />
         <Route path="/threads" element={<ThreadsPage />} />

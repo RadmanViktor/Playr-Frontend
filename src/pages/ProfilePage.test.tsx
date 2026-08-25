@@ -5,10 +5,17 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import ProfilePage from './ProfilePage'
 import * as profilesApi from '../api/profilesApi'
 
+const logoutMock = vi.fn()
+
 vi.mock('../api/profilesApi')
 vi.mock('../api/postsApi', () => ({ getFeed: vi.fn(), createPost: vi.fn(), updatePost: vi.fn(), deletePost: vi.fn(), getProfilePosts: vi.fn() }))
 vi.mock('../context/AuthContext', () => ({
-  useAuth: () => ({ user: { id: 'u1', username: 'player', displayName: 'Player', email: 'p@p.com' }, token: 'tok', isLoading: false }),
+  useAuth: () => ({
+    user: { id: 'u1', username: 'player', displayName: 'Player', email: 'p@p.com' },
+    token: 'tok',
+    isLoading: false,
+    logout: logoutMock,
+  }),
 }))
 
 const profile: profilesApi.ProfileData = {
@@ -19,6 +26,7 @@ const profile: profilesApi.ProfileData = {
 }
 
 beforeEach(async () => {
+  logoutMock.mockClear()
   vi.mocked(profilesApi.getProfile).mockResolvedValue(profile)
   vi.mocked(profilesApi.getProfilePosts).mockResolvedValue([])
 })
@@ -28,6 +36,8 @@ function renderProfile(username = 'player') {
     <MemoryRouter initialEntries={[`/profile/${username}`]}>
       <Routes>
         <Route path="/profile/:username" element={<ProfilePage />} />
+        <Route path="/settings" element={<p>Settings page</p>} />
+        <Route path="/login" element={<p>Login page</p>} />
       </Routes>
     </MemoryRouter>
   )
@@ -57,13 +67,20 @@ describe('ProfilePage', () => {
     await waitFor(() => expect(screen.getByText(/not found/i)).toBeInTheDocument())
   })
 
-  it('toggles edit form on Edit Profile click', async () => {
+  it('navigates to settings on Edit Profile click', async () => {
     const user = userEvent.setup()
     renderProfile()
     await waitFor(() => screen.getByRole('button', { name: /edit profile/i }))
     await user.click(screen.getByRole('button', { name: /edit profile/i }))
-    expect(screen.getByRole('button', { name: /save/i })).toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: /cancel/i }))
-    expect(screen.queryByRole('button', { name: /save/i })).not.toBeInTheDocument()
+    expect(screen.getByText('Settings page')).toBeInTheDocument()
+  })
+
+  it('logs out and navigates to login on Sign out click', async () => {
+    const user = userEvent.setup()
+    renderProfile()
+    await waitFor(() => screen.getByRole('button', { name: /sign out/i }))
+    await user.click(screen.getByRole('button', { name: /sign out/i }))
+    expect(logoutMock).toHaveBeenCalledOnce()
+    expect(screen.getByText('Login page')).toBeInTheDocument()
   })
 })

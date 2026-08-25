@@ -9,7 +9,7 @@ import { useAuth } from '../context/AuthContext'
 
 export default function ProfilePage() {
   const { username } = useParams<{ username: string }>()
-  const { user, token } = useAuth()
+  const { user, token, logout } = useAuth()
   const navigate = useNavigate()
 
   const [profile, setProfile] = useState<ProfileData | null>(null)
@@ -35,6 +35,11 @@ export default function ProfilePage() {
 
   const isOwner = !!user && !!profile && user.id === profile.userId
 
+  function handleSignOut() {
+    logout()
+    navigate('/login', { replace: true })
+  }
+
   if (isLoading) return <p className="text-muted">Loading…</p>
   if (notFound) return <p className="text-muted">Profile not found.</p>
   if (error) return <p className="text-frustrated">{error}</p>
@@ -46,6 +51,7 @@ export default function ProfilePage() {
         profile={profile}
         isOwner={isOwner}
         onEditClick={() => navigate('/settings')}
+        onSignOutClick={handleSignOut}
         postCount={posts.length}
       />
 

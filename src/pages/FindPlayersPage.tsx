@@ -13,6 +13,7 @@ export default function FindPlayersPage() {
   const [players, setPlayers] = useState<LookingForGamePlayer[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [invitePlayer, setInvitePlayer] = useState<LookingForGamePlayer | null>(null)
 
   const loadPlayers = useCallback(async () => {
@@ -34,9 +35,11 @@ export default function FindPlayersPage() {
   }, [loadPlayers])
 
   function handleInviteSent(userId: string) {
+    const player = players.find((p) => p.userId === userId)
     setPlayers((prev) =>
       prev.map((p) => (p.userId === userId ? { ...p, relationshipStatus: 'InvitePending' } : p)),
     )
+    setSuccessMessage(`Invitation sent${player ? ` to ${player.displayName}` : ''}.`)
   }
 
   if (isLoading) {
@@ -61,6 +64,12 @@ export default function FindPlayersPage() {
         <h1 className="mb-1 text-lg font-semibold text-text">Find Players</h1>
         <p className="text-sm text-muted">Players currently looking for a game.</p>
       </Card>
+
+      {successMessage && (
+        <div className="rounded-xl border border-enjoying/40 bg-enjoying/10 px-4 py-3 text-sm text-enjoying">
+          {successMessage}
+        </div>
+      )}
 
       {players.length === 0 ? (
         <Card>
@@ -95,7 +104,13 @@ export default function FindPlayersPage() {
                 {player.relationshipStatus === 'Friends' && <Badge variant="completed">Friend</Badge>}
                 {player.relationshipStatus === 'InvitePending' && <Badge variant="tag">Invited</Badge>}
                 {player.relationshipStatus === 'None' && (
-                  <Button size="sm" onClick={() => setInvitePlayer(player)}>
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setSuccessMessage(null)
+                      setInvitePlayer(player)
+                    }}
+                  >
                     Invite
                   </Button>
                 )}
@@ -114,6 +129,7 @@ export default function FindPlayersPage() {
           onSent={() => handleInviteSent(invitePlayer.userId)}
         />
       )}
+
     </div>
   )
 }

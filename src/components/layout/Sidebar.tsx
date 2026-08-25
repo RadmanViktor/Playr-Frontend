@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { Home, Rss, Users, MessageSquare, Plus } from 'lucide-react'
+import { Home, Rss, Users, MessageSquare, Plus, UserRoundCheck } from 'lucide-react'
 import { Button } from '../ui/Button'
 import { Avatar, type AvatarStatus } from '../ui/Avatar'
 import { StatusModal } from '../ui/StatusModal'
@@ -10,6 +10,7 @@ import type { ProfileStatus } from '../../api/profilesApi'
 
 const navItems = [
   { to: '/', label: 'Home', icon: Home, end: true },
+  { to: '/friends', label: 'Friends', icon: UserRoundCheck, end: false },
   { to: '/feed', label: 'Feed', icon: Rss, end: false },
   { to: '/find-players', label: 'Find Players', icon: Users, end: false },
   { to: '/threads', label: 'Threads', icon: MessageSquare, end: false },
@@ -98,7 +99,7 @@ export function Sidebar() {
         </p>
       </div>
 
-      <Button variant="secondary" className="w-full">
+      <Button variant="secondary" className="w-full" onClick={() => navigate('/find-players')}>
         Find Players
       </Button>
 

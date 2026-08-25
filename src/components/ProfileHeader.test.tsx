@@ -5,7 +5,7 @@ import { ProfileHeader } from './ProfileHeader'
 import type { ProfileData } from '../api/profilesApi'
 
 const profile: ProfileData = {
-  userId: 'u1', username: 'nexusnova', displayName: 'NexusNova', bio: 'Gaming is life',
+  userId: 'u1', username: 'nexusnova', displayName: 'Nexus Nova', bio: 'Gaming is life',
   avatarUrl: null, region: 'EU', languages: ['English', 'Swedish'],
   platforms: ['PC', 'PlayStation'], externalLinks: { Steam: 'https://steamcommunity.com/id/nexusnova' },
   currentlyPlayingGames: [], status: 'Online' as const, lookingForGameId: null, lookingForGameName: null, lookingForPlayStyle: null,
@@ -15,7 +15,7 @@ const profile: ProfileData = {
 describe('ProfileHeader', () => {
   it('renders displayName and username', () => {
     render(<ProfileHeader profile={profile} isOwner={false} onEditClick={vi.fn()} />)
-    expect(screen.getByText('NexusNova')).toBeInTheDocument()
+    expect(screen.getByText('Nexus Nova')).toBeInTheDocument()
     expect(screen.getByText('@nexusnova')).toBeInTheDocument()
   })
 
@@ -47,9 +47,17 @@ describe('ProfileHeader', () => {
     expect(screen.getByRole('button', { name: /edit profile/i })).toBeInTheDocument()
   })
 
+  it('shows Sign out button under Edit Profile when owner can sign out', () => {
+    render(<ProfileHeader profile={profile} isOwner={true} onEditClick={vi.fn()} onSignOutClick={vi.fn()} />)
+    const editButton = screen.getByRole('button', { name: /edit profile/i })
+    const signOutButton = screen.getByRole('button', { name: /sign out/i })
+    expect(editButton.compareDocumentPosition(signOutButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
   it('hides Edit Profile button when not isOwner', () => {
     render(<ProfileHeader profile={profile} isOwner={false} onEditClick={vi.fn()} />)
     expect(screen.queryByRole('button', { name: /edit profile/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /sign out/i })).not.toBeInTheDocument()
   })
 
   it('calls onEditClick when Edit Profile is clicked', async () => {
@@ -58,5 +66,13 @@ describe('ProfileHeader', () => {
     render(<ProfileHeader profile={profile} isOwner={true} onEditClick={onEditClick} />)
     await user.click(screen.getByRole('button', { name: /edit profile/i }))
     expect(onEditClick).toHaveBeenCalledOnce()
+  })
+
+  it('calls onSignOutClick when Sign out is clicked', async () => {
+    const onSignOutClick = vi.fn()
+    const user = userEvent.setup()
+    render(<ProfileHeader profile={profile} isOwner={true} onEditClick={vi.fn()} onSignOutClick={onSignOutClick} />)
+    await user.click(screen.getByRole('button', { name: /sign out/i }))
+    expect(onSignOutClick).toHaveBeenCalledOnce()
   })
 })
