@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button } from '../components/ui/Button'
+import { MediaUploadInput } from '../components/MediaUploadInput'
 import { useAuth } from '../context/AuthContext'
 import { getGames, type Game } from '../api/gamesApi'
 import { createPost } from '../api/postsApi'
@@ -25,6 +26,8 @@ export default function CreatePostPage() {
   const [selectedMood, setSelectedMood] = useState<MoodOption>('None')
   const [text, setText] = useState('')
   const [textError, setTextError] = useState<string | null>(null)
+  const [mediaFile, setMediaFile] = useState<File | null>(null)
+  const [mediaError, setMediaError] = useState<string | null>(null)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -49,7 +52,7 @@ export default function CreatePostPage() {
 
     setIsSubmitting(true)
     try {
-      await createPost(token!, { gameId: selectedGameId, textContent: trimmed, mood: moodToApi(selectedMood) })
+      await createPost(token!, { gameId: selectedGameId, textContent: trimmed, mood: moodToApi(selectedMood), media: mediaFile })
       navigate('/feed')
     } catch (err) {
       setSubmitError(err instanceof ApiError ? err.message : 'Something went wrong.')
@@ -113,6 +116,14 @@ export default function CreatePostPage() {
         </label>
 
         {textError && <p className="text-frustrated text-sm">{textError}</p>}
+
+        <MediaUploadInput
+          file={mediaFile}
+          onFileChange={setMediaFile}
+          error={mediaError}
+          onError={setMediaError}
+        />
+
         {submitError && <p className="text-frustrated text-sm">{submitError}</p>}
 
         <Button type="submit" disabled={isSubmitting} className="w-full">

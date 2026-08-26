@@ -7,6 +7,7 @@ import { IconButton } from './ui/IconButton'
 import { MoreHorizontal, Heart } from 'lucide-react'
 import { updatePost, deletePost, toggleLike } from '../api/postsApi'
 import { ApiError } from '../api/http'
+import { MediaUploadInput } from './MediaUploadInput'
 import type { PostFeedItem } from '../api/postsApi'
 import type { ComponentProps } from 'react'
 
@@ -62,6 +63,9 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardPr
   const [state, setState] = useState<CardState>('read')
   const [editText, setEditText] = useState(post.textContent)
   const [editMood, setEditMood] = useState<MoodOption>(apiMoodToOption(post.mood))
+  const [editMediaFile, setEditMediaFile] = useState<File | null>(null)
+  const [editMediaError, setEditMediaError] = useState<string | null>(null)
+  const [removeMedia, setRemoveMedia] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -92,7 +96,7 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardPr
       const updated = await updatePost(
         localStorage.getItem('playr_token') ?? '',
         post.id,
-        { textContent: editText.trim(), mood: moodOptionToApi(editMood) }
+        { textContent: editText.trim(), mood: moodOptionToApi(editMood), media: editMediaFile, removeMedia }
       )
       onUpdate?.(updated)
       setState('read')
@@ -118,6 +122,9 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardPr
   function openEdit() {
     setEditText(post.textContent)
     setEditMood(apiMoodToOption(post.mood))
+    setEditMediaFile(null)
+    setEditMediaError(null)
+    setRemoveMedia(false)
     setActionError(null)
     setState('editing')
   }
@@ -222,6 +229,16 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardPr
             onChange={(e) => setEditText(e.target.value)}
           />
           <span className="text-xs text-muted self-end">{editText.length} / 1000</span>
+          <MediaUploadInput
+            file={editMediaFile}
+            onFileChange={setEditMediaFile}
+            existingMediaUrl={post.mediaUrl}
+            existingMediaType={post.mediaType}
+            removeExisting={removeMedia}
+            onRemoveExistingChange={setRemoveMedia}
+            error={editMediaError}
+            onError={setEditMediaError}
+          />
           {actionError && <p className="text-frustrated text-xs">{actionError}</p>}
           <div className="flex gap-2">
             <Button size="sm" onClick={handleSave} disabled={isSaving}>
@@ -252,7 +269,16 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardPr
           </div>
         </div>
       ) : (
-        <p className="text-sm text-text leading-relaxed">{post.textContent}</p>
+        <div className="flex flex-col gap-3">
+          <p className="text-sm text-text leading-relaxed">{post.textContent}</p>
+          {post.mediaUrl && (
+            post.mediaType === 'Video' ? (
+              <video src={post.mediaUrl} controls className="max-h-96 w-full rounded-lg object-contain" />
+            ) : (
+              <img src={post.mediaUrl} alt="Post media" className="max-h-96 w-full rounded-lg object-contain" />
+            )
+          )}
+        </div>
       )}
 
       {/* Timestamp + likes */}

@@ -13,6 +13,8 @@ export interface PostFeedItem {
   gameCoverImageUrl: string | null
   textContent: string
   mood: string | null
+  mediaUrl: string | null
+  mediaType: string | null
   createdAt: string
   likesCount: number
   likedByCurrentUser: boolean
@@ -20,15 +22,18 @@ export interface PostFeedItem {
 
 export async function createPost(
   token: string,
-  data: { gameId: string; textContent: string; mood?: string | null }
+  data: { gameId: string; textContent: string; mood?: string | null; media?: File | null }
 ): Promise<PostFeedItem> {
+  const form = new FormData()
+  form.append('GameId', data.gameId)
+  form.append('TextContent', data.textContent)
+  if (data.mood) form.append('Mood', data.mood)
+  if (data.media) form.append('Media', data.media)
+
   const response = await fetch(`${API_BASE_URL}/api/posts`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(data),
+    headers: { Authorization: `Bearer ${token}` },
+    body: form,
   })
   if (!response.ok) {
     const message = await parseErrorMessage(response, 'Failed to create post.')
@@ -51,15 +56,18 @@ export async function getFeed(token?: string | null): Promise<PostFeedItem[]> {
 export async function updatePost(
   token: string,
   postId: string,
-  data: { textContent: string; mood?: string | null }
+  data: { textContent: string; mood?: string | null; media?: File | null; removeMedia?: boolean }
 ): Promise<PostFeedItem> {
+  const form = new FormData()
+  form.append('TextContent', data.textContent)
+  if (data.mood) form.append('Mood', data.mood)
+  if (data.media) form.append('Media', data.media)
+  if (data.removeMedia) form.append('RemoveMedia', 'true')
+
   const response = await fetch(`${API_BASE_URL}/api/posts/${postId}`, {
     method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(data),
+    headers: { Authorization: `Bearer ${token}` },
+    body: form,
   })
   if (!response.ok) {
     const message = await parseErrorMessage(response, 'Failed to update post.')
