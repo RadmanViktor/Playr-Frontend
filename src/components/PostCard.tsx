@@ -5,7 +5,7 @@ import { Badge } from './ui/Badge'
 import { Button } from './ui/Button'
 import { IconButton } from './ui/IconButton'
 import { MoreHorizontal, Heart } from 'lucide-react'
-import { updatePost, deletePost, toggleLike } from '../api/postsApi'
+import { updatePost, deletePost, toggleLike, resolveMediaUrl } from '../api/postsApi'
 import { ApiError } from '../api/http'
 import { MediaUploadInput } from './MediaUploadInput'
 import type { PostFeedItem } from '../api/postsApi'
@@ -232,7 +232,7 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardPr
           <MediaUploadInput
             file={editMediaFile}
             onFileChange={setEditMediaFile}
-            existingMediaUrl={post.mediaUrl}
+            existingMediaUrl={resolveMediaUrl(post.mediaUrl)}
             existingMediaType={post.mediaType}
             removeExisting={removeMedia}
             onRemoveExistingChange={setRemoveMedia}
@@ -273,9 +273,9 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardPr
           <p className="text-sm text-text leading-relaxed">{post.textContent}</p>
           {post.mediaUrl && (
             post.mediaType === 'Video' ? (
-              <video src={post.mediaUrl} controls className="max-h-96 w-full rounded-lg object-contain" />
+              <video src={resolveMediaUrl(post.mediaUrl)!} controls className="max-h-96 w-full rounded-lg object-contain" />
             ) : (
-              <img src={post.mediaUrl} alt="Post media" className="max-h-96 w-full rounded-lg object-contain" />
+              <img src={resolveMediaUrl(post.mediaUrl)!} alt="Post media" className="max-h-96 w-full rounded-lg object-contain" />
             )
           )}
         </div>

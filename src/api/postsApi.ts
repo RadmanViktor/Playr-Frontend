@@ -2,6 +2,12 @@ import { API_BASE_URL, ApiError, parseErrorMessage } from './http'
 
 export type Mood = 'Enjoying' | 'Frustrated' | 'Completed' | 'NeedHelp'
 
+export function resolveMediaUrl(url: string | null): string | null {
+  if (!url) return null
+  if (url.startsWith('http://') || url.startsWith('https://')) return url
+  return `${API_BASE_URL}${url}`
+}
+
 export interface PostFeedItem {
   id: string
   authorId: string
