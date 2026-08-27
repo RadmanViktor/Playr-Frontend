@@ -17,6 +17,7 @@ import {
 import { ApiError } from '../../api/http'
 import { Search } from 'lucide-react'
 import { useChat } from '../../context/ChatContext'
+import { onInvitationReceived, onInvitationUpdated } from '../../lib/chatHubConnection'
 
 const statusAvatarMap = {
   Online: 'online',
@@ -87,6 +88,31 @@ export function TopBar() {
       cancelled = true
     }
   }, [token])
+
+  // Live-update invitations pushed over the chat hub, so the badge/dropdown
+  // reflect new/accepted/declined/cancelled invitations without a page reload.
+  useEffect(() => {
+    if (!user) return
+
+    const unsubscribeReceived = onInvitationReceived((invitation) => {
+      if (invitation.recipientUserId !== user.id) return
+      setInvitations((prev) =>
+        prev.some((i) => i.id === invitation.id) ? prev : [invitation, ...prev],
+      )
+    })
+
+    const unsubscribeUpdated = onInvitationUpdated((invitation) => {
+      if (invitation.status !== 'Pending') {
+        setInvitations((prev) => prev.filter((i) => i.id !== invitation.id))
+      }
+      setSentInvitations((prev) => prev.map((i) => (i.id === invitation.id ? invitation : i)))
+    })
+
+    return () => {
+      unsubscribeReceived()
+      unsubscribeUpdated()
+    }
+  }, [user])
 
   // Close on outside click
   useEffect(() => {

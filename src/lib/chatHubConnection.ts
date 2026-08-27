@@ -1,12 +1,16 @@
 import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr'
 import { API_BASE_URL } from '../api/http'
 import type { ChatMessage } from '../api/chatApi'
+import type { Invitation } from '../api/invitationsApi'
 
 type MessageListener = (message: ChatMessage) => void
+type InvitationListener = (invitation: Invitation) => void
 
 let connection: HubConnection | null = null
 let currentToken: string | null = null
-const listeners = new Set<MessageListener>()
+const messageListeners = new Set<MessageListener>()
+const invitationReceivedListeners = new Set<InvitationListener>()
+const invitationUpdatedListeners = new Set<InvitationListener>()
 
 function buildConnection(token: string): HubConnection {
   return new HubConnectionBuilder()
@@ -29,7 +33,13 @@ export async function connectChatHub(token: string): Promise<void> {
   currentToken = token
   const hub = buildConnection(token)
   hub.on('ReceiveMessage', (message: ChatMessage) => {
-    listeners.forEach((listener) => listener(message))
+    messageListeners.forEach((listener) => listener(message))
+  })
+  hub.on('InvitationReceived', (invitation: Invitation) => {
+    invitationReceivedListeners.forEach((listener) => listener(invitation))
+  })
+  hub.on('InvitationUpdated', (invitation: Invitation) => {
+    invitationUpdatedListeners.forEach((listener) => listener(invitation))
   })
 
   try {
@@ -54,6 +64,18 @@ export async function disconnectChatHub(): Promise<void> {
 
 /** Subscribe to every incoming chat message pushed over the hub. Returns an unsubscribe function. */
 export function onChatMessage(listener: MessageListener): () => void {
-  listeners.add(listener)
-  return () => listeners.delete(listener)
+  messageListeners.add(listener)
+  return () => messageListeners.delete(listener)
+}
+
+/** Subscribe to invitations pushed to the current user right after they're created. */
+export function onInvitationReceived(listener: InvitationListener): () => void {
+  invitationReceivedListeners.add(listener)
+  return () => invitationReceivedListeners.delete(listener)
+}
+
+/** Subscribe to invitation status changes (accepted/declined/cancelled), pushed to both parties. */
+export function onInvitationUpdated(listener: InvitationListener): () => void {
+  invitationUpdatedListeners.add(listener)
+  return () => invitationUpdatedListeners.delete(listener)
 }
