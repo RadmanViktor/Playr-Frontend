@@ -68,6 +68,26 @@ export function TopBar() {
     return () => clearTimeout(timer)
   }, [query])
 
+  // Fetch incoming invitations on mount / token change so the badge count
+  // is correct without requiring the user to open the invitations dropdown.
+  useEffect(() => {
+    if (!token) {
+      setInvitations([])
+      return
+    }
+    let cancelled = false
+    getIncomingInvitations(token)
+      .then((incoming) => {
+        if (!cancelled) setInvitations(incoming)
+      })
+      .catch(() => {
+        // Silently ignore; the dropdown fetch will surface errors if opened.
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [token])
+
   // Close on outside click
   useEffect(() => {
     if (!isOpen) return
@@ -126,7 +146,7 @@ export function TopBar() {
       const invitation = await acceptInvitation(token, invitationId)
       setInvitations((prev) => prev.filter((i) => i.id !== invitationId))
       await openChatWithUser(invitation.senderUserId, {
-        successMessage: `You are now connected with ${invitation.senderDisplayName}. Happy gaming! :D`,
+        successMessage: `You're now chatting with ${invitation.senderDisplayName}. Happy gaming! :D`,
       })
       setIsInvitationsOpen(false)
     } catch (err) {

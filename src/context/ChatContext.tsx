@@ -1,8 +1,13 @@
-import { createContext, useCallback, useContext, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { ChatWindow } from '../components/ChatWindow'
-import { getOrCreateConversation, type Conversation } from '../api/chatApi'
+import { Toast } from '../components/ui/Toast'
+import { getOrCreateConversation, type ChatMessage, type Conversation } from '../api/chatApi'
 import { useAuth } from './AuthContext'
+import { useNotificationPreferences } from './NotificationPreferencesContext'
+import { connectChatHub, disconnectChatHub, onChatMessage } from '../lib/chatHubConnection'
+import { playNotificationSound } from '../lib/sound'
+import { showBrowserNotification } from '../lib/browserNotifications'
 
 const MAX_OPEN_CHATS = 4
 const CHAT_WINDOW_OFFSET_REM = 25 // window width (24rem) + gap (1rem)
@@ -22,14 +27,62 @@ interface ChatContextValue {
   openConversation: (conversation: Conversation) => void
   closeChat: (conversationId: string) => void
   error: string | null
+  unreadConversationIds: Set<string>
+  hasUnread: boolean
 }
 
 const ChatContext = createContext<ChatContextValue | null>(null)
 
 export function ChatProvider({ children }: { children: ReactNode }) {
-  const { token } = useAuth()
+  const { user, token } = useAuth()
+  const { preferences } = useNotificationPreferences()
   const [openChats, setOpenChats] = useState<OpenChat[]>([])
   const [error, setError] = useState<string | null>(null)
+  const [notificationToast, setNotificationToast] = useState<string | null>(null)
+  const [unreadConversationIds, setUnreadConversationIds] = useState<Set<string>>(new Set())
+
+  useEffect(() => {
+    if (!token) {
+      disconnectChatHub()
+      return
+    }
+    connectChatHub(token)
+    return () => {
+      disconnectChatHub()
+    }
+  }, [token])
+
+  useEffect(() => {
+    if (!user) return
+
+    return onChatMessage((message: ChatMessage) => {
+      if (message.senderUserId === user.id) return
+
+      const isConversationActiveOnScreen = openChats.some(
+        (chat) => chat.conversation.id === message.conversationId && !chat.isMinimized,
+      )
+      const shouldNotify = document.hidden || !document.hasFocus() || !isConversationActiveOnScreen
+
+      if (!shouldNotify) return
+
+      setUnreadConversationIds((prev) => {
+        if (prev.has(message.conversationId)) return prev
+        const next = new Set(prev)
+        next.add(message.conversationId)
+        return next
+      })
+
+      if (preferences.chatSoundEnabled) {
+        playNotificationSound()
+      }
+
+      if (preferences.chatBrowserNotificationsEnabled) {
+        showBrowserNotification(message.senderDisplayName, message.body)
+      } else {
+        setNotificationToast(`${message.senderDisplayName}: ${message.body}`)
+      }
+    })
+  }, [user, openChats, preferences])
 
   const showConversation = useCallback((conversation: Conversation, successMessage: string | null) => {
     setOpenChats((prev) => {
@@ -37,6 +90,12 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       const withoutExisting = existingIndex >= 0 ? prev.filter((chat) => chat.conversation.id !== conversation.id) : prev
       const next = [...withoutExisting, { conversation, successMessage, isMinimized: false }]
       return next.length > MAX_OPEN_CHATS ? next.slice(next.length - MAX_OPEN_CHATS) : next
+    })
+    setUnreadConversationIds((prev) => {
+      if (!prev.has(conversation.id)) return prev
+      const next = new Set(prev)
+      next.delete(conversation.id)
+      return next
     })
   }, [])
 
@@ -72,10 +131,25 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         chat.conversation.id === conversationId ? { ...chat, isMinimized: !chat.isMinimized } : chat,
       ),
     )
+    setUnreadConversationIds((prev) => {
+      if (!prev.has(conversationId)) return prev
+      const next = new Set(prev)
+      next.delete(conversationId)
+      return next
+    })
   }, [])
 
   return (
-    <ChatContext.Provider value={{ openChatWithUser, openConversation, closeChat, error }}>
+    <ChatContext.Provider
+      value={{
+        openChatWithUser,
+        openConversation,
+        closeChat,
+        error,
+        unreadConversationIds,
+        hasUnread: unreadConversationIds.size > 0,
+      }}
+    >
       {children}
       {openChats.map((chat, index) => (
         <ChatWindow
@@ -88,6 +162,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           style={{ right: `calc(1rem + ${index * CHAT_WINDOW_OFFSET_REM}rem)` }}
         />
       ))}
+      {notificationToast && (
+        <Toast message={notificationToast} onDismiss={() => setNotificationToast(null)} />
+      )}
     </ChatContext.Provider>
   )
 }

@@ -26,6 +26,7 @@ const players: profilesApi.LookingForGamePlayer[] = [
     lookingForGameName: 'Apex Legends',
     lookingForPlayStyle: 'Chill',
     relationshipStatus: 'None',
+    pendingInvitationId: null,
   },
 ]
 

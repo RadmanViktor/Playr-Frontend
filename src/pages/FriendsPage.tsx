@@ -4,9 +4,16 @@ import { Card } from '../components/ui/Card'
 import { Avatar, type AvatarStatus } from '../components/ui/Avatar'
 import { Button } from '../components/ui/Button'
 import { getFriends, type Friend } from '../api/friendsApi'
+import {
+  getIncomingFriendRequests,
+  acceptFriendRequest,
+  declineFriendRequest,
+  type FriendRequest,
+} from '../api/friendRequestsApi'
 import { getProfile, type ProfileStatus } from '../api/profilesApi'
 import { useAuth } from '../context/AuthContext'
 import { useChat } from '../context/ChatContext'
+import { ApiError } from '../api/http'
 
 const statusAvatarMap: Record<ProfileStatus, AvatarStatus> = {
   Online: 'online',
@@ -23,8 +30,12 @@ export default function FriendsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [statusByUsername, setStatusByUsername] = useState<Record<string, ProfileStatus>>({})
+  const [incomingRequests, setIncomingRequests] = useState<FriendRequest[]>([])
+  const [isLoadingRequests, setIsLoadingRequests] = useState(true)
+  const [requestActionError, setRequestActionError] = useState<string | null>(null)
+  const [respondingRequestId, setRespondingRequestId] = useState<string | null>(null)
 
-  useEffect(() => {
+  function reloadFriends() {
     if (!token) return
     setIsLoading(true)
     setError(null)
@@ -32,6 +43,23 @@ export default function FriendsPage() {
       .then(setFriends)
       .catch(() => setError('Failed to load friends.'))
       .finally(() => setIsLoading(false))
+  }
+
+  function reloadIncomingRequests() {
+    if (!token) return
+    setIsLoadingRequests(true)
+    getIncomingFriendRequests(token)
+      .then(setIncomingRequests)
+      .catch(() => {
+        /* non-critical */
+      })
+      .finally(() => setIsLoadingRequests(false))
+  }
+
+  useEffect(() => {
+    reloadFriends()
+    reloadIncomingRequests()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token])
 
   useEffect(() => {
@@ -62,6 +90,35 @@ export default function FriendsPage() {
     await openChatWithUser(friend.userId)
   }
 
+  async function handleAcceptRequest(request: FriendRequest) {
+    if (!token) return
+    setRespondingRequestId(request.id)
+    setRequestActionError(null)
+    try {
+      await acceptFriendRequest(token, request.id)
+      setIncomingRequests((prev) => prev.filter((r) => r.id !== request.id))
+      reloadFriends()
+    } catch (err) {
+      setRequestActionError(err instanceof ApiError ? err.message : 'Failed to accept friend request.')
+    } finally {
+      setRespondingRequestId(null)
+    }
+  }
+
+  async function handleDeclineRequest(request: FriendRequest) {
+    if (!token) return
+    setRespondingRequestId(request.id)
+    setRequestActionError(null)
+    try {
+      await declineFriendRequest(token, request.id)
+      setIncomingRequests((prev) => prev.filter((r) => r.id !== request.id))
+    } catch (err) {
+      setRequestActionError(err instanceof ApiError ? err.message : 'Failed to decline friend request.')
+    } finally {
+      setRespondingRequestId(null)
+    }
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <div className="mb-2 border-l-4 border-primary pl-4">
@@ -71,6 +128,41 @@ export default function FriendsPage() {
           The players you've connected with. Jump into a chat or check out their profile whenever you're ready to play.
         </p>
       </div>
+
+      {!isLoadingRequests && incomingRequests.length > 0 && (
+        <div className="flex flex-col gap-2">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Friend requests</h2>
+          {requestActionError && <p className="text-sm text-frustrated">{requestActionError}</p>}
+          {incomingRequests.map((request) => (
+            <Card key={request.id} className="flex items-center justify-between gap-4">
+              <div className="flex min-w-0 items-center gap-3">
+                <Avatar src={request.senderAvatarUrl ?? undefined} alt={request.senderDisplayName} />
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-text">{request.senderDisplayName}</p>
+                  <p className="truncate text-xs text-muted">@{request.senderUsername}</p>
+                </div>
+              </div>
+              <div className="flex shrink-0 gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleDeclineRequest(request)}
+                  disabled={respondingRequestId === request.id}
+                >
+                  Decline
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => handleAcceptRequest(request)}
+                  disabled={respondingRequestId === request.id}
+                >
+                  {respondingRequestId === request.id ? 'Working...' : 'Accept'}
+                </Button>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
 
       {chatError && <p className="text-sm text-frustrated">{chatError}</p>}
       {isLoading && <p className="text-muted">Loading friends...</p>}

@@ -10,6 +10,7 @@ const profile: ProfileData = {
   platforms: ['PC', 'PlayStation'], externalLinks: { Steam: 'https://steamcommunity.com/id/nexusnova' },
   currentlyPlayingGames: [], status: 'Online' as const, lookingForGameId: null, lookingForGameName: null, lookingForPlayStyle: null,
   createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+  relationshipStatus: null, pendingInvitationId: null,
 }
 
 describe('ProfileHeader', () => {

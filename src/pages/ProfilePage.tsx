@@ -3,16 +3,21 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ProfileHeader } from '../components/ProfileHeader'
 import { PostCard } from '../components/PostCard'
 import { SteamGamesList } from '../components/SteamGamesList'
-import { InviteModal } from '../components/ui/InviteModal'
 import { getProfile, getProfilePosts, type ProfileData } from '../api/profilesApi'
-import { cancelInvitation } from '../api/invitationsApi'
+import {
+  sendFriendRequest,
+  cancelFriendRequest,
+  getSentFriendRequests,
+} from '../api/friendRequestsApi'
 import { type PostFeedItem } from '../api/postsApi'
 import { ApiError } from '../api/http'
 import { useAuth } from '../context/AuthContext'
+import { useChat } from '../context/ChatContext'
 
 export default function ProfilePage() {
   const { username } = useParams<{ username: string }>()
   const { user, token, logout } = useAuth()
+  const { openChatWithUser } = useChat()
   const navigate = useNavigate()
 
   const [profile, setProfile] = useState<ProfileData | null>(null)
@@ -21,8 +26,9 @@ export default function ProfilePage() {
   const [notFound, setNotFound] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'posts' | 'games'>('posts')
-  const [showFriendRequestModal, setShowFriendRequestModal] = useState(false)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [pendingFriendRequestId, setPendingFriendRequestId] = useState<string | null>(null)
+  const [isSendingFriendRequest, setIsSendingFriendRequest] = useState(false)
   const [isCancellingFriendRequest, setIsCancellingFriendRequest] = useState(false)
   const [friendRequestError, setFriendRequestError] = useState<string | null>(null)
 
@@ -41,6 +47,28 @@ export default function ProfilePage() {
       .finally(() => setIsLoading(false))
   }, [username, token])
 
+  useEffect(() => {
+    if (!token || !profile || !user || user.id === profile.userId) {
+      setPendingFriendRequestId(null)
+      return
+    }
+    let cancelled = false
+    getSentFriendRequests(token)
+      .then((requests) => {
+        if (cancelled) return
+        const pending = requests.find(
+          (r) => r.status === 'Pending' && r.recipientUserId === profile.userId,
+        )
+        setPendingFriendRequestId(pending?.id ?? null)
+      })
+      .catch(() => {
+        /* ignore - non-critical */
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [token, profile, user])
+
   const isOwner = !!user && !!profile && user.id === profile.userId
 
   function handleSignOut() {
@@ -48,24 +76,39 @@ export default function ProfilePage() {
     navigate('/login', { replace: true })
   }
 
-  function handleFriendRequestSent() {
-    setProfile((prev) => (prev ? { ...prev, relationshipStatus: 'InvitePending' } : prev))
-    setSuccessMessage('Friend request sent.')
+  async function handleAddFriend() {
+    if (!token || !profile) return
+    setIsSendingFriendRequest(true)
+    setFriendRequestError(null)
+    try {
+      const request = await sendFriendRequest(token, profile.userId)
+      setPendingFriendRequestId(request.id)
+      setSuccessMessage('Friend request sent.')
+    } catch (err) {
+      setFriendRequestError(err instanceof ApiError ? err.message : 'Failed to send friend request.')
+    } finally {
+      setIsSendingFriendRequest(false)
+    }
   }
 
   async function handleCancelFriendRequest() {
-    if (!token || !profile?.pendingInvitationId) return
+    if (!token || !pendingFriendRequestId) return
     setIsCancellingFriendRequest(true)
     setFriendRequestError(null)
     try {
-      await cancelInvitation(token, profile.pendingInvitationId)
-      setProfile((prev) => (prev ? { ...prev, relationshipStatus: 'None', pendingInvitationId: null } : prev))
+      await cancelFriendRequest(token, pendingFriendRequestId)
+      setPendingFriendRequestId(null)
       setSuccessMessage('Friend request cancelled.')
     } catch (err) {
       setFriendRequestError(err instanceof ApiError ? err.message : 'Failed to cancel friend request.')
     } finally {
       setIsCancellingFriendRequest(false)
     }
+  }
+
+  async function handleMessageClick() {
+    if (!profile) return
+    await openChatWithUser(profile.userId)
   }
 
   useEffect(() => {
@@ -100,9 +143,11 @@ export default function ProfilePage() {
         onEditClick={() => navigate('/settings')}
         onSignOutClick={handleSignOut}
         postCount={posts.length}
-        onAddFriendClick={() => setShowFriendRequestModal(true)}
+        onAddFriendClick={handleAddFriend}
         onCancelFriendRequestClick={handleCancelFriendRequest}
         isCancellingFriendRequest={isCancellingFriendRequest}
+        isFriendRequestPending={!!pendingFriendRequestId || isSendingFriendRequest}
+        onMessageClick={handleMessageClick}
       />
 
       {successMessage && (
@@ -161,21 +206,6 @@ export default function ProfilePage() {
           <SteamGamesList userId={profile.userId} />
         )}
       </div>
-
-      {showFriendRequestModal && (
-        <InviteModal
-          recipientUserId={profile.userId}
-          recipientDisplayName={profile.displayName}
-          recipientAvatarUrl={profile.avatarUrl}
-          title="Send friend request"
-          promptText="Send a friend request to"
-          promptSuffix=""
-          placeholderText="Say hi and introduce yourself..."
-          actionLabel="Send request"
-          onClose={() => setShowFriendRequestModal(false)}
-          onSent={handleFriendRequestSent}
-        />
-      )}
     </div>
   )
 }

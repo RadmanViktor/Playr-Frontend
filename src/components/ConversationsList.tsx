@@ -24,7 +24,7 @@ function formatRelativeTime(dateString: string): string {
 
 export function ConversationsList() {
   const { token } = useAuth()
-  const { openConversation, error: chatError } = useChat()
+  const { openConversation, error: chatError, unreadConversationIds } = useChat()
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -76,34 +76,40 @@ export function ConversationsList() {
         </Card>
       )}
 
-      {conversations.map((conversation) => (
-        <Card
-          key={conversation.id}
-          className="flex cursor-pointer items-center justify-between gap-4"
-          onClick={() => openConversation(conversation)}
-        >
-          <div className="flex min-w-0 items-center gap-3">
-            <Avatar
-              src={conversation.otherParticipant.avatarUrl ?? undefined}
-              alt={conversation.otherParticipant.displayName}
-              status={statusByUsername[conversation.otherParticipant.username]
-                ? statusAvatarMap[statusByUsername[conversation.otherParticipant.username]]
-                : undefined}
-            />
-            <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-text">
-                {conversation.otherParticipant.displayName}
-              </p>
-              <p className="truncate text-xs text-muted">
-                {conversation.lastMessage ?? 'No messages yet'}
-              </p>
+      {conversations.map((conversation) => {
+        const isUnread = unreadConversationIds.has(conversation.id)
+        return (
+          <Card
+            key={conversation.id}
+            className="flex cursor-pointer items-center justify-between gap-4"
+            onClick={() => openConversation(conversation)}
+          >
+            <div className="flex min-w-0 items-center gap-3">
+              <Avatar
+                src={conversation.otherParticipant.avatarUrl ?? undefined}
+                alt={conversation.otherParticipant.displayName}
+                status={statusByUsername[conversation.otherParticipant.username]
+                  ? statusAvatarMap[statusByUsername[conversation.otherParticipant.username]]
+                  : undefined}
+              />
+              <div className="min-w-0">
+                <p className={`truncate text-sm ${isUnread ? 'font-semibold text-text' : 'font-medium text-text'}`}>
+                  {conversation.otherParticipant.displayName}
+                </p>
+                <p className={`truncate text-xs ${isUnread ? 'font-medium text-text' : 'text-muted'}`}>
+                  {conversation.lastMessage ?? 'No messages yet'}
+                </p>
+              </div>
             </div>
-          </div>
-          {conversation.lastMessageAt && (
-            <p className="shrink-0 text-xs text-muted">{formatRelativeTime(conversation.lastMessageAt)}</p>
-          )}
-        </Card>
-      ))}
+            <div className="flex shrink-0 items-center gap-2">
+              {conversation.lastMessageAt && (
+                <p className="text-xs text-muted">{formatRelativeTime(conversation.lastMessageAt)}</p>
+              )}
+              {isUnread && <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-primary" aria-label="Unread" />}
+            </div>
+          </Card>
+        )
+      })}
     </div>
   )
 }

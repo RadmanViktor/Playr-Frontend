@@ -9,6 +9,11 @@ const logoutMock = vi.fn()
 
 vi.mock('../api/profilesApi')
 vi.mock('../api/postsApi', () => ({ getFeed: vi.fn(), createPost: vi.fn(), updatePost: vi.fn(), deletePost: vi.fn(), getProfilePosts: vi.fn() }))
+vi.mock('../api/friendRequestsApi', () => ({
+  sendFriendRequest: vi.fn(),
+  cancelFriendRequest: vi.fn(),
+  getSentFriendRequests: vi.fn().mockResolvedValue([]),
+}))
 vi.mock('../context/AuthContext', () => ({
   useAuth: () => ({
     user: { id: 'u1', username: 'player', displayName: 'Player', email: 'p@p.com' },
@@ -17,12 +22,21 @@ vi.mock('../context/AuthContext', () => ({
     logout: logoutMock,
   }),
 }))
+vi.mock('../context/ChatContext', () => ({
+  useChat: () => ({
+    openChatWithUser: vi.fn(),
+    openConversation: vi.fn(),
+    closeChat: vi.fn(),
+    error: null,
+  }),
+}))
 
 const profile: profilesApi.ProfileData = {
   userId: 'u1', username: 'player', displayName: 'Player One', bio: 'My bio',
   avatarUrl: null, region: 'EU', languages: [], platforms: ['PC'],
   externalLinks: {}, currentlyPlayingGames: [], status: 'Online' as const, lookingForGameId: null, lookingForGameName: null, lookingForPlayStyle: null,
   createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+  relationshipStatus: null, pendingInvitationId: null,
 }
 
 beforeEach(async () => {

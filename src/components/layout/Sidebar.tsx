@@ -6,6 +6,7 @@ import { Avatar, type AvatarStatus } from '../ui/Avatar'
 import { StatusModal } from '../ui/StatusModal'
 import { useAuth } from '../../context/AuthContext'
 import { useStatus } from '../../context/StatusContext'
+import { useChat } from '../../context/ChatContext'
 import { useCreatePostModal } from '../../context/CreatePostModalContext'
 import type { ProfileStatus } from '../../api/profilesApi'
 
@@ -40,6 +41,7 @@ const statusTextColorMap: Record<ProfileStatus, string> = {
 export function Sidebar() {
   const { user } = useAuth()
   const { status, avatarUrl, lookingForGameName } = useStatus()
+  const { hasUnread } = useChat()
   const { openCreatePost } = useCreatePostModal()
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false)
 
@@ -83,6 +85,9 @@ export function Sidebar() {
           >
             <Icon className="h-5 w-5" aria-hidden="true" />
             {label}
+            {to === '/chats' && hasUnread && (
+              <span className="ml-auto h-2 w-2 shrink-0 rounded-full bg-frustrated" aria-label="Unread messages" />
+            )}
           </NavLink>
         ))}
       </nav>

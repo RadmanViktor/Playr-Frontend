@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { EditProfileForm } from '../components/EditProfileForm'
 import { SteamAccountSection } from '../components/SteamAccountSection'
+import { NotificationSettingsSection } from '../components/NotificationSettingsSection'
 import { getProfile, type ProfileData } from '../api/profilesApi'
 import { useAuth } from '../context/AuthContext'
 
@@ -24,6 +25,7 @@ export default function SettingsPage() {
   return (
     <div className="flex flex-col gap-4 max-w-xl">
       <h1 className="text-2xl font-bold text-text">Settings</h1>
+      <NotificationSettingsSection />
       <SteamAccountSection token={token} />
       <EditProfileForm
         profile={profile}
