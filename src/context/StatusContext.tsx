@@ -5,6 +5,7 @@ import { useAuth } from './AuthContext'
 
 export interface StatusContextValue {
   status: ProfileStatus
+  avatarUrl: string | null
   lookingForGameId: string | null
   lookingForGameName: string | null
   lookingForPlayStyle: PlayStyle | null
@@ -21,6 +22,7 @@ const StatusContext = createContext<StatusContextValue | null>(null)
 export function StatusProvider({ children }: { children: ReactNode }) {
   const { user, token } = useAuth()
   const [status, setStatus] = useState<ProfileStatus>('Online')
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const [lookingForGameId, setLookingForGameId] = useState<string | null>(null)
   const [lookingForGameName, setLookingForGameName] = useState<string | null>(null)
   const [lookingForPlayStyle, setLookingForPlayStyle] = useState<PlayStyle | null>(null)
@@ -32,6 +34,7 @@ export function StatusProvider({ children }: { children: ReactNode }) {
     async function loadStatus() {
       if (!user) {
         setStatus('Online')
+        setAvatarUrl(null)
         setLookingForGameId(null)
         setLookingForGameName(null)
         setLookingForPlayStyle(null)
@@ -44,6 +47,7 @@ export function StatusProvider({ children }: { children: ReactNode }) {
         const profile = await getProfile(user.username)
         if (!cancelled) {
           setStatus(profile.status)
+          setAvatarUrl(profile.avatarUrl)
           setLookingForGameId(profile.lookingForGameId)
           setLookingForGameName(profile.lookingForGameName)
           setLookingForPlayStyle(profile.lookingForPlayStyle)
@@ -81,6 +85,7 @@ export function StatusProvider({ children }: { children: ReactNode }) {
       })
 
       setStatus(profile.status)
+      setAvatarUrl(profile.avatarUrl)
       setLookingForGameId(profile.lookingForGameId)
       setLookingForGameName(profile.lookingForGameName)
       setLookingForPlayStyle(profile.lookingForPlayStyle)
@@ -90,7 +95,7 @@ export function StatusProvider({ children }: { children: ReactNode }) {
 
   return (
     <StatusContext.Provider
-      value={{ status, lookingForGameId, lookingForGameName, lookingForPlayStyle, isLoading, updateStatus }}
+      value={{ status, avatarUrl, lookingForGameId, lookingForGameName, lookingForPlayStyle, isLoading, updateStatus }}
     >
       {children}
     </StatusContext.Provider>

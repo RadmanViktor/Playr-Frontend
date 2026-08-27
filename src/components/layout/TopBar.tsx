@@ -26,7 +26,7 @@ const statusAvatarMap = {
 
 export function TopBar() {
   const { user, token } = useAuth()
-  const { status } = useStatus()
+  const { status, avatarUrl } = useStatus()
   const { openChatWithUser } = useChat()
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
@@ -303,7 +303,7 @@ export function TopBar() {
             className="rounded-full focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
             aria-label="My profile"
           >
-            <Avatar alt={user.displayName ?? user.username} status={statusAvatarMap[status]} />
+            <Avatar src={avatarUrl ?? undefined} alt={user.displayName ?? user.username} status={statusAvatarMap[status]} />
           </button>
         )}
       </div>

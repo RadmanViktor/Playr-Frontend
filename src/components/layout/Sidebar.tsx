@@ -39,7 +39,7 @@ const statusTextColorMap: Record<ProfileStatus, string> = {
 
 export function Sidebar() {
   const { user } = useAuth()
-  const { status, lookingForGameName } = useStatus()
+  const { status, avatarUrl, lookingForGameName } = useStatus()
   const navigate = useNavigate()
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false)
 
@@ -55,7 +55,7 @@ export function Sidebar() {
           onClick={() => setIsStatusModalOpen(true)}
           className="flex items-center gap-3 rounded-xl border border-border bg-surface-raised p-3 text-left transition-colors hover:bg-border cursor-pointer"
         >
-          <Avatar alt={user.displayName ?? user.username} status={statusAvatarMap[status]} />
+          <Avatar src={avatarUrl ?? undefined} alt={user.displayName ?? user.username} status={statusAvatarMap[status]} />
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-text">{user.username}</p>
             <p className={`truncate text-xs ${statusTextColorMap[status]}`}>
