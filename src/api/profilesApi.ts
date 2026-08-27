@@ -26,7 +26,6 @@ export interface ProfileData {
 export interface UpdateProfileData {
   displayName: string
   bio?: string | null
-  avatarUrl?: string | null
   region?: string | null
   languages: string[]
   platforms: string[]
@@ -87,6 +86,22 @@ export async function updateProfileStatus(token: string, data: UpdateStatusData)
   })
   if (!response.ok) {
     const message = await parseErrorMessage(response, 'Failed to update status.')
+    throw new ApiError(response.status, message)
+  }
+  return response.json()
+}
+
+export async function uploadAvatar(token: string, file: File): Promise<ProfileData> {
+  const form = new FormData()
+  form.append('Avatar', file)
+
+  const response = await fetch(`${API_BASE_URL}/api/profiles/me/avatar`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: form,
+  })
+  if (!response.ok) {
+    const message = await parseErrorMessage(response, 'Failed to upload avatar.')
     throw new ApiError(response.status, message)
   }
   return response.json()

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Button } from './ui/Button'
-import { updateProfile, type ProfileData } from '../api/profilesApi'
+import { AvatarUploadInput } from './AvatarUploadInput'
+import { updateProfile, uploadAvatar, type ProfileData } from '../api/profilesApi'
 import { ApiError } from '../api/http'
 
 const PLATFORMS = ['PC', 'Xbox', 'PlayStation', 'Switch']
@@ -17,7 +18,8 @@ interface LinkRow { key: string; value: string }
 export function EditProfileForm({ profile, token, onSave, onCancel }: EditProfileFormProps) {
   const [displayName, setDisplayName] = useState(profile.displayName)
   const [bio, setBio] = useState(profile.bio ?? '')
-  const [avatarUrl, setAvatarUrl] = useState(profile.avatarUrl ?? '')
+  const [avatarFile, setAvatarFile] = useState<File | null>(null)
+  const [avatarError, setAvatarError] = useState<string | null>(null)
   const [region, setRegion] = useState(profile.region ?? '')
   const [platforms, setPlatforms] = useState<string[]>(profile.platforms)
   const [links, setLinks] = useState<LinkRow[]>(
@@ -54,10 +56,12 @@ export function EditProfileForm({ profile, token, onSave, onCancel }: EditProfil
       if (key.trim() && value.trim()) externalLinks[key.trim()] = value.trim()
     }
     try {
+      if (avatarFile) {
+        await uploadAvatar(token, avatarFile)
+      }
       const updated = await updateProfile(token, {
         displayName: displayName.trim(),
         bio: bio.trim() || null,
-        avatarUrl: avatarUrl.trim() || null,
         region: region.trim() || null,
         languages: profile.languages,
         platforms,
@@ -95,8 +99,15 @@ export function EditProfileForm({ profile, token, onSave, onCancel }: EditProfil
       </label>
 
       <label className="flex flex-col gap-1 text-sm text-muted">
-        Avatar URL
-        <input className={inputClass} value={avatarUrl} onChange={(e) => setAvatarUrl(e.target.value)} placeholder="https://..." />
+        Avatar
+        <AvatarUploadInput
+          currentAvatarUrl={profile.avatarUrl}
+          displayName={profile.displayName}
+          file={avatarFile}
+          onFileChange={setAvatarFile}
+          error={avatarError}
+          onError={setAvatarError}
+        />
       </label>
 
       <label className="flex flex-col gap-1 text-sm text-muted">
