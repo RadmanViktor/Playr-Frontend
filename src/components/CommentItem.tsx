@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Avatar } from './ui/Avatar'
 import { Button } from './ui/Button'
+import { EmojiPickerButton } from './EmojiPickerButton'
 import type { CommentItem as CommentItemType } from '../api/commentsApi'
 
 function formatRelativeTime(createdAt: string): string {
@@ -67,13 +68,18 @@ export function CommentItem({ comment, currentUserId, onSave, onDelete }: Commen
           </Link>
           {isEditing ? (
             <div className="mt-1 flex flex-col gap-2">
-              <textarea
-                aria-label="Edit comment text"
-                className="rounded-lg border border-border bg-surface px-2 py-1 text-sm text-text resize-none h-16 outline-none focus:border-primary"
-                value={text}
-                maxLength={500}
-                onChange={(e) => setText(e.target.value)}
-              />
+              <div className="relative">
+                <textarea
+                  aria-label="Edit comment text"
+                  className="w-full rounded-lg border border-border bg-surface px-2 py-1 pr-10 text-sm text-text resize-none h-16 outline-none focus:border-primary"
+                  value={text}
+                  maxLength={500}
+                  onChange={(e) => setText(e.target.value)}
+                />
+                <div className="absolute bottom-1.5 right-1.5">
+                  <EmojiPickerButton onSelect={(emoji) => setText((t) => t + emoji)} />
+                </div>
+              </div>
               {error && <p className="text-frustrated text-xs">{error}</p>}
               <div className="flex gap-2">
                 <Button size="sm" onClick={handleSave} disabled={isSaving}>

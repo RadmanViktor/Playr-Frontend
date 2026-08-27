@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Button } from './ui/Button'
 import { CommentItem } from './CommentItem'
+import { EmojiPickerButton } from './EmojiPickerButton'
 import { getComments, createComment, updateComment, deleteComment } from '../api/commentsApi'
 import type { CommentItem as CommentItemType } from '../api/commentsApi'
 import { ApiError } from '../api/http'
@@ -112,14 +113,19 @@ export function CommentsSection({ postId, currentUserId, onCountChange }: Commen
 
       {currentUserId != null && (
         <form onSubmit={handlePost} className="flex flex-col gap-2">
-          <textarea
-            aria-label="Write a comment"
-            placeholder="Write a comment…"
-            className="rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm text-text resize-none h-16 outline-none focus:border-primary"
-            value={newText}
-            maxLength={500}
-            onChange={(e) => setNewText(e.target.value)}
-          />
+          <div className="relative">
+            <textarea
+              aria-label="Write a comment"
+              placeholder="Write a comment…"
+              className="w-full rounded-lg border border-border bg-surface-raised px-3 py-2 pr-10 text-sm text-text resize-none h-16 outline-none focus:border-primary"
+              value={newText}
+              maxLength={500}
+              onChange={(e) => setNewText(e.target.value)}
+            />
+            <div className="absolute bottom-2 right-2">
+              <EmojiPickerButton onSelect={(emoji) => setNewText((t) => t + emoji)} />
+            </div>
+          </div>
           {postError && <p className="text-frustrated text-xs">{postError}</p>}
           <Button type="submit" size="sm" disabled={isPosting || newText.trim().length === 0} className="self-end mt-1">
             {isPosting ? 'Posting…' : 'Comment'}

@@ -9,6 +9,7 @@ import { updatePost, deletePost, toggleLike, resolveMediaUrl } from '../api/post
 import { ApiError } from '../api/http'
 import { MediaUploadInput } from './MediaUploadInput'
 import { CommentsSection } from './CommentsSection'
+import { EmojiPickerButton } from './EmojiPickerButton'
 import type { PostFeedItem } from '../api/postsApi'
 import type { ComponentProps } from 'react'
 
@@ -224,13 +225,18 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardPr
             ))}
           </div>
           {/* Textarea */}
-          <textarea
-            aria-label="Edit post text"
-            className="rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm text-text resize-none h-28 outline-none focus:border-primary"
-            value={editText}
-            maxLength={1000}
-            onChange={(e) => setEditText(e.target.value)}
-          />
+          <div className="relative">
+            <textarea
+              aria-label="Edit post text"
+              className="w-full rounded-lg border border-border bg-surface-raised px-3 py-2 pr-10 text-sm text-text resize-none h-28 outline-none focus:border-primary"
+              value={editText}
+              maxLength={1000}
+              onChange={(e) => setEditText(e.target.value)}
+            />
+            <div className="absolute bottom-2 right-2">
+              <EmojiPickerButton onSelect={(emoji) => setEditText((t) => t + emoji)} />
+            </div>
+          </div>
           <span className="text-xs text-muted self-end">{editText.length} / 1000</span>
           <MediaUploadInput
             file={editMediaFile}
