@@ -26,7 +26,7 @@ export function SteamGamesList({ userId }: SteamGamesListProps) {
 
   if (isLoading) return <p className="text-muted">Loading…</p>
   if (!games || games.length === 0) {
-    return <p className="text-muted">Inga Steam-spel att visa.</p>
+    return <p className="text-muted">No Steam games to show.</p>
   }
 
   return (

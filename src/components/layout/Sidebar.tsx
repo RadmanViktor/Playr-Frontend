@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import { Home, Rss, Users, MessageSquare, Plus, UserRoundCheck } from 'lucide-react'
+import { Rss, Users, MessageSquare, Plus, UserRoundCheck } from 'lucide-react'
 import { Button } from '../ui/Button'
 import { Avatar, type AvatarStatus } from '../ui/Avatar'
 import { StatusModal } from '../ui/StatusModal'
@@ -10,11 +10,10 @@ import { useCreatePostModal } from '../../context/CreatePostModalContext'
 import type { ProfileStatus } from '../../api/profilesApi'
 
 const navItems = [
-  { to: '/', label: 'Home', icon: Home, end: true },
-  { to: '/friends', label: 'Friends', icon: UserRoundCheck, end: false },
   { to: '/feed', label: 'Feed', icon: Rss, end: false },
   { to: '/find-players', label: 'Find Players', icon: Users, end: false },
   { to: '/threads', label: 'Threads', icon: MessageSquare, end: false },
+  { to: '/friends', label: 'Friends', icon: UserRoundCheck, end: false },
 ]
 
 const statusAvatarMap: Record<ProfileStatus, AvatarStatus> = {

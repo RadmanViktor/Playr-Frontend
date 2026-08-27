@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Gamepad2, Moon, Circle, EyeOff, X } from 'lucide-react'
 import { Button } from './Button'
+import { Select } from './Select'
 import { getGames, type Game } from '../../api/gamesApi'
 import type { PlayStyle, ProfileStatus } from '../../api/profilesApi'
 import { useStatus } from '../../context/StatusContext'
@@ -118,21 +119,13 @@ export function StatusModal({ onClose }: StatusModalProps) {
               <label htmlFor="status-game" className="mb-1 block text-xs font-medium text-muted">
                 Game
               </label>
-              <select
+              <Select
                 id="status-game"
                 value={selectedGameId ?? ''}
-                onChange={(event) => setSelectedGameId(event.target.value || null)}
-                className="w-full rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm text-text cursor-pointer"
-              >
-                <option value="" disabled>
-                  Select a game
-                </option>
-                {games.map((game) => (
-                  <option key={game.id} value={game.id}>
-                    {game.name}
-                  </option>
-                ))}
-              </select>
+                onChange={(val) => setSelectedGameId(val || null)}
+                placeholder="Select a game"
+                options={games.map((game) => ({ value: game.id, label: game.name }))}
+              />
             </div>
 
             <div>

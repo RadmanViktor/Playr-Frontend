@@ -49,7 +49,7 @@ export function SteamAccountSection({ token }: SteamAccountSectionProps) {
 
   return (
     <div className="flex flex-col gap-2 rounded-lg border border-border bg-surface-raised p-4">
-      <h2 className="text-lg font-semibold text-text">Steam-konto</h2>
+        <h2 className="text-lg font-semibold text-text">Steam account</h2>
       {error && <p className="text-frustrated text-sm">{error}</p>}
       {account ? (
         <div className="flex items-center justify-between gap-4">
@@ -60,19 +60,19 @@ export function SteamAccountSection({ token }: SteamAccountSectionProps) {
             <div>
               <p className="text-text">{account.displayName ?? account.steamId}</p>
               <p className="text-muted text-sm">
-                {account.isPublic ? 'Publikt spelbibliotek' : 'Privat profil – spel kan inte hämtas'}
+                {account.isPublic ? 'Public game library' : 'Private profile – games cannot be fetched'}
               </p>
             </div>
           </div>
           <Button variant="secondary" size="sm" disabled={isBusy} onClick={handleUnlink}>
-            Koppla bort
+            Unlink
           </Button>
         </div>
       ) : (
         <div className="flex items-center justify-between gap-4">
-          <p className="text-muted text-sm">Koppla ditt Steam-konto för att visa ditt spelbibliotek på profilen.</p>
+          <p className="text-muted text-sm">Connect your Steam account to show your game library on your profile.</p>
           <Button size="sm" disabled={isBusy} onClick={handleLink}>
-            Koppla Steam
+            Connect Steam
           </Button>
         </div>
       )}

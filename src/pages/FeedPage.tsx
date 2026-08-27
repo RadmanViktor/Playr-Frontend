@@ -4,6 +4,7 @@ import { getFeed, type PostFeedItem } from '../api/postsApi'
 import { getGames, type Game } from '../api/gamesApi'
 import { useAuth } from '../context/AuthContext'
 import { useCreatePostModal } from '../context/CreatePostModalContext'
+import { Select } from '../components/ui/Select'
 
 export default function FeedPage() {
   const { user, token } = useAuth()
@@ -49,17 +50,16 @@ export default function FeedPage() {
     <div className="flex flex-col gap-4">
       {gamesInFeed.length > 0 && (
         <div className="flex items-center justify-end">
-          <select
+          <Select
             aria-label="Filter by game"
             value={selectedGameId}
-            onChange={(e) => setSelectedGameId(e.target.value)}
-            className="rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm text-text outline-none focus:border-primary"
-          >
-            <option value="all">All games</option>
-            {gamesInFeed.map((g) => (
-              <option key={g.id} value={g.id}>{g.name}</option>
-            ))}
-          </select>
+            onChange={setSelectedGameId}
+            className="w-auto"
+            options={[
+              { value: 'all', label: 'All games' },
+              ...gamesInFeed.map((g) => ({ value: g.id, label: g.name })),
+            ]}
+          />
         </div>
       )}
 

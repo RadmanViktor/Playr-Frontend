@@ -42,6 +42,19 @@ export default function ProfilePage() {
     navigate('/login', { replace: true })
   }
 
+  function handleTabChange(tab: 'posts' | 'games') {
+    if (tab === activeTab) return
+    const applyChange = () => setActiveTab(tab)
+    const doc = document as Document & {
+      startViewTransition?: (callback: () => void) => void
+    }
+    if (typeof doc.startViewTransition === 'function') {
+      doc.startViewTransition(applyChange)
+    } else {
+      applyChange()
+    }
+  }
+
   if (isLoading) return <p className="text-muted">Loading…</p>
   if (notFound) return <p className="text-muted">Profile not found.</p>
   if (error) return <p className="text-frustrated">{error}</p>
@@ -57,38 +70,50 @@ export default function ProfilePage() {
         postCount={posts.length}
       />
 
-      <div className="flex gap-2 border-b border-border">
+      <div className="relative flex gap-2 rounded-lg border border-border bg-surface-raised p-1">
+        <div
+          className={`absolute inset-y-1 w-[calc(50%-0.25rem)] rounded-md bg-primary shadow-sm transition-transform duration-300 ease-out ${
+            activeTab === 'games' ? 'translate-x-[calc(100%+0.5rem)]' : 'translate-x-0'
+          }`}
+          aria-hidden
+        />
         <button
-          className={`px-3 py-2 text-sm font-medium ${activeTab === 'posts' ? 'text-text border-b-2 border-primary' : 'text-muted'}`}
-          onClick={() => setActiveTab('posts')}
+          className={`relative z-10 flex-1 rounded-md px-4 py-2 text-base font-semibold transition-colors duration-300 ${
+            activeTab === 'posts' ? 'text-white' : 'text-muted hover:text-text'
+          }`}
+          onClick={() => handleTabChange('posts')}
         >
           Posts
         </button>
         <button
-          className={`px-3 py-2 text-sm font-medium ${activeTab === 'games' ? 'text-text border-b-2 border-primary' : 'text-muted'}`}
-          onClick={() => setActiveTab('games')}
+          className={`relative z-10 flex-1 rounded-md px-4 py-2 text-base font-semibold transition-colors duration-300 ${
+            activeTab === 'games' ? 'text-white' : 'text-muted hover:text-text'
+          }`}
+          onClick={() => handleTabChange('games')}
         >
-          Spel
+          Games
         </button>
       </div>
 
-      {activeTab === 'posts' ? (
-        posts.length === 0 ? (
-          <p className="text-muted">No posts yet.</p>
+      <div key={activeTab} className="animate-tab-content flex flex-col gap-4">
+        {activeTab === 'posts' ? (
+          posts.length === 0 ? (
+            <p className="text-muted">No posts yet.</p>
+          ) : (
+            posts.map((post) => (
+              <PostCard
+                key={post.id}
+                post={post}
+                currentUserId={user?.id}
+                onUpdate={(updated) => setPosts((prev) => prev.map((p) => (p.id === updated.id ? updated : p)))}
+                onDelete={(postId) => setPosts((prev) => prev.filter((p) => p.id !== postId))}
+              />
+            ))
+          )
         ) : (
-          posts.map((post) => (
-            <PostCard
-              key={post.id}
-              post={post}
-              currentUserId={user?.id}
-              onUpdate={(updated) => setPosts((prev) => prev.map((p) => (p.id === updated.id ? updated : p)))}
-              onDelete={(postId) => setPosts((prev) => prev.filter((p) => p.id !== postId))}
-            />
-          ))
-        )
-      ) : (
-        <SteamGamesList userId={profile.userId} />
-      )}
+          <SteamGamesList userId={profile.userId} />
+        )}
+      </div>
     </div>
   )
 }

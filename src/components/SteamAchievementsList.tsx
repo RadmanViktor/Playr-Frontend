@@ -11,12 +11,14 @@ interface SteamAchievementsListProps {
 export function SteamAchievementsList({ userId, appId, gameName, onClose }: SteamAchievementsListProps) {
   const [achievements, setAchievements] = useState<SteamAchievement[] | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     setIsLoading(true)
+    setError(null)
     getSteamAchievements(userId, appId)
       .then(setAchievements)
-      .catch(() => setAchievements([]))
+      .catch(() => setError('Failed to load achievements.'))
       .finally(() => setIsLoading(false))
   }, [userId, appId])
 
@@ -35,8 +37,10 @@ export function SteamAchievementsList({ userId, appId, gameName, onClose }: Stea
 
         {isLoading ? (
           <p className="text-muted">Loading…</p>
+        ) : error ? (
+          <p className="text-frustrated">{error}</p>
         ) : !achievements || achievements.length === 0 ? (
-          <p className="text-muted">Inga achievements att visa för det här spelet.</p>
+          <p className="text-muted">No achievements to show for this game.</p>
         ) : (
           <ul className="flex flex-col gap-2">
             {achievements.map((achievement) => (
@@ -57,7 +61,7 @@ export function SteamAchievementsList({ userId, appId, gameName, onClose }: Stea
                   <p className="text-text text-sm">{achievement.displayName ?? achievement.apiName}</p>
                   {achievement.achieved && achievement.unlockedAt && (
                     <p className="text-muted text-xs">
-                      Upplåst {new Date(achievement.unlockedAt).toLocaleDateString()}
+                      Unlocked {new Date(achievement.unlockedAt).toLocaleDateString()}
                     </p>
                   )}
                 </div>
