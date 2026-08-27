@@ -1,7 +1,9 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Avatar } from './ui/Avatar'
 import { Button } from './ui/Button'
+import { IconButton } from './ui/IconButton'
+import { MoreHorizontal } from 'lucide-react'
 import { EmojiPickerButton } from './EmojiPickerButton'
 import { CommentReactions } from './CommentReactions'
 import type { CommentItem as CommentItemType, ReactionType } from '../api/commentsApi'
@@ -31,8 +33,21 @@ export function CommentItem({ comment, currentUserId, onSave, onDelete, onReact,
   const [isDeleting, setIsDeleting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [reactionError, setReactionError] = useState<string | null>(null)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuRef = useRef<HTMLDivElement>(null)
 
   const isOwner = currentUserId != null && currentUserId === comment.authorId
+
+  useEffect(() => {
+    if (!menuOpen) return
+    function handleMouseDown(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleMouseDown)
+    return () => document.removeEventListener('mousedown', handleMouseDown)
+  }, [menuOpen])
 
   async function handleReact(type: ReactionType) {
     setReactionError(null)
@@ -123,19 +138,31 @@ export function CommentItem({ comment, currentUserId, onSave, onDelete, onReact,
             onRemoveReaction={handleRemoveReaction}
           />
           {isOwner && (
-            <>
-              <button type="button" className="cursor-pointer hover:text-text" onClick={() => setIsEditing(true)}>
-                Edit
-              </button>
-              <button
-                type="button"
-                className="cursor-pointer hover:text-frustrated"
-                onClick={handleDelete}
-                disabled={isDeleting}
+            <div className="relative" ref={menuRef}>
+              <IconButton
+                aria-label="Comment options"
+                onClick={() => setMenuOpen((open) => !open)}
               >
-                {isDeleting ? 'Deleting…' : 'Delete'}
-              </button>
-            </>
+                <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
+              </IconButton>
+              {menuOpen && (
+                <div className="absolute right-0 top-7 z-10 min-w-[120px] rounded-lg border border-border bg-surface-raised shadow-lg">
+                  <button
+                    className="w-full px-4 py-2 text-left text-sm text-text hover:bg-border rounded-t-lg cursor-pointer"
+                    onClick={() => { setIsEditing(true); setMenuOpen(false) }}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="w-full px-4 py-2 text-left text-sm text-frustrated hover:bg-border rounded-b-lg cursor-pointer disabled:opacity-60"
+                    onClick={handleDelete}
+                    disabled={isDeleting}
+                  >
+                    {isDeleting ? 'Deleting…' : 'Delete'}
+                  </button>
+                </div>
+              )}
+            </div>
           )}
         </div>
       )}
