@@ -121,7 +121,7 @@ export function CommentsSection({ postId, currentUserId, onCountChange }: Commen
             onChange={(e) => setNewText(e.target.value)}
           />
           {postError && <p className="text-frustrated text-xs">{postError}</p>}
-          <Button type="submit" size="sm" disabled={isPosting || newText.trim().length === 0} className="self-end">
+          <Button type="submit" size="sm" disabled={isPosting || newText.trim().length === 0} className="self-end mt-1">
             {isPosting ? 'Posting…' : 'Comment'}
           </Button>
         </form>
