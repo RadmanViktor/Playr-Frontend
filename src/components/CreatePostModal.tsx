@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { X } from 'lucide-react'
 import { Button } from './ui/Button'
-import { MediaUploadInput, validateMediaFile } from './MediaUploadInput'
+import { MediaGalleryUploadInput } from './MediaGalleryUploadInput'
+import { validateMediaFile } from './MediaUploadInput'
 import { EmojiPickerButton } from './EmojiPickerButton'
 import { GamePickerInput } from './GamePickerInput'
 import { useAuth } from '../context/AuthContext'
@@ -26,7 +27,7 @@ export function CreatePostModal({ onClose, onPostCreated }: CreatePostModalProps
   const [selectedMood, setSelectedMood] = useState<MoodOption>('None')
   const [text, setText] = useState('')
   const [textError, setTextError] = useState<string | null>(null)
-  const [mediaFile, setMediaFile] = useState<File | null>(null)
+  const [mediaFiles, setMediaFiles] = useState<File[]>([])
   const [mediaError, setMediaError] = useState<string | null>(null)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -50,7 +51,7 @@ export function CreatePostModal({ onClose, onPostCreated }: CreatePostModalProps
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [text, mediaFile])
+  }, [text, mediaFiles])
 
   useEffect(() => {
     function handlePaste(e: ClipboardEvent) {
@@ -65,7 +66,7 @@ export function CreatePostModal({ onClose, onPostCreated }: CreatePostModalProps
             setMediaError(validationError)
           } else {
             setMediaError(null)
-            setMediaFile(file)
+            setMediaFiles((current) => (current.length < 5 ? [...current, file] : current))
           }
           break
         }
@@ -75,7 +76,7 @@ export function CreatePostModal({ onClose, onPostCreated }: CreatePostModalProps
     return () => document.removeEventListener('paste', handlePaste)
   }, [])
 
-  const hasUnsavedContent = text.trim() !== '' || mediaFile !== null
+  const hasUnsavedContent = text.trim() !== '' || mediaFiles.length > 0
 
   function requestClose() {
     if (hasUnsavedContent) {
@@ -96,12 +97,12 @@ export function CreatePostModal({ onClose, onPostCreated }: CreatePostModalProps
     if (trimmed.length > 1000) { setTextError('Post text cannot be longer than 1000 characters.'); return }
 
     setIsSubmitting(true)
-    setUploadProgress(mediaFile ? 0 : null)
+    setUploadProgress(mediaFiles.length > 0 ? 0 : null)
     try {
       const post = await createPost(
         token!,
-        { gameId: selectedGameId, textContent: trimmed, mood: moodOptionToApi(selectedMood), media: mediaFile },
-        mediaFile ? setUploadProgress : undefined
+        { gameId: selectedGameId, textContent: trimmed, mood: moodOptionToApi(selectedMood), media: mediaFiles },
+        mediaFiles.length > 0 ? setUploadProgress : undefined
       )
       addRecentGameId(selectedGameId)
       onPostCreated(post)
@@ -199,9 +200,9 @@ export function CreatePostModal({ onClose, onPostCreated }: CreatePostModalProps
 
             {textError && <p className="text-frustrated text-sm">{textError}</p>}
 
-            <MediaUploadInput
-              file={mediaFile}
-              onFileChange={setMediaFile}
+            <MediaGalleryUploadInput
+              files={mediaFiles}
+              onFilesChange={setMediaFiles}
               error={mediaError}
               onError={setMediaError}
             />

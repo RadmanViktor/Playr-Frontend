@@ -22,7 +22,7 @@ export function validateMediaFile(file: File): string | null {
   return 'Unsupported file type. Allowed: jpg, jpeg, png, webp, gif, mp4, webm, mov.'
 }
 
-function isVideoFile(file: File): boolean {
+export function isVideoFile(file: File): boolean {
   const extension = file.name.slice(file.name.lastIndexOf('.')).toLowerCase()
   return ALLOWED_VIDEO_EXTENSIONS.includes(extension)
 }

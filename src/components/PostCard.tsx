@@ -5,9 +5,10 @@ import { Badge } from './ui/Badge'
 import { Button } from './ui/Button'
 import { IconButton } from './ui/IconButton'
 import { MoreHorizontal, Heart, MessageCircle } from 'lucide-react'
-import { updatePost, deletePost, toggleLike, resolveMediaUrl } from '../api/postsApi'
+import { updatePost, deletePost, toggleLike } from '../api/postsApi'
 import { ApiError } from '../api/http'
-import { MediaUploadInput } from './MediaUploadInput'
+import { MediaGalleryUploadInput } from './MediaGalleryUploadInput'
+import { PostMediaCarousel } from './PostMediaCarousel'
 import { CommentsSection } from './CommentsSection'
 import { EmojiPickerButton } from './EmojiPickerButton'
 import { useAuth } from '../context/AuthContext'
@@ -50,9 +51,9 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardPr
   const [state, setState] = useState<CardState>('read')
   const [editText, setEditText] = useState(post.textContent)
   const [editMood, setEditMood] = useState<MoodOption>(apiMoodToOption(post.mood))
-  const [editMediaFile, setEditMediaFile] = useState<File | null>(null)
+  const [editMediaFiles, setEditMediaFiles] = useState<File[]>([])
   const [editMediaError, setEditMediaError] = useState<string | null>(null)
-  const [removeMedia, setRemoveMedia] = useState(false)
+  const [removedExistingIds, setRemovedExistingIds] = useState<string[]>([])
   const [actionError, setActionError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -85,7 +86,12 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardPr
       const updated = await updatePost(
         token ?? '',
         post.id,
-        { textContent: editText.trim(), mood: moodOptionToApi(editMood), media: editMediaFile, removeMedia }
+        {
+          textContent: editText.trim(),
+          mood: moodOptionToApi(editMood),
+          media: editMediaFiles,
+          removeMediaIds: removedExistingIds,
+        }
       )
       onUpdate?.(updated)
       setState('read')
@@ -111,9 +117,9 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardPr
   function openEdit() {
     setEditText(post.textContent)
     setEditMood(apiMoodToOption(post.mood))
-    setEditMediaFile(null)
+    setEditMediaFiles([])
     setEditMediaError(null)
-    setRemoveMedia(false)
+    setRemovedExistingIds([])
     setActionError(null)
     setState('editing')
   }
@@ -223,13 +229,12 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardPr
             </div>
           </div>
           <span className="text-xs text-muted self-end">{editText.length} / 1000</span>
-          <MediaUploadInput
-            file={editMediaFile}
-            onFileChange={setEditMediaFile}
-            existingMediaUrl={resolveMediaUrl(post.mediaUrl)}
-            existingMediaType={post.mediaType}
-            removeExisting={removeMedia}
-            onRemoveExistingChange={setRemoveMedia}
+          <MediaGalleryUploadInput
+            files={editMediaFiles}
+            onFilesChange={setEditMediaFiles}
+            existingMedia={post.media}
+            removedExistingIds={removedExistingIds}
+            onRemovedExistingIdsChange={setRemovedExistingIds}
             error={editMediaError}
             onError={setEditMediaError}
           />
@@ -265,13 +270,7 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardPr
       ) : (
         <div className="flex flex-col gap-3">
           <p className="text-sm text-text leading-relaxed whitespace-pre-wrap">{linkify(post.textContent)}</p>
-          {post.mediaUrl && (
-            post.mediaType === 'Video' ? (
-              <video src={resolveMediaUrl(post.mediaUrl)!} controls className="max-h-96 w-full rounded-lg object-contain" />
-            ) : (
-              <img src={resolveMediaUrl(post.mediaUrl)!} alt="Post media" className="max-h-96 w-full rounded-lg object-contain" />
-            )
-          )}
+          <PostMediaCarousel media={post.media} />
         </div>
       )}
 

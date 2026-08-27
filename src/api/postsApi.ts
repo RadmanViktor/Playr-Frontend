@@ -8,6 +8,13 @@ export function resolveMediaUrl(url: string | null): string | null {
   return `${API_BASE_URL}${url}`
 }
 
+export interface PostMediaItem {
+  id: string
+  url: string
+  mediaType: string
+  sortOrder: number
+}
+
 export interface PostFeedItem {
   id: string
   authorId: string
@@ -19,8 +26,7 @@ export interface PostFeedItem {
   gameCoverImageUrl: string | null
   textContent: string
   mood: string | null
-  mediaUrl: string | null
-  mediaType: string | null
+  media: PostMediaItem[]
   createdAt: string
   likesCount: number
   likedByCurrentUser: boolean
@@ -29,14 +35,14 @@ export interface PostFeedItem {
 
 export async function createPost(
   token: string,
-  data: { gameId: string; textContent: string; mood?: string | null; media?: File | null },
+  data: { gameId: string; textContent: string; mood?: string | null; media?: File[] },
   onProgress?: (percent: number) => void
 ): Promise<PostFeedItem> {
   const form = new FormData()
   form.append('GameId', data.gameId)
   form.append('TextContent', data.textContent)
   if (data.mood) form.append('Mood', data.mood)
-  if (data.media) form.append('Media', data.media)
+  for (const file of data.media ?? []) form.append('Media', file)
 
   if (!onProgress) {
     const response = await fetch(`${API_BASE_URL}/api/posts`, {
@@ -100,13 +106,13 @@ export async function getFeed(token?: string | null): Promise<PostFeedItem[]> {
 export async function updatePost(
   token: string,
   postId: string,
-  data: { textContent: string; mood?: string | null; media?: File | null; removeMedia?: boolean }
+  data: { textContent: string; mood?: string | null; media?: File[]; removeMediaIds?: string[] }
 ): Promise<PostFeedItem> {
   const form = new FormData()
   form.append('TextContent', data.textContent)
   if (data.mood) form.append('Mood', data.mood)
-  if (data.media) form.append('Media', data.media)
-  if (data.removeMedia) form.append('RemoveMedia', 'true')
+  for (const file of data.media ?? []) form.append('Media', file)
+  for (const id of data.removeMediaIds ?? []) form.append('RemoveMediaIds', id)
 
   const response = await fetch(`${API_BASE_URL}/api/posts/${postId}`, {
     method: 'PUT',
