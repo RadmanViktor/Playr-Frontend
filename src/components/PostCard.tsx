@@ -4,10 +4,11 @@ import { Avatar } from './ui/Avatar'
 import { Badge } from './ui/Badge'
 import { Button } from './ui/Button'
 import { IconButton } from './ui/IconButton'
-import { MoreHorizontal, Heart } from 'lucide-react'
+import { MoreHorizontal, Heart, MessageCircle } from 'lucide-react'
 import { updatePost, deletePost, toggleLike, resolveMediaUrl } from '../api/postsApi'
 import { ApiError } from '../api/http'
 import { MediaUploadInput } from './MediaUploadInput'
+import { CommentsSection } from './CommentsSection'
 import type { PostFeedItem } from '../api/postsApi'
 import type { ComponentProps } from 'react'
 
@@ -72,6 +73,8 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardPr
   const [likesCount, setLikesCount] = useState(post.likesCount)
   const [liked, setLiked] = useState(post.likedByCurrentUser)
   const [isLiking, setIsLiking] = useState(false)
+  const [commentsCount, setCommentsCount] = useState(post.commentsCount)
+  const [commentsOpen, setCommentsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
   const isOwner = currentUserId != null && currentUserId === post.authorId
@@ -284,19 +287,38 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardPr
       {/* Timestamp + likes */}
       <div className="flex items-center justify-between">
         <p className="text-xs text-muted">{formatRelativeTime(post.createdAt)}</p>
-        <button
-          onClick={handleToggleLike}
-          disabled={currentUserId == null}
-          aria-label={liked ? 'Unlike post' : 'Like post'}
-          aria-pressed={liked}
-          className={`flex items-center gap-1.5 text-xs font-medium transition-colors cursor-pointer disabled:cursor-default ${
-            liked ? 'text-frustrated' : 'text-muted hover:text-frustrated'
-          }`}
-        >
-          <Heart className="h-4 w-4" fill={liked ? 'currentColor' : 'none'} aria-hidden="true" />
-          {likesCount > 0 && likesCount}
-        </button>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => setCommentsOpen((open) => !open)}
+            aria-label={commentsOpen ? 'Hide comments' : 'Show comments'}
+            aria-pressed={commentsOpen}
+            className="flex items-center gap-1.5 text-xs font-medium text-muted hover:text-text transition-colors cursor-pointer"
+          >
+            <MessageCircle className="h-4 w-4" aria-hidden="true" />
+            {commentsCount > 0 && commentsCount}
+          </button>
+          <button
+            onClick={handleToggleLike}
+            disabled={currentUserId == null}
+            aria-label={liked ? 'Unlike post' : 'Like post'}
+            aria-pressed={liked}
+            className={`flex items-center gap-1.5 text-xs font-medium transition-colors cursor-pointer disabled:cursor-default ${
+              liked ? 'text-frustrated' : 'text-muted hover:text-frustrated'
+            }`}
+          >
+            <Heart className="h-4 w-4" fill={liked ? 'currentColor' : 'none'} aria-hidden="true" />
+            {likesCount > 0 && likesCount}
+          </button>
+        </div>
       </div>
+
+      {commentsOpen && (
+        <CommentsSection
+          postId={post.id}
+          currentUserId={currentUserId}
+          onCountChange={(delta) => setCommentsCount((count) => count + delta)}
+        />
+      )}
     </div>
   )
 }

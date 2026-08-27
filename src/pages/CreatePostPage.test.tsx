@@ -22,7 +22,7 @@ beforeEach(() => {
   vi.mocked(postsApi.createPost).mockResolvedValue({
     id: 'p1', authorId: 'a', authorUsername: 'player', authorDisplayName: 'Player',
     authorAvatarUrl: null, gameId: 'g1', gameName: 'Hollow Knight', gameCoverImageUrl: null,
-    textContent: 'Hello', mood: null, mediaUrl: null, mediaType: null, createdAt: new Date().toISOString(), likesCount: 0, likedByCurrentUser: false,
+    textContent: 'Hello', mood: null, mediaUrl: null, mediaType: null, createdAt: new Date().toISOString(), likesCount: 0, likedByCurrentUser: false, commentsCount: 0,
   })
 })
 

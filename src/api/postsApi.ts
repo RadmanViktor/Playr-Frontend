@@ -24,6 +24,7 @@ export interface PostFeedItem {
   createdAt: string
   likesCount: number
   likedByCurrentUser: boolean
+  commentsCount: number
 }
 
 export async function createPost(

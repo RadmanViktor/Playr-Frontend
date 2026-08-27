@@ -13,7 +13,7 @@ const base: PostFeedItem = {
   textContent: 'Finally beat Radahn!', mood: 'Enjoying',
   mediaUrl: null, mediaType: null,
   createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-  likesCount: 0, likedByCurrentUser: false,
+  likesCount: 0, likedByCurrentUser: false, commentsCount: 0,
 }
 
 beforeEach(() => { vi.resetAllMocks() })
