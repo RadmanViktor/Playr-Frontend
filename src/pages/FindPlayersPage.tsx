@@ -8,6 +8,8 @@ import { Button } from '../components/ui/Button'
 import { InviteModal } from '../components/ui/InviteModal'
 import { useAuth } from '../context/AuthContext'
 import { getLookingForGamePlayers, type LookingForGamePlayer } from '../api/profilesApi'
+import { cancelInvitation } from '../api/invitationsApi'
+import { ApiError } from '../api/http'
 
 export default function FindPlayersPage() {
   const { token } = useAuth()
@@ -17,6 +19,8 @@ export default function FindPlayersPage() {
   const [error, setError] = useState<string | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [invitePlayer, setInvitePlayer] = useState<LookingForGamePlayer | null>(null)
+  const [cancellingUserId, setCancellingUserId] = useState<string | null>(null)
+  const [cancelError, setCancelError] = useState<string | null>(null)
 
   const loadPlayers = useCallback(async () => {
     if (!token) return
@@ -42,6 +46,26 @@ export default function FindPlayersPage() {
       prev.map((p) => (p.userId === userId ? { ...p, relationshipStatus: 'InvitePending' } : p)),
     )
     setSuccessMessage(`Invitation sent${player ? ` to ${player.displayName}` : ''}.`)
+  }
+
+  async function handleCancelInvite(player: LookingForGamePlayer) {
+    if (!token || !player.pendingInvitationId) return
+    setCancellingUserId(player.userId)
+    setCancelError(null)
+    try {
+      await cancelInvitation(token, player.pendingInvitationId)
+      setPlayers((prev) =>
+        prev.map((p) =>
+          p.userId === player.userId ? { ...p, relationshipStatus: 'None', pendingInvitationId: null } : p,
+        ),
+      )
+      setSuccessMessage(`Invitation to ${player.displayName} cancelled.`)
+    } catch (err) {
+      setSuccessMessage(null)
+      setCancelError(err instanceof ApiError ? err.message : 'Failed to cancel invitation.')
+    } finally {
+      setCancellingUserId(null)
+    }
   }
 
   if (isLoading) {
@@ -73,6 +97,12 @@ export default function FindPlayersPage() {
       {successMessage && (
         <div className="rounded-xl border border-enjoying/40 bg-enjoying/10 px-4 py-3 text-sm text-enjoying">
           {successMessage}
+        </div>
+      )}
+
+      {cancelError && (
+        <div className="rounded-xl border border-frustrated/40 bg-frustrated/10 px-4 py-3 text-sm text-frustrated">
+          {cancelError}
         </div>
       )}
 
@@ -123,7 +153,21 @@ export default function FindPlayersPage() {
                     </Button>
                   </>
                 )}
-                {player.relationshipStatus === 'InvitePending' && <Badge variant="tag">Invited</Badge>}
+                {player.relationshipStatus === 'InvitePending' && (
+                  <>
+                    <Badge variant="tag">Invited</Badge>
+                    {player.pendingInvitationId && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleCancelInvite(player)}
+                        disabled={cancellingUserId === player.userId}
+                      >
+                        {cancellingUserId === player.userId ? 'Cancelling...' : 'Cancel'}
+                      </Button>
+                    )}
+                  </>
+                )}
                 {player.relationshipStatus === 'None' && (
                   <Button
                     size="sm"

@@ -11,6 +11,7 @@ import {
   getSentInvitations,
   acceptInvitation,
   declineInvitation,
+  cancelInvitation,
   type Invitation,
 } from '../../api/invitationsApi'
 import { ApiError } from '../../api/http'
@@ -143,6 +144,19 @@ export function TopBar() {
       setInvitations((prev) => prev.filter((i) => i.id !== invitationId))
     } catch (err) {
       setInvitationsError(err instanceof ApiError ? err.message : 'Failed to decline invitation.')
+    } finally {
+      setRespondingId(null)
+    }
+  }
+
+  async function handleCancel(invitationId: string) {
+    if (!token) return
+    setRespondingId(invitationId)
+    try {
+      await cancelInvitation(token, invitationId)
+      setSentInvitations((prev) => prev.filter((i) => i.id !== invitationId))
+    } catch (err) {
+      setInvitationsError(err instanceof ApiError ? err.message : 'Failed to cancel invitation.')
     } finally {
       setRespondingId(null)
     }
@@ -289,6 +303,17 @@ export function TopBar() {
                           </span>
                         </div>
                         <p className="mt-0.5 text-xs text-muted break-words">{invitation.message}</p>
+                        {invitation.status === 'Pending' && (
+                          <div className="mt-2 flex gap-2">
+                            <button
+                              onClick={() => handleCancel(invitation.id)}
+                              disabled={respondingId === invitation.id}
+                              className="rounded-md bg-surface-raised px-2.5 py-1 text-xs font-medium text-text hover:bg-border disabled:opacity-50 cursor-pointer"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}

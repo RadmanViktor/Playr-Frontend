@@ -1,6 +1,6 @@
 import { API_BASE_URL, ApiError, parseErrorMessage } from './http'
 
-export type InvitationStatus = 'Pending' | 'Accepted' | 'Declined'
+export type InvitationStatus = 'Pending' | 'Accepted' | 'Declined' | 'Cancelled'
 
 export interface Invitation {
   id: string
@@ -83,6 +83,18 @@ export async function declineInvitation(token: string, invitationId: string): Pr
   })
   if (!response.ok) {
     const message = await parseErrorMessage(response, 'Failed to decline invitation.')
+    throw new ApiError(response.status, message)
+  }
+  return response.json()
+}
+
+export async function cancelInvitation(token: string, invitationId: string): Promise<Invitation> {
+  const response = await fetch(`${API_BASE_URL}/api/invitations/${invitationId}/cancel`, {
+    method: 'POST',
+    headers: authHeaders(token),
+  })
+  if (!response.ok) {
+    const message = await parseErrorMessage(response, 'Failed to cancel invitation.')
     throw new ApiError(response.status, message)
   }
   return response.json()

@@ -11,6 +11,8 @@ interface ProfileHeaderProps {
   onSignOutClick?: () => void
   postCount?: number
   onAddFriendClick?: () => void
+  onCancelFriendRequestClick?: () => void
+  isCancellingFriendRequest?: boolean
 }
 
 const statusAvatarMap: Record<ProfileData['status'], AvatarStatus> = {
@@ -31,6 +33,8 @@ export function ProfileHeader({
   onSignOutClick,
   postCount = 0,
   onAddFriendClick,
+  onCancelFriendRequestClick,
+  isCancellingFriendRequest = false,
 }: ProfileHeaderProps) {
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-surface">
@@ -73,7 +77,21 @@ export function ProfileHeader({
           {!isOwner && (
             <div className="flex flex-col items-end gap-2">
               {profile.relationshipStatus === 'Friends' && <Badge variant="completed">Friend</Badge>}
-              {profile.relationshipStatus === 'InvitePending' && <Badge variant="tag">Request sent</Badge>}
+              {profile.relationshipStatus === 'InvitePending' && (
+                <>
+                  <Badge variant="tag">Request sent</Badge>
+                  {profile.pendingInvitationId && onCancelFriendRequestClick && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={onCancelFriendRequestClick}
+                      disabled={isCancellingFriendRequest}
+                    >
+                      {isCancellingFriendRequest ? 'Cancelling...' : 'Cancel request'}
+                    </Button>
+                  )}
+                </>
+              )}
               {(profile.relationshipStatus === 'None' || profile.relationshipStatus === null) && onAddFriendClick && (
                 <Button size="sm" onClick={onAddFriendClick}>
                   Add friend

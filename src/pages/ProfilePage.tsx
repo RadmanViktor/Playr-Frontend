@@ -5,6 +5,7 @@ import { PostCard } from '../components/PostCard'
 import { SteamGamesList } from '../components/SteamGamesList'
 import { InviteModal } from '../components/ui/InviteModal'
 import { getProfile, getProfilePosts, type ProfileData } from '../api/profilesApi'
+import { cancelInvitation } from '../api/invitationsApi'
 import { type PostFeedItem } from '../api/postsApi'
 import { ApiError } from '../api/http'
 import { useAuth } from '../context/AuthContext'
@@ -22,6 +23,8 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<'posts' | 'games'>('posts')
   const [showFriendRequestModal, setShowFriendRequestModal] = useState(false)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [isCancellingFriendRequest, setIsCancellingFriendRequest] = useState(false)
+  const [friendRequestError, setFriendRequestError] = useState<string | null>(null)
 
   useEffect(() => {
     if (!username) return
@@ -48,6 +51,21 @@ export default function ProfilePage() {
   function handleFriendRequestSent() {
     setProfile((prev) => (prev ? { ...prev, relationshipStatus: 'InvitePending' } : prev))
     setSuccessMessage('Friend request sent.')
+  }
+
+  async function handleCancelFriendRequest() {
+    if (!token || !profile?.pendingInvitationId) return
+    setIsCancellingFriendRequest(true)
+    setFriendRequestError(null)
+    try {
+      await cancelInvitation(token, profile.pendingInvitationId)
+      setProfile((prev) => (prev ? { ...prev, relationshipStatus: 'None', pendingInvitationId: null } : prev))
+      setSuccessMessage('Friend request cancelled.')
+    } catch (err) {
+      setFriendRequestError(err instanceof ApiError ? err.message : 'Failed to cancel friend request.')
+    } finally {
+      setIsCancellingFriendRequest(false)
+    }
   }
 
   useEffect(() => {
@@ -83,11 +101,19 @@ export default function ProfilePage() {
         onSignOutClick={handleSignOut}
         postCount={posts.length}
         onAddFriendClick={() => setShowFriendRequestModal(true)}
+        onCancelFriendRequestClick={handleCancelFriendRequest}
+        isCancellingFriendRequest={isCancellingFriendRequest}
       />
 
       {successMessage && (
         <div className="rounded-xl border border-enjoying/40 bg-enjoying/10 px-4 py-3 text-sm text-enjoying">
           {successMessage}
+        </div>
+      )}
+
+      {friendRequestError && (
+        <div className="rounded-xl border border-frustrated/40 bg-frustrated/10 px-4 py-3 text-sm text-frustrated">
+          {friendRequestError}
         </div>
       )}
 
