@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Gamepad2 } from 'lucide-react'
 import { Card } from '../components/ui/Card'
 import { Avatar } from '../components/ui/Avatar'
@@ -10,6 +11,7 @@ import { getLookingForGamePlayers, type LookingForGamePlayer } from '../api/prof
 
 export default function FindPlayersPage() {
   const { token } = useAuth()
+  const navigate = useNavigate()
   const [players, setPlayers] = useState<LookingForGamePlayer[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -82,10 +84,13 @@ export default function FindPlayersPage() {
         <div className="flex flex-col gap-2">
           {players.map((player) => (
             <Card key={player.userId} className="flex items-center justify-between gap-4">
-              <div className="flex min-w-0 items-center gap-3">
+              <div
+                className="group flex min-w-0 cursor-pointer items-center gap-3"
+                onClick={() => navigate(`/profile/${player.username}`)}
+              >
                 <Avatar src={player.avatarUrl ?? undefined} alt={player.displayName} status="looking-for-game" />
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-text">{player.displayName}</p>
+                  <p className="truncate text-sm font-medium text-text group-hover:underline">{player.displayName}</p>
                   <p className="truncate text-xs text-muted">@{player.username}</p>
                   <div className="mt-1 flex flex-wrap items-center gap-1.5">
                     {player.lookingForGameName && (
