@@ -31,10 +31,13 @@ export default function FriendsPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <Card>
-        <h1 className="mb-1 text-lg font-semibold text-text">Friends</h1>
-        <p className="text-sm text-muted">Players you are connected with.</p>
-      </Card>
+      <div className="mb-2 border-l-4 border-primary pl-4">
+        <p className="mb-1 text-xs font-semibold uppercase tracking-[0.22em] text-primary">Your crew</p>
+        <h1 className="text-3xl font-bold tracking-tight text-text">Friends</h1>
+        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
+          The players you've connected with. Jump into a chat or check out their profile whenever you're ready to play.
+        </p>
+      </div>
 
       {chatError && <p className="text-sm text-frustrated">{chatError}</p>}
       {isLoading && <p className="text-muted">Loading friends...</p>}

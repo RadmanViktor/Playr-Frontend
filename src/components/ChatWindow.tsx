@@ -1,9 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
 import { X } from 'lucide-react'
-import { Avatar } from './ui/Avatar'
+import { Avatar, type AvatarStatus } from './ui/Avatar'
 import { Button } from './ui/Button'
+import { EmojiPickerButton } from './EmojiPickerButton'
 import { getMessages, sendMessage, type ChatMessage, type Conversation } from '../api/chatApi'
+import { getProfile, type ProfileStatus } from '../api/profilesApi'
 import { useAuth } from '../context/AuthContext'
+
+const statusAvatarMap: Record<ProfileStatus, AvatarStatus> = {
+  Online: 'online',
+  LookingForGame: 'looking-for-game',
+  Busy: 'busy',
+  Offline: 'offline',
+}
 
 const MESSAGE_REFRESH_INTERVAL_MS = 2000
 
@@ -20,7 +29,23 @@ export function ChatWindow({ conversation, successMessage, onClose }: ChatWindow
   const [isLoading, setIsLoading] = useState(true)
   const [isSending, setIsSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [otherStatus, setOtherStatus] = useState<ProfileStatus | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    setOtherStatus(null)
+    getProfile(conversation.otherParticipant.username)
+      .then((profile) => {
+        if (!cancelled) setOtherStatus(profile.status)
+      })
+      .catch(() => {
+        if (!cancelled) setOtherStatus(null)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [conversation.otherParticipant.username])
 
   useEffect(() => {
     if (!token) return
@@ -79,12 +104,13 @@ export function ChatWindow({ conversation, successMessage, onClose }: ChatWindow
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex h-[28rem] w-96 max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-xl border border-border bg-surface shadow-2xl">
-      <div className="flex items-center gap-3 border-b border-border bg-surface-raised px-4 py-3">
+    <div className="fixed bottom-4 right-4 z-50 flex h-[28rem] w-96 max-w-[calc(100vw-2rem)] flex-col rounded-xl border border-border bg-surface shadow-2xl">
+      <div className="flex items-center gap-3 rounded-t-xl border-b border-border bg-surface-raised px-4 py-3">
         <Avatar
           src={conversation.otherParticipant.avatarUrl ?? undefined}
           alt={conversation.otherParticipant.displayName}
           size="sm"
+          status={otherStatus ? statusAvatarMap[otherStatus] : undefined}
         />
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-text">{conversation.otherParticipant.displayName}</p>
@@ -134,7 +160,7 @@ export function ChatWindow({ conversation, successMessage, onClose }: ChatWindow
 
       {error && <p className="px-4 pb-2 text-xs text-frustrated">{error}</p>}
 
-      <div className="flex gap-2 border-t border-border p-3">
+      <div className="flex items-center gap-2 border-t border-border p-3 overflow-visible rounded-b-xl">
         <input
           value={body}
           onChange={(event) => setBody(event.target.value.slice(0, 1000))}
@@ -147,6 +173,7 @@ export function ChatWindow({ conversation, successMessage, onClose }: ChatWindow
           placeholder="Write a message..."
           className="min-w-0 flex-1 rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm text-text outline-none placeholder:text-muted focus:border-primary"
         />
+        <EmojiPickerButton onSelect={(emoji) => setBody((prev) => (prev + emoji).slice(0, 1000))} />
         <Button size="sm" onClick={handleSend} disabled={isSending || body.trim().length === 0}>
           Send
         </Button>
