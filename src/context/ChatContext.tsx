@@ -4,14 +4,23 @@ import { ChatWindow } from '../components/ChatWindow'
 import { getOrCreateConversation, type Conversation } from '../api/chatApi'
 import { useAuth } from './AuthContext'
 
+const MAX_OPEN_CHATS = 4
+const CHAT_WINDOW_OFFSET_REM = 25 // window width (24rem) + gap (1rem)
+
 interface OpenChatOptions {
   successMessage?: string | null
+}
+
+interface OpenChat {
+  conversation: Conversation
+  successMessage: string | null
+  isMinimized: boolean
 }
 
 interface ChatContextValue {
   openChatWithUser: (userId: string, options?: OpenChatOptions) => Promise<void>
   openConversation: (conversation: Conversation) => void
-  closeChat: () => void
+  closeChat: (conversationId: string) => void
   error: string | null
 }
 
@@ -19,9 +28,17 @@ const ChatContext = createContext<ChatContextValue | null>(null)
 
 export function ChatProvider({ children }: { children: ReactNode }) {
   const { token } = useAuth()
-  const [activeConversation, setActiveConversation] = useState<Conversation | null>(null)
-  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [openChats, setOpenChats] = useState<OpenChat[]>([])
   const [error, setError] = useState<string | null>(null)
+
+  const showConversation = useCallback((conversation: Conversation, successMessage: string | null) => {
+    setOpenChats((prev) => {
+      const existingIndex = prev.findIndex((chat) => chat.conversation.id === conversation.id)
+      const withoutExisting = existingIndex >= 0 ? prev.filter((chat) => chat.conversation.id !== conversation.id) : prev
+      const next = [...withoutExisting, { conversation, successMessage, isMinimized: false }]
+      return next.length > MAX_OPEN_CHATS ? next.slice(next.length - MAX_OPEN_CHATS) : next
+    })
+  }, [])
 
   const openChatWithUser = useCallback(
     async (userId: string, options?: OpenChatOptions) => {
@@ -29,32 +46,48 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       setError(null)
       try {
         const conversation = await getOrCreateConversation(token, userId)
-        setSuccessMessage(options?.successMessage ?? null)
-        setActiveConversation(conversation)
+        showConversation(conversation, options?.successMessage ?? null)
       } catch {
         setError('Failed to open chat.')
       }
     },
-    [token],
+    [token, showConversation],
   )
 
-  const openConversation = useCallback((conversation: Conversation) => {
-    setError(null)
-    setSuccessMessage(null)
-    setActiveConversation(conversation)
+  const openConversation = useCallback(
+    (conversation: Conversation) => {
+      setError(null)
+      showConversation(conversation, null)
+    },
+    [showConversation],
+  )
+
+  const closeChat = useCallback((conversationId: string) => {
+    setOpenChats((prev) => prev.filter((chat) => chat.conversation.id !== conversationId))
   }, [])
 
-  const closeChat = useCallback(() => {
-    setActiveConversation(null)
-    setSuccessMessage(null)
+  const toggleMinimize = useCallback((conversationId: string) => {
+    setOpenChats((prev) =>
+      prev.map((chat) =>
+        chat.conversation.id === conversationId ? { ...chat, isMinimized: !chat.isMinimized } : chat,
+      ),
+    )
   }, [])
 
   return (
     <ChatContext.Provider value={{ openChatWithUser, openConversation, closeChat, error }}>
       {children}
-      {activeConversation && (
-        <ChatWindow conversation={activeConversation} successMessage={successMessage} onClose={closeChat} />
-      )}
+      {openChats.map((chat, index) => (
+        <ChatWindow
+          key={chat.conversation.id}
+          conversation={chat.conversation}
+          successMessage={chat.successMessage}
+          isMinimized={chat.isMinimized}
+          onToggleMinimize={() => toggleMinimize(chat.conversation.id)}
+          onClose={() => closeChat(chat.conversation.id)}
+          style={{ right: `calc(1rem + ${index * CHAT_WINDOW_OFFSET_REM}rem)` }}
+        />
+      ))}
     </ChatContext.Provider>
   )
 }

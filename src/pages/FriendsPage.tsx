@@ -1,11 +1,19 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card } from '../components/ui/Card'
-import { Avatar } from '../components/ui/Avatar'
+import { Avatar, type AvatarStatus } from '../components/ui/Avatar'
 import { Button } from '../components/ui/Button'
 import { getFriends, type Friend } from '../api/friendsApi'
+import { getProfile, type ProfileStatus } from '../api/profilesApi'
 import { useAuth } from '../context/AuthContext'
 import { useChat } from '../context/ChatContext'
+
+const statusAvatarMap: Record<ProfileStatus, AvatarStatus> = {
+  Online: 'online',
+  LookingForGame: 'looking-for-game',
+  Busy: 'busy',
+  Offline: 'offline',
+}
 
 export default function FriendsPage() {
   const { token } = useAuth()
@@ -14,6 +22,7 @@ export default function FriendsPage() {
   const [friends, setFriends] = useState<Friend[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [statusByUsername, setStatusByUsername] = useState<Record<string, ProfileStatus>>({})
 
   useEffect(() => {
     if (!token) return
@@ -24,6 +33,30 @@ export default function FriendsPage() {
       .catch(() => setError('Failed to load friends.'))
       .finally(() => setIsLoading(false))
   }, [token])
+
+  useEffect(() => {
+    if (friends.length === 0) return
+    let cancelled = false
+    Promise.all(
+      friends.map((friend) =>
+        getProfile(friend.username)
+          .then((profile) => [friend.username, profile.status] as const)
+          .catch(() => null),
+      ),
+    ).then((results) => {
+      if (cancelled) return
+      setStatusByUsername((prev) => {
+        const next = { ...prev }
+        for (const result of results) {
+          if (result) next[result[0]] = result[1]
+        }
+        return next
+      })
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [friends])
 
   async function handleOpenChat(friend: Friend) {
     await openChatWithUser(friend.userId)
@@ -51,7 +84,11 @@ export default function FriendsPage() {
       {friends.map((friend) => (
         <Card key={friend.userId} className="flex items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">
-            <Avatar src={friend.avatarUrl ?? undefined} alt={friend.displayName} />
+            <Avatar
+              src={friend.avatarUrl ?? undefined}
+              alt={friend.displayName}
+              status={statusByUsername[friend.username] ? statusAvatarMap[statusByUsername[friend.username]] : undefined}
+            />
             <div className="min-w-0">
               <p className="truncate text-sm font-medium text-text">{friend.displayName}</p>
               <p className="truncate text-xs text-muted">@{friend.username}</p>
