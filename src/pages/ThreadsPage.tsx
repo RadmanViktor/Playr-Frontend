@@ -1,11 +1,15 @@
 import { Card } from '../components/ui/Card'
+import { ConversationsList } from '../components/ConversationsList'
 
 export default function ThreadsPage() {
   return (
     <div className="flex flex-col gap-4">
       <Card>
-        <p className="text-muted">Threads coming soon</p>
+        <h1 className="mb-1 text-lg font-semibold text-text">Chats</h1>
+        <p className="text-sm text-muted">Conversations you've had with other players.</p>
       </Card>
+
+      <ConversationsList />
     </div>
   )
 }

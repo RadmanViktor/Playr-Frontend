@@ -42,7 +42,7 @@ describe('Sidebar', () => {
     renderSidebar()
     expect(screen.getByRole('link', { name: /home/i })).toHaveAttribute('href', '/')
     expect(screen.getByRole('link', { name: /find players/i })).toHaveAttribute('href', '/find-players')
-    expect(screen.getByRole('link', { name: /threads/i })).toHaveAttribute('href', '/threads')
+    expect(screen.getByRole('link', { name: /chats/i })).toHaveAttribute('href', '/threads')
   })
 
   it('shows the current username', () => {

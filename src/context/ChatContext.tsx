@@ -10,6 +10,7 @@ interface OpenChatOptions {
 
 interface ChatContextValue {
   openChatWithUser: (userId: string, options?: OpenChatOptions) => Promise<void>
+  openConversation: (conversation: Conversation) => void
   closeChat: () => void
   error: string | null
 }
@@ -37,13 +38,19 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     [token],
   )
 
+  const openConversation = useCallback((conversation: Conversation) => {
+    setError(null)
+    setSuccessMessage(null)
+    setActiveConversation(conversation)
+  }, [])
+
   const closeChat = useCallback(() => {
     setActiveConversation(null)
     setSuccessMessage(null)
   }, [])
 
   return (
-    <ChatContext.Provider value={{ openChatWithUser, closeChat, error }}>
+    <ChatContext.Provider value={{ openChatWithUser, openConversation, closeChat, error }}>
       {children}
       {activeConversation && (
         <ChatWindow conversation={activeConversation} successMessage={successMessage} onClose={closeChat} />
