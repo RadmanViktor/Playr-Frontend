@@ -3,9 +3,11 @@ import { PostCard } from '../components/PostCard'
 import { getFeed, type PostFeedItem } from '../api/postsApi'
 import { getGames, type Game } from '../api/gamesApi'
 import { useAuth } from '../context/AuthContext'
+import { useCreatePostModal } from '../context/CreatePostModalContext'
 
 export default function FeedPage() {
   const { user, token } = useAuth()
+  const { subscribePostCreated } = useCreatePostModal()
   const [posts, setPosts] = useState<PostFeedItem[]>([])
   const [games, setGames] = useState<Game[]>([])
   const [selectedGameId, setSelectedGameId] = useState<string>('all')
@@ -18,6 +20,12 @@ export default function FeedPage() {
       .catch(() => setError('Failed to load feed.'))
       .finally(() => setIsLoading(false))
   }, [])
+
+  useEffect(() => {
+    return subscribePostCreated((post) => {
+      setPosts((prev) => [post, ...prev])
+    })
+  }, [subscribePostCreated])
 
   const handleDelete = useCallback((postId: string) => {
     setPosts((prev) => prev.filter((p) => p.id !== postId))

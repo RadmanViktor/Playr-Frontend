@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ProfileHeader } from '../components/ProfileHeader'
 import { PostCard } from '../components/PostCard'
+import { SteamGamesList } from '../components/SteamGamesList'
 import { getProfile, getProfilePosts, type ProfileData } from '../api/profilesApi'
 import { type PostFeedItem } from '../api/postsApi'
 import { ApiError } from '../api/http'
@@ -17,6 +18,7 @@ export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState<'posts' | 'games'>('posts')
 
   useEffect(() => {
     if (!username) return
@@ -55,19 +57,37 @@ export default function ProfilePage() {
         postCount={posts.length}
       />
 
-      <h2 className="text-lg font-semibold text-text">Posts</h2>
-      {posts.length === 0 ? (
-        <p className="text-muted">No posts yet.</p>
+      <div className="flex gap-2 border-b border-border">
+        <button
+          className={`px-3 py-2 text-sm font-medium ${activeTab === 'posts' ? 'text-text border-b-2 border-primary' : 'text-muted'}`}
+          onClick={() => setActiveTab('posts')}
+        >
+          Posts
+        </button>
+        <button
+          className={`px-3 py-2 text-sm font-medium ${activeTab === 'games' ? 'text-text border-b-2 border-primary' : 'text-muted'}`}
+          onClick={() => setActiveTab('games')}
+        >
+          Spel
+        </button>
+      </div>
+
+      {activeTab === 'posts' ? (
+        posts.length === 0 ? (
+          <p className="text-muted">No posts yet.</p>
+        ) : (
+          posts.map((post) => (
+            <PostCard
+              key={post.id}
+              post={post}
+              currentUserId={user?.id}
+              onUpdate={(updated) => setPosts((prev) => prev.map((p) => (p.id === updated.id ? updated : p)))}
+              onDelete={(postId) => setPosts((prev) => prev.filter((p) => p.id !== postId))}
+            />
+          ))
+        )
       ) : (
-        posts.map((post) => (
-          <PostCard
-            key={post.id}
-            post={post}
-            currentUserId={user?.id}
-            onUpdate={(updated) => setPosts((prev) => prev.map((p) => (p.id === updated.id ? updated : p)))}
-            onDelete={(postId) => setPosts((prev) => prev.filter((p) => p.id !== postId))}
-          />
-        ))
+        <SteamGamesList userId={profile.userId} />
       )}
     </div>
   )

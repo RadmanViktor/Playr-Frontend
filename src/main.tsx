@@ -6,6 +6,7 @@ import App from './App.tsx'
 import { AuthProvider } from './context/AuthContext.tsx'
 import { StatusProvider } from './context/StatusContext.tsx'
 import { ChatProvider } from './context/ChatContext.tsx'
+import { CreatePostModalProvider } from './context/CreatePostModalContext.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -13,7 +14,9 @@ createRoot(document.getElementById('root')!).render(
       <AuthProvider>
         <StatusProvider>
           <ChatProvider>
-            <App />
+            <CreatePostModalProvider>
+              <App />
+            </CreatePostModalProvider>
           </ChatProvider>
         </StatusProvider>
       </AuthProvider>

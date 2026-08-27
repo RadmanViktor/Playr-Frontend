@@ -7,6 +7,10 @@ import * as postsApi from '../api/postsApi'
 
 vi.mock('../api/postsApi')
 
+vi.mock('../context/AuthContext', () => ({
+  useAuth: () => ({ token: 'test-token', user: null }),
+}))
+
 const base: PostFeedItem = {
   id: 'p1', authorId: 'a1', authorUsername: 'nexusnova', authorDisplayName: 'NexusNova',
   authorAvatarUrl: null, gameId: 'g1', gameName: 'Elden Ring', gameCoverImageUrl: null,

@@ -50,6 +50,7 @@ export function MediaUploadInput({
 }: MediaUploadInputProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [isDragOver, setIsDragOver] = useState(false)
 
   useEffect(() => {
     if (!file) {
@@ -119,9 +120,24 @@ export function MediaUploadInput({
           </button>
         </div>
       ) : (
-        <label className="flex w-fit cursor-pointer items-center gap-2 rounded-lg border border-dashed border-border px-3 py-2 text-sm text-muted hover:text-text">
+        <label
+          onDragOver={(e) => {
+            e.preventDefault()
+            setIsDragOver(true)
+          }}
+          onDragLeave={() => setIsDragOver(false)}
+          onDrop={(e) => {
+            e.preventDefault()
+            setIsDragOver(false)
+            onRemoveExistingChange?.(false)
+            handleFileSelected(e.dataTransfer.files?.[0] ?? null)
+          }}
+          className={`flex w-fit cursor-pointer items-center gap-2 rounded-lg border border-dashed px-3 py-2 text-sm transition-colors ${
+            isDragOver ? 'border-primary text-text bg-surface-raised' : 'border-border text-muted hover:text-text'
+          }`}
+        >
           <Upload className="h-4 w-4" aria-hidden="true" />
-          Add photo or video
+          Add photo or video, or drag & drop
           <input
             ref={inputRef}
             type="file"

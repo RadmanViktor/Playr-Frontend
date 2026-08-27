@@ -21,6 +21,14 @@ vi.mock('../../context/StatusContext', () => ({
   }),
 }))
 
+vi.mock('../../context/CreatePostModalContext', () => ({
+  useCreatePostModal: () => ({
+    openCreatePost: vi.fn(),
+    closeCreatePost: vi.fn(),
+    subscribePostCreated: vi.fn(() => vi.fn()),
+  }),
+}))
+
 function renderSidebar() {
   return render(
     <MemoryRouter>

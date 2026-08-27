@@ -29,7 +29,8 @@ export interface PostFeedItem {
 
 export async function createPost(
   token: string,
-  data: { gameId: string; textContent: string; mood?: string | null; media?: File | null }
+  data: { gameId: string; textContent: string; mood?: string | null; media?: File | null },
+  onProgress?: (percent: number) => void
 ): Promise<PostFeedItem> {
   const form = new FormData()
   form.append('GameId', data.gameId)
@@ -37,16 +38,52 @@ export async function createPost(
   if (data.mood) form.append('Mood', data.mood)
   if (data.media) form.append('Media', data.media)
 
-  const response = await fetch(`${API_BASE_URL}/api/posts`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
-    body: form,
-  })
-  if (!response.ok) {
-    const message = await parseErrorMessage(response, 'Failed to create post.')
-    throw new ApiError(response.status, message)
+  if (!onProgress) {
+    const response = await fetch(`${API_BASE_URL}/api/posts`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+      body: form,
+    })
+    if (!response.ok) {
+      const message = await parseErrorMessage(response, 'Failed to create post.')
+      throw new ApiError(response.status, message)
+    }
+    return response.json()
   }
-  return response.json()
+
+  return new Promise<PostFeedItem>((resolve, reject) => {
+    const xhr = new XMLHttpRequest()
+    xhr.open('POST', `${API_BASE_URL}/api/posts`)
+    xhr.setRequestHeader('Authorization', `Bearer ${token}`)
+
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        onProgress(Math.round((event.loaded / event.total) * 100))
+      }
+    }
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          resolve(JSON.parse(xhr.responseText))
+        } catch {
+          reject(new ApiError(xhr.status, 'Failed to parse response.'))
+        }
+      } else {
+        let message = 'Failed to create post.'
+        try {
+          const body = JSON.parse(xhr.responseText)
+          if (typeof body?.error === 'string') message = body.error
+        } catch {
+          // keep fallback message
+        }
+        reject(new ApiError(xhr.status, message))
+      }
+    }
+
+    xhr.onerror = () => reject(new ApiError(0, 'Failed to create post.'))
+    xhr.send(form)
+  })
 }
 
 export async function getFeed(token?: string | null): Promise<PostFeedItem[]> {

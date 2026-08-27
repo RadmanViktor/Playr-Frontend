@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import { Home, Rss, Users, MessageSquare, Plus, UserRoundCheck } from 'lucide-react'
 import { Button } from '../ui/Button'
 import { Avatar, type AvatarStatus } from '../ui/Avatar'
 import { StatusModal } from '../ui/StatusModal'
 import { useAuth } from '../../context/AuthContext'
 import { useStatus } from '../../context/StatusContext'
+import { useCreatePostModal } from '../../context/CreatePostModalContext'
 import type { ProfileStatus } from '../../api/profilesApi'
 
 const navItems = [
@@ -40,7 +41,7 @@ const statusTextColorMap: Record<ProfileStatus, string> = {
 export function Sidebar() {
   const { user } = useAuth()
   const { status, avatarUrl, lookingForGameName } = useStatus()
-  const navigate = useNavigate()
+  const { openCreatePost } = useCreatePostModal()
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false)
 
   return (
@@ -87,7 +88,7 @@ export function Sidebar() {
         ))}
       </nav>
 
-      <Button className="w-full" onClick={() => navigate('/create-post')}>
+      <Button className="w-full" onClick={openCreatePost}>
         <Plus className="h-4 w-4" aria-hidden="true" />
         Create Post
       </Button>

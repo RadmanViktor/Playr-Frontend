@@ -10,14 +10,14 @@ import { ApiError } from '../api/http'
 import { MediaUploadInput } from './MediaUploadInput'
 import { CommentsSection } from './CommentsSection'
 import { EmojiPickerButton } from './EmojiPickerButton'
+import { useAuth } from '../context/AuthContext'
+import { MOOD_OPTIONS, moodOptionToApi, apiMoodToOption, type MoodOption } from '../lib/mood'
+import { linkify } from '../lib/linkify'
 import type { PostFeedItem } from '../api/postsApi'
 import type { ComponentProps } from 'react'
 
 type BadgeVariant = ComponentProps<typeof Badge>['variant']
 type CardState = 'read' | 'menu-open' | 'editing' | 'confirming-delete'
-type MoodOption = 'None' | 'Enjoying' | 'Frustrated' | 'Completed' | 'Need Help'
-
-const MOOD_OPTIONS: MoodOption[] = ['None', 'Enjoying', 'Frustrated', 'Completed', 'Need Help']
 
 function moodBadge(mood: string | null): { label: string; variant: BadgeVariant } | null {
   switch (mood) {
@@ -27,22 +27,6 @@ function moodBadge(mood: string | null): { label: string; variant: BadgeVariant 
     case 'Completed':  return { label: 'Completed',  variant: 'completed'  }
     default: return null
   }
-}
-
-function apiMoodToOption(mood: string | null): MoodOption {
-  switch (mood) {
-    case 'Enjoying':   return 'Enjoying'
-    case 'NeedHelp':   return 'Need Help'
-    case 'Frustrated': return 'Frustrated'
-    case 'Completed':  return 'Completed'
-    default:           return 'None'
-  }
-}
-
-function moodOptionToApi(mood: MoodOption): string | null {
-  if (mood === 'None') return null
-  if (mood === 'Need Help') return 'NeedHelp'
-  return mood
 }
 
 function formatRelativeTime(createdAt: string): string {
@@ -62,6 +46,7 @@ interface PostCardProps {
 }
 
 export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardProps) {
+  const { token } = useAuth()
   const [state, setState] = useState<CardState>('read')
   const [editText, setEditText] = useState(post.textContent)
   const [editMood, setEditMood] = useState<MoodOption>(apiMoodToOption(post.mood))
@@ -98,7 +83,7 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardPr
     setIsSaving(true)
     try {
       const updated = await updatePost(
-        localStorage.getItem('playr_token') ?? '',
+        token ?? '',
         post.id,
         { textContent: editText.trim(), mood: moodOptionToApi(editMood), media: editMediaFile, removeMedia }
       )
@@ -115,7 +100,7 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardPr
     setActionError(null)
     setIsDeleting(true)
     try {
-      await deletePost(localStorage.getItem('playr_token') ?? '', post.id)
+      await deletePost(token ?? '', post.id)
       onDelete?.(post.id)
     } catch (err) {
       setActionError(err instanceof ApiError ? err.message : 'Failed to delete post.')
@@ -141,7 +126,7 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardPr
     setLiked(!previousLiked)
     setLikesCount(previousLiked ? previousCount - 1 : previousCount + 1)
     try {
-      const result = await toggleLike(localStorage.getItem('playr_token') ?? '', post.id)
+      const result = await toggleLike(token ?? '', post.id)
       setLiked(result.liked)
       setLikesCount(result.likesCount)
     } catch {
@@ -279,7 +264,7 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardPr
         </div>
       ) : (
         <div className="flex flex-col gap-3">
-          <p className="text-sm text-text leading-relaxed">{post.textContent}</p>
+          <p className="text-sm text-text leading-relaxed whitespace-pre-wrap">{linkify(post.textContent)}</p>
           {post.mediaUrl && (
             post.mediaType === 'Video' ? (
               <video src={resolveMediaUrl(post.mediaUrl)!} controls className="max-h-96 w-full rounded-lg object-contain" />

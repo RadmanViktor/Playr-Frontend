@@ -1,14 +1,14 @@
 import { useEffect, useState, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { PostCard } from '../components/PostCard'
 import { Button } from '../components/ui/Button'
 import { getProfilePosts } from '../api/profilesApi'
 import { type PostFeedItem } from '../api/postsApi'
 import { useAuth } from '../context/AuthContext'
+import { useCreatePostModal } from '../context/CreatePostModalContext'
 
 export default function HomePage() {
-  const navigate = useNavigate()
   const { user, token } = useAuth()
+  const { openCreatePost, subscribePostCreated } = useCreatePostModal()
   const [posts, setPosts] = useState<PostFeedItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -21,6 +21,14 @@ export default function HomePage() {
       .finally(() => setIsLoading(false))
   }, [user])
 
+  useEffect(() => {
+    return subscribePostCreated((post) => {
+      if (post.authorId === user?.id) {
+        setPosts((prev) => [post, ...prev])
+      }
+    })
+  }, [subscribePostCreated, user])
+
   const handleDelete = useCallback((postId: string) => {
     setPosts((prev) => prev.filter((p) => p.id !== postId))
   }, [])
@@ -32,7 +40,7 @@ export default function HomePage() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-end">
-        <Button onClick={() => navigate('/create-post')}>Create Post</Button>
+        <Button onClick={openCreatePost}>Create Post</Button>
       </div>
 
       {isLoading && <p className="text-muted">Loading…</p>}
