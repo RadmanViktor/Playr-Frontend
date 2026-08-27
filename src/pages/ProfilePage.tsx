@@ -21,6 +21,7 @@ export default function ProfilePage() {
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'posts' | 'games'>('posts')
   const [showFriendRequestModal, setShowFriendRequestModal] = useState(false)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   useEffect(() => {
     if (!username) return
@@ -46,7 +47,14 @@ export default function ProfilePage() {
 
   function handleFriendRequestSent() {
     setProfile((prev) => (prev ? { ...prev, relationshipStatus: 'InvitePending' } : prev))
+    setSuccessMessage('Friend request sent.')
   }
+
+  useEffect(() => {
+    if (!successMessage) return
+    const timeoutId = setTimeout(() => setSuccessMessage(null), 5000)
+    return () => clearTimeout(timeoutId)
+  }, [successMessage])
 
   function handleTabChange(tab: 'posts' | 'games') {
     if (tab === activeTab) return
@@ -76,6 +84,12 @@ export default function ProfilePage() {
         postCount={posts.length}
         onAddFriendClick={() => setShowFriendRequestModal(true)}
       />
+
+      {successMessage && (
+        <div className="rounded-xl border border-enjoying/40 bg-enjoying/10 px-4 py-3 text-sm text-enjoying">
+          {successMessage}
+        </div>
+      )}
 
       <div className="relative flex gap-2 rounded-lg border border-border bg-surface-raised p-1">
         <div
