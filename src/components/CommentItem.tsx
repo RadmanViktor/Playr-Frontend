@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom'
 import { Avatar } from './ui/Avatar'
 import { Button } from './ui/Button'
 import { EmojiPickerButton } from './EmojiPickerButton'
-import type { CommentItem as CommentItemType } from '../api/commentsApi'
+import { CommentReactions } from './CommentReactions'
+import type { CommentItem as CommentItemType, ReactionType } from '../api/commentsApi'
 
 function formatRelativeTime(createdAt: string): string {
   const diffMs = Date.now() - new Date(createdAt).getTime()
@@ -19,16 +20,37 @@ interface CommentItemProps {
   currentUserId?: string
   onSave: (commentId: string, textContent: string) => Promise<void>
   onDelete: (commentId: string) => Promise<void>
+  onReact: (commentId: string, type: ReactionType) => Promise<void>
+  onRemoveReaction: (commentId: string) => Promise<void>
 }
 
-export function CommentItem({ comment, currentUserId, onSave, onDelete }: CommentItemProps) {
+export function CommentItem({ comment, currentUserId, onSave, onDelete, onReact, onRemoveReaction }: CommentItemProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [text, setText] = useState(comment.textContent)
   const [isSaving, setIsSaving] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [reactionError, setReactionError] = useState<string | null>(null)
 
   const isOwner = currentUserId != null && currentUserId === comment.authorId
+
+  async function handleReact(type: ReactionType) {
+    setReactionError(null)
+    try {
+      await onReact(comment.id, type)
+    } catch (err) {
+      setReactionError(err instanceof Error ? err.message : 'Failed to update reaction.')
+    }
+  }
+
+  async function handleRemoveReaction() {
+    setReactionError(null)
+    try {
+      await onRemoveReaction(comment.id)
+    } catch (err) {
+      setReactionError(err instanceof Error ? err.message : 'Failed to update reaction.')
+    }
+  }
 
   async function handleSave() {
     const trimmed = text.trim()
@@ -97,6 +119,12 @@ export function CommentItem({ comment, currentUserId, onSave, onDelete }: Commen
         {!isEditing && (
           <div className="mt-1 flex items-center gap-3 px-1 text-xs text-muted">
             <span>{formatRelativeTime(comment.createdAt)}</span>
+            <CommentReactions
+              reactions={comment.reactions}
+              canReact={currentUserId != null}
+              onReact={handleReact}
+              onRemoveReaction={handleRemoveReaction}
+            />
             {isOwner && (
               <>
                 <button type="button" className="cursor-pointer hover:text-text" onClick={() => setIsEditing(true)}>
@@ -114,6 +142,7 @@ export function CommentItem({ comment, currentUserId, onSave, onDelete }: Commen
             )}
           </div>
         )}
+        {!isEditing && reactionError && <p className="mt-1 px-1 text-frustrated text-xs">{reactionError}</p>}
         {!isEditing && error && <p className="mt-1 px-1 text-frustrated text-xs">{error}</p>}
       </div>
     </div>

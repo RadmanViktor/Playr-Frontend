@@ -1,5 +1,20 @@
 import { API_BASE_URL, ApiError, parseErrorMessage } from './http'
 
+export type ReactionType = 'Like' | 'Haha' | 'Wow' | 'Sad' | 'Angry'
+
+export interface ReactionCounts {
+  like: number
+  haha: number
+  wow: number
+  sad: number
+  angry: number
+}
+
+export interface CommentReactions {
+  counts: ReactionCounts
+  currentUserReaction: ReactionType | null
+}
+
 export interface CommentItem {
   id: string
   postId: string
@@ -10,6 +25,7 @@ export interface CommentItem {
   textContent: string
   createdAt: string
   updatedAt: string | null
+  reactions: CommentReactions
 }
 
 export interface PagedComments {
@@ -68,4 +84,41 @@ export async function deleteComment(token: string, postId: string, commentId: st
     const message = await parseErrorMessage(response, 'Failed to delete comment.')
     throw new ApiError(response.status, message)
   }
+}
+
+export async function setCommentReaction(
+  token: string,
+  postId: string,
+  commentId: string,
+  type: ReactionType
+): Promise<CommentReactions> {
+  const response = await fetch(`${API_BASE_URL}/api/posts/${postId}/comments/${commentId}/reactions`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ type }),
+  })
+  if (!response.ok) {
+    const message = await parseErrorMessage(response, 'Failed to update reaction.')
+    throw new ApiError(response.status, message)
+  }
+  return response.json()
+}
+
+export async function removeCommentReaction(
+  token: string,
+  postId: string,
+  commentId: string
+): Promise<CommentReactions> {
+  const response = await fetch(`${API_BASE_URL}/api/posts/${postId}/comments/${commentId}/reactions`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (!response.ok) {
+    const message = await parseErrorMessage(response, 'Failed to remove reaction.')
+    throw new ApiError(response.status, message)
+  }
+  return response.json()
 }

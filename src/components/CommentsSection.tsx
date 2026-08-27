@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import { Button } from './ui/Button'
 import { CommentItem } from './CommentItem'
 import { EmojiPickerButton } from './EmojiPickerButton'
-import { getComments, createComment, updateComment, deleteComment } from '../api/commentsApi'
-import type { CommentItem as CommentItemType } from '../api/commentsApi'
+import { getComments, createComment, updateComment, deleteComment, setCommentReaction, removeCommentReaction } from '../api/commentsApi'
+import type { CommentItem as CommentItemType, ReactionType } from '../api/commentsApi'
 import { ApiError } from '../api/http'
 
 const PAGE_SIZE = 20
@@ -86,6 +86,16 @@ export function CommentsSection({ postId, currentUserId, onCountChange }: Commen
     onCountChange(-1)
   }
 
+  async function handleReact(commentId: string, type: ReactionType) {
+    const reactions = await setCommentReaction(localStorage.getItem('playr_token') ?? '', postId, commentId, type)
+    setComments((prev) => prev.map((c) => (c.id === commentId ? { ...c, reactions } : c)))
+  }
+
+  async function handleRemoveReaction(commentId: string) {
+    const reactions = await removeCommentReaction(localStorage.getItem('playr_token') ?? '', postId, commentId)
+    setComments((prev) => prev.map((c) => (c.id === commentId ? { ...c, reactions } : c)))
+  }
+
   return (
     <div className="flex flex-col gap-3 border-t border-border pt-3">
       {isLoading && <p className="text-xs text-muted">Loading comments…</p>}
@@ -102,6 +112,8 @@ export function CommentsSection({ postId, currentUserId, onCountChange }: Commen
           currentUserId={currentUserId}
           onSave={handleSave}
           onDelete={handleDelete}
+          onReact={handleReact}
+          onRemoveReaction={handleRemoveReaction}
         />
       ))}
 
