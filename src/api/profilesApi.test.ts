@@ -20,7 +20,10 @@ describe('getProfile', () => {
     mockFetch.mockResolvedValueOnce({ ok: true, json: async () => sampleProfile })
     const result = await getProfile('player')
     expect(result.username).toBe('player')
-    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/api/profiles/player'))
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/api/profiles/player'),
+      expect.anything(),
+    )
   })
 
   it('throws ApiError on 404', async () => {

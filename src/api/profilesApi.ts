@@ -3,6 +3,7 @@ import type { PostFeedItem } from './postsApi'
 
 export type ProfileStatus = 'Online' | 'LookingForGame' | 'Busy' | 'Offline'
 export type PlayStyle = 'Competitive' | 'Chill'
+export type RelationshipStatus = 'None' | 'InvitePending' | 'Friends'
 
 export interface ProfileData {
   userId: string
@@ -21,6 +22,7 @@ export interface ProfileData {
   lookingForPlayStyle: PlayStyle | null
   createdAt: string
   updatedAt: string
+  relationshipStatus: RelationshipStatus | null
 }
 
 export interface UpdateProfileData {
@@ -39,8 +41,10 @@ export interface UpdateStatusData {
   lookingForPlayStyle?: PlayStyle | null
 }
 
-export async function getProfile(username: string): Promise<ProfileData> {
-  const response = await fetch(`${API_BASE_URL}/api/profiles/${username}`)
+export async function getProfile(username: string, token?: string | null): Promise<ProfileData> {
+  const response = await fetch(`${API_BASE_URL}/api/profiles/${username}`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+  })
   if (!response.ok) {
     const message = await parseErrorMessage(response, 'Profile not found.')
     throw new ApiError(response.status, message)
@@ -122,8 +126,6 @@ export async function searchProfiles(query: string): Promise<ProfileSearchResult
   }
   return response.json()
 }
-
-export type RelationshipStatus = 'None' | 'InvitePending' | 'Friends'
 
 export interface LookingForGamePlayer {
   userId: string

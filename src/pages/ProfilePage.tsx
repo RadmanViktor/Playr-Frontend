@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ProfileHeader } from '../components/ProfileHeader'
 import { PostCard } from '../components/PostCard'
 import { SteamGamesList } from '../components/SteamGamesList'
+import { InviteModal } from '../components/ui/InviteModal'
 import { getProfile, getProfilePosts, type ProfileData } from '../api/profilesApi'
 import { type PostFeedItem } from '../api/postsApi'
 import { ApiError } from '../api/http'
@@ -19,6 +20,7 @@ export default function ProfilePage() {
   const [notFound, setNotFound] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'posts' | 'games'>('posts')
+  const [showFriendRequestModal, setShowFriendRequestModal] = useState(false)
 
   useEffect(() => {
     if (!username) return
@@ -26,20 +28,24 @@ export default function ProfilePage() {
     setNotFound(false)
     setError(null)
 
-    Promise.all([getProfile(username), getProfilePosts(username, token)])
+    Promise.all([getProfile(username, token), getProfilePosts(username, token)])
       .then(([p, ps]) => { setProfile(p); setPosts(ps) })
       .catch((err) => {
         if (err instanceof ApiError && err.status === 404) setNotFound(true)
         else setError('Failed to load profile.')
       })
       .finally(() => setIsLoading(false))
-  }, [username])
+  }, [username, token])
 
   const isOwner = !!user && !!profile && user.id === profile.userId
 
   function handleSignOut() {
     logout()
     navigate('/login', { replace: true })
+  }
+
+  function handleFriendRequestSent() {
+    setProfile((prev) => (prev ? { ...prev, relationshipStatus: 'InvitePending' } : prev))
   }
 
   function handleTabChange(tab: 'posts' | 'games') {
@@ -68,6 +74,7 @@ export default function ProfilePage() {
         onEditClick={() => navigate('/settings')}
         onSignOutClick={handleSignOut}
         postCount={posts.length}
+        onAddFriendClick={() => setShowFriendRequestModal(true)}
       />
 
       <div className="relative flex gap-2 rounded-lg border border-border bg-surface-raised p-1">
@@ -114,6 +121,21 @@ export default function ProfilePage() {
           <SteamGamesList userId={profile.userId} />
         )}
       </div>
+
+      {showFriendRequestModal && (
+        <InviteModal
+          recipientUserId={profile.userId}
+          recipientDisplayName={profile.displayName}
+          recipientAvatarUrl={profile.avatarUrl}
+          title="Send friend request"
+          promptText="Send a friend request to"
+          promptSuffix=""
+          placeholderText="Say hi and introduce yourself..."
+          actionLabel="Send request"
+          onClose={() => setShowFriendRequestModal(false)}
+          onSent={handleFriendRequestSent}
+        />
+      )}
     </div>
   )
 }

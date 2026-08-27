@@ -10,6 +10,7 @@ interface ProfileHeaderProps {
   onEditClick: () => void
   onSignOutClick?: () => void
   postCount?: number
+  onAddFriendClick?: () => void
 }
 
 const statusAvatarMap: Record<ProfileData['status'], AvatarStatus> = {
@@ -23,7 +24,14 @@ function formatJoinDate(createdAt: string): string {
   return new Date(createdAt).toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
 }
 
-export function ProfileHeader({ profile, isOwner, onEditClick, onSignOutClick, postCount = 0 }: ProfileHeaderProps) {
+export function ProfileHeader({
+  profile,
+  isOwner,
+  onEditClick,
+  onSignOutClick,
+  postCount = 0,
+  onAddFriendClick,
+}: ProfileHeaderProps) {
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-surface">
       {/* Gradient banner */}
@@ -58,6 +66,17 @@ export function ProfileHeader({ profile, isOwner, onEditClick, onSignOutClick, p
               {onSignOutClick && (
                 <Button variant="ghost" size="sm" onClick={onSignOutClick}>
                   Sign out
+                </Button>
+              )}
+            </div>
+          )}
+          {!isOwner && (
+            <div className="flex flex-col items-end gap-2">
+              {profile.relationshipStatus === 'Friends' && <Badge variant="completed">Friend</Badge>}
+              {profile.relationshipStatus === 'InvitePending' && <Badge variant="tag">Request sent</Badge>}
+              {(profile.relationshipStatus === 'None' || profile.relationshipStatus === null) && onAddFriendClick && (
+                <Button size="sm" onClick={onAddFriendClick}>
+                  Add friend
                 </Button>
               )}
             </div>

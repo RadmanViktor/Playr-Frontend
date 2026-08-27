@@ -14,6 +14,11 @@ interface InviteModalProps {
   recipientAvatarUrl?: string | null
   onClose: () => void
   onSent: () => void
+  title?: string
+  promptText?: string
+  promptSuffix?: string
+  placeholderText?: string
+  actionLabel?: string
 }
 
 export function InviteModal({
@@ -22,6 +27,11 @@ export function InviteModal({
   recipientAvatarUrl,
   onClose,
   onSent,
+  title = 'Send invitation',
+  promptText = 'Invite',
+  promptSuffix = ' to play',
+  placeholderText = "Say hi and tell them why you'd like to play together...",
+  actionLabel = 'Send invitation',
 }: InviteModalProps) {
   const { token } = useAuth()
   const [message, setMessage] = useState('')
@@ -63,7 +73,7 @@ export function InviteModal({
         onClick={(event) => event.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-text">Send invitation</h2>
+          <h2 className="text-lg font-semibold text-text">{title}</h2>
           <button
             type="button"
             onClick={onClose}
@@ -77,7 +87,7 @@ export function InviteModal({
         <div className="mb-4 flex items-center gap-3">
           <Avatar src={recipientAvatarUrl ?? undefined} alt={recipientDisplayName} size="md" />
           <p className="text-sm text-text">
-            Invite <span className="font-medium">{recipientDisplayName}</span> to play
+            {promptText} <span className="font-medium">{recipientDisplayName}</span>{promptSuffix}
           </p>
         </div>
 
@@ -88,7 +98,7 @@ export function InviteModal({
           id="invite-message"
           value={message}
           onChange={(event) => setMessage(event.target.value.slice(0, MAX_MESSAGE_LENGTH))}
-          placeholder="Say hi and tell them why you'd like to play together..."
+          placeholder={placeholderText}
           rows={4}
           className="w-full resize-none rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm text-text outline-none placeholder:text-muted focus:border-primary"
         />
@@ -103,7 +113,7 @@ export function InviteModal({
             Cancel
           </Button>
           <Button onClick={handleSend} disabled={isSending}>
-            {isSending ? 'Sending...' : 'Send invitation'}
+            {isSending ? 'Sending...' : actionLabel}
           </Button>
         </div>
       </div>
