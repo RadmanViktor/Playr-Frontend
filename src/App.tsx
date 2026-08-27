@@ -5,7 +5,7 @@ import HomePage from './pages/HomePage'
 import FriendsPage from './pages/FriendsPage'
 import FeedPage from './pages/FeedPage'
 import FindPlayersPage from './pages/FindPlayersPage'
-import ThreadsPage from './pages/ThreadsPage'
+import ChatsPage from './pages/ChatsPage'
 import ProfilePage from './pages/ProfilePage'
 import SettingsPage from './pages/SettingsPage'
 import { ProtectedRoute } from './components/ProtectedRoute'
@@ -34,7 +34,7 @@ function App() {
         <Route path="/friends" element={<FriendsPage />} />
         <Route path="/feed" element={<FeedPage />} />
         <Route path="/find-players" element={<FindPlayersPage />} />
-        <Route path="/threads" element={<ThreadsPage />} />
+        <Route path="/chats" element={<ChatsPage />} />
         <Route path="/settings" element={<SettingsPage />} />
       </Route>
     </Routes>

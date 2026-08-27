@@ -12,7 +12,7 @@ import type { ProfileStatus } from '../../api/profilesApi'
 const navItems = [
   { to: '/feed', label: 'Feed', icon: Rss, end: false },
   { to: '/find-players', label: 'Find Players', icon: Users, end: false },
-  { to: '/threads', label: 'Chats', icon: MessageSquare, end: false },
+  { to: '/chats', label: 'Chats', icon: MessageSquare, end: false },
   { to: '/friends', label: 'Friends', icon: UserRoundCheck, end: false },
 ]
 
