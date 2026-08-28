@@ -175,21 +175,24 @@ export default function FriendsPage() {
 
       {friends.map((friend) => (
         <Card key={friend.userId} className="flex flex-wrap items-center justify-between gap-4">
-          <div className="flex min-w-0 items-center gap-3">
+          <button
+            type="button"
+            onClick={() => navigate(`/profile/${friend.username}`)}
+            className="group flex min-w-0 items-center gap-3 rounded-md p-1 -m-1 text-left transition-colors hover:bg-surface-raised focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary cursor-pointer"
+          >
             <Avatar
               src={friend.avatarUrl ?? undefined}
               alt={friend.displayName}
               status={statusByUsername[friend.username] ? statusAvatarMap[statusByUsername[friend.username]] : undefined}
             />
             <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-text">{friend.displayName}</p>
+              <p className="truncate text-sm font-medium text-text group-hover:text-primary group-hover:underline">
+                {friend.displayName}
+              </p>
               <p className="truncate text-xs text-muted">@{friend.username}</p>
             </div>
-          </div>
+          </button>
           <div className="flex shrink-0 gap-2">
-            <Button variant="ghost" size="sm" onClick={() => navigate(`/profile/${friend.username}`)}>
-              View profile
-            </Button>
             <Button size="sm" onClick={() => handleOpenChat(friend)}>
               Chat
             </Button>
