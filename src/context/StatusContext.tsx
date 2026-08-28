@@ -9,11 +9,13 @@ export interface StatusContextValue {
   lookingForGameId: string | null
   lookingForGameName: string | null
   lookingForPlayStyle: PlayStyle | null
+  lookingForGameNote: string | null
   isLoading: boolean
   updateStatus: (
     status: ProfileStatus,
     lookingForGameId?: string | null,
     lookingForPlayStyle?: PlayStyle | null,
+    lookingForGameNote?: string | null,
   ) => Promise<void>
 }
 
@@ -26,6 +28,7 @@ export function StatusProvider({ children }: { children: ReactNode }) {
   const [lookingForGameId, setLookingForGameId] = useState<string | null>(null)
   const [lookingForGameName, setLookingForGameName] = useState<string | null>(null)
   const [lookingForPlayStyle, setLookingForPlayStyle] = useState<PlayStyle | null>(null)
+  const [lookingForGameNote, setLookingForGameNote] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -38,6 +41,7 @@ export function StatusProvider({ children }: { children: ReactNode }) {
         setLookingForGameId(null)
         setLookingForGameName(null)
         setLookingForPlayStyle(null)
+        setLookingForGameNote(null)
         setIsLoading(false)
         return
       }
@@ -51,6 +55,7 @@ export function StatusProvider({ children }: { children: ReactNode }) {
           setLookingForGameId(profile.lookingForGameId)
           setLookingForGameName(profile.lookingForGameName)
           setLookingForPlayStyle(profile.lookingForPlayStyle)
+          setLookingForGameNote(profile.lookingForGameNote)
         }
       } catch {
         // Keep defaults if the profile can't be loaded.
@@ -73,6 +78,7 @@ export function StatusProvider({ children }: { children: ReactNode }) {
       newStatus: ProfileStatus,
       newLookingForGameId?: string | null,
       newLookingForPlayStyle?: PlayStyle | null,
+      newLookingForGameNote?: string | null,
     ) => {
       if (!token) {
         throw new Error('You must be logged in to update your status.')
@@ -82,6 +88,7 @@ export function StatusProvider({ children }: { children: ReactNode }) {
         status: newStatus,
         lookingForGameId: newLookingForGameId ?? null,
         lookingForPlayStyle: newLookingForPlayStyle ?? null,
+        lookingForGameNote: newLookingForGameNote ?? null,
       })
 
       setStatus(profile.status)
@@ -89,13 +96,23 @@ export function StatusProvider({ children }: { children: ReactNode }) {
       setLookingForGameId(profile.lookingForGameId)
       setLookingForGameName(profile.lookingForGameName)
       setLookingForPlayStyle(profile.lookingForPlayStyle)
+      setLookingForGameNote(profile.lookingForGameNote)
     },
     [token],
   )
 
   return (
     <StatusContext.Provider
-      value={{ status, avatarUrl, lookingForGameId, lookingForGameName, lookingForPlayStyle, isLoading, updateStatus }}
+      value={{
+        status,
+        avatarUrl,
+        lookingForGameId,
+        lookingForGameName,
+        lookingForPlayStyle,
+        lookingForGameNote,
+        isLoading,
+        updateStatus,
+      }}
     >
       {children}
     </StatusContext.Provider>

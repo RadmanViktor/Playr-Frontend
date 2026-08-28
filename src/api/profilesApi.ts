@@ -20,6 +20,7 @@ export interface ProfileData {
   lookingForGameId: string | null
   lookingForGameName: string | null
   lookingForPlayStyle: PlayStyle | null
+  lookingForGameNote: string | null
   createdAt: string
   updatedAt: string
   relationshipStatus: RelationshipStatus | null
@@ -40,6 +41,7 @@ export interface UpdateStatusData {
   status: ProfileStatus
   lookingForGameId?: string | null
   lookingForPlayStyle?: PlayStyle | null
+  lookingForGameNote?: string | null
 }
 
 export async function getProfile(username: string, token?: string | null): Promise<ProfileData> {
@@ -136,6 +138,7 @@ export interface LookingForGamePlayer {
   lookingForGameId: string | null
   lookingForGameName: string | null
   lookingForPlayStyle: PlayStyle | null
+  lookingForGameNote: string | null
   relationshipStatus: RelationshipStatus
   pendingInvitationId: string | null
 }
