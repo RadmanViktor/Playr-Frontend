@@ -27,7 +27,7 @@ export function EmojiPickerButton({ onSelect }: EmojiPickerButtonProps) {
   }
 
   return (
-    <div className="relative" ref={containerRef}>
+    <div className="relative hidden sm:block" ref={containerRef}>
       <button
         type="button"
         aria-label="Add emoji"
