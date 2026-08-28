@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
 import { X } from 'lucide-react'
+import { useBodyScrollLock } from '../../lib/useBodyScrollLock'
+import { useOverlayDismiss } from '../../lib/useOverlayDismiss'
 
 interface ModalProps {
   title: string
@@ -9,14 +11,18 @@ interface ModalProps {
 }
 
 export function Modal({ title, onClose, children, maxWidthClassName = 'max-w-md' }: ModalProps) {
+  useBodyScrollLock()
+  const { backdropProps } = useOverlayDismiss({ onDismiss: onClose })
+
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 cursor-pointer"
-      onClick={onClose}
+      // items-start on mobile: centring tall content pushes it off *both* the
+      // top and the bottom of a short viewport, making it unreachable.
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 p-4 cursor-pointer sm:items-center"
+      {...backdropProps}
     >
       <div
-        className={`w-full ${maxWidthClassName} rounded-xl border border-border bg-surface p-5 cursor-default`}
-        onClick={(event) => event.stopPropagation()}
+        className={`my-auto flex max-h-[90svh] w-full ${maxWidthClassName} cursor-default flex-col overflow-y-auto overscroll-contain rounded-xl border border-border bg-surface p-5`}
       >
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-semibold text-text">{title}</h2>

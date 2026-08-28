@@ -42,8 +42,17 @@ html, body, #root {
   height: 100%;
 }
 
+#root {
+  /* dvh tracks the collapsing/expanding browser chrome on mobile, unlike 100%
+     which resolves against the static layout viewport. */
+  min-height: 100dvh;
+}
+
 body {
   margin: 0;
+  /* Safety net: a single unconstrained child should not make the whole page
+     pannable sideways on a phone. */
+  overflow-x: hidden;
   background-color: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-sans);

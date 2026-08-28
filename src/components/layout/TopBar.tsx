@@ -348,7 +348,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
   }
 
   return (
-    <header className="flex items-center gap-2 border-b border-border bg-surface px-3 py-3 sm:gap-4 sm:px-6">
+    <header className="flex items-center gap-2 border-b border-border bg-surface py-3 pt-[max(0.75rem,env(safe-area-inset-top))] pl-[max(0.75rem,env(safe-area-inset-left))] pr-[max(0.75rem,env(safe-area-inset-right))] sm:gap-4 sm:pl-[max(1.5rem,env(safe-area-inset-left))] sm:pr-[max(1.5rem,env(safe-area-inset-right))]">
       <IconButton aria-label="Open menu" onClick={onMenuClick} className="md:hidden">
         <Menu className="h-5 w-5" aria-hidden="true" />
       </IconButton>

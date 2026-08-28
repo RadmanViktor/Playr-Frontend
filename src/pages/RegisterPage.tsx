@@ -60,7 +60,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-bg px-4">
+    <div className="flex min-h-dvh items-center justify-center bg-bg px-4">
       <AuthPanel title="Create your PLAYR account">
         <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
           <label className="flex flex-col gap-1 text-sm text-muted">

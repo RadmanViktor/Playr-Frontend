@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { resolveMediaUrl } from '../api/postsApi'
 import type { PostMediaItem } from '../api/postsApi'
+import { useBodyScrollLock } from '../lib/useBodyScrollLock'
+import { useOverlayDismiss } from '../lib/useOverlayDismiss'
 
 interface MediaLightboxProps {
   media: PostMediaItem[]
@@ -12,15 +14,17 @@ interface MediaLightboxProps {
 export function MediaLightbox({ media, initialIndex, onClose }: MediaLightboxProps) {
   const [index, setIndex] = useState(initialIndex)
 
+  useBodyScrollLock()
+  const { backdropProps } = useOverlayDismiss({ onDismiss: onClose })
+
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose()
       if (e.key === 'ArrowLeft') setIndex((i) => Math.max(0, i - 1))
       if (e.key === 'ArrowRight') setIndex((i) => Math.min(media.length - 1, i + 1))
     }
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [media.length, onClose])
+  }, [media.length])
 
   const current = media[index]
   if (!current) return null
@@ -28,13 +32,13 @@ export function MediaLightbox({ media, initialIndex, onClose }: MediaLightboxPro
   return (
     <div
       className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 p-4 cursor-pointer"
-      onClick={onClose}
+      {...backdropProps}
     >
       <button
         type="button"
         aria-label="Close"
         onClick={onClose}
-        className="absolute right-4 top-4 rounded-full bg-surface/80 p-2 text-text cursor-pointer"
+        className="absolute right-4 top-[max(1rem,env(safe-area-inset-top))] rounded-full bg-surface/80 p-2 text-text cursor-pointer"
       >
         <X className="h-5 w-5" aria-hidden="true" />
       </button>
@@ -72,19 +76,19 @@ export function MediaLightbox({ media, initialIndex, onClose }: MediaLightboxPro
             src={resolveMediaUrl(current.url)!}
             controls
             autoPlay
-            className="max-h-[90vh] max-w-[90vw] rounded-lg object-contain"
+            className="max-h-[85dvh] max-w-[90vw] rounded-lg object-contain"
           />
         ) : (
           <img
             src={resolveMediaUrl(current.url)!}
             alt="Post media"
-            className="max-h-[90vh] max-w-[90vw] rounded-lg object-contain"
+            className="max-h-[85dvh] max-w-[90vw] rounded-lg object-contain"
           />
         )}
       </div>
 
       {media.length > 1 && (
-        <div className="absolute bottom-6 left-1/2 flex -translate-x-1/2 gap-1.5">
+        <div className="absolute bottom-[max(1.5rem,env(safe-area-inset-bottom))] left-1/2 flex -translate-x-1/2 gap-1.5">
           {media.map((_, i) => (
             <span
               key={i}

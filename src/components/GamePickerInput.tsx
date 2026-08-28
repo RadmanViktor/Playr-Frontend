@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ChevronDown, Gamepad2, RefreshCw } from 'lucide-react'
 import type { Game } from '../api/gamesApi'
+import { resolveMediaUrl } from '../api/http'
 import { getRecentGameIds } from '../lib/recentGames'
+import { useIsMobile } from '../lib/useIsMobile'
 
 interface GamePickerInputProps {
   games: Game[]
@@ -17,6 +19,7 @@ export function GamePickerInput({ games, value, onChange, error, onRetry, disabl
   const [open, setOpen] = useState(false)
   const [highlightedIndex, setHighlightedIndex] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
+  const isMobile = useIsMobile()
 
   const selectedGame = games.find((g) => g.id === value) ?? null
 
@@ -111,7 +114,7 @@ export function GamePickerInput({ games, value, onChange, error, onRetry, disabl
         className="flex w-full items-center gap-2 rounded-lg border border-border bg-surface-raised px-3 py-2 text-left text-text outline-none focus:border-primary disabled:opacity-50 cursor-pointer"
       >
         {selectedGame?.coverImageUrl ? (
-          <img src={selectedGame.coverImageUrl} alt="" className="h-6 w-6 rounded object-cover" />
+          <img src={resolveMediaUrl(selectedGame.coverImageUrl)!} alt="" className="h-6 w-6 rounded object-cover" />
         ) : (
           <Gamepad2 className="h-5 w-5 text-muted" aria-hidden="true" />
         )}
@@ -122,7 +125,9 @@ export function GamePickerInput({ games, value, onChange, error, onRetry, disabl
       {open && (
         <div className="absolute left-0 right-0 top-full z-20 mt-1 rounded-lg border border-border bg-surface shadow-lg">
           <input
-            autoFocus
+            // Autofocusing on mobile raises the virtual keyboard, which covers
+            // the results list below and leaves the picker looking empty.
+            autoFocus={!isMobile}
             type="text"
             aria-label="Search games"
             placeholder="Search games…"
@@ -146,7 +151,7 @@ export function GamePickerInput({ games, value, onChange, error, onRetry, disabl
                   }`}
                 >
                   {game.coverImageUrl ? (
-                    <img src={game.coverImageUrl} alt="" className="h-6 w-6 rounded object-cover" />
+                    <img src={resolveMediaUrl(game.coverImageUrl)!} alt="" className="h-6 w-6 rounded object-cover" />
                   ) : (
                     <Gamepad2 className="h-5 w-5 shrink-0" aria-hidden="true" />
                   )}

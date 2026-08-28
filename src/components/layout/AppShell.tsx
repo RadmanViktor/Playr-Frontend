@@ -31,7 +31,7 @@ export function AppShell() {
   }, [isMobileNavMounted, isMobileNavOpen])
 
   return (
-    <div className="flex min-h-screen bg-bg text-text">
+    <div className="flex min-h-dvh bg-bg text-text">
       {/* Desktop sidebar */}
       <div className="hidden md:flex">
         <Sidebar />

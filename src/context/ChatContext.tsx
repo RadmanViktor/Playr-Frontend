@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import { ChatWindow } from '../components/ChatWindow'
 import { Toast } from '../components/ui/Toast'
@@ -8,6 +8,7 @@ import { useNotificationPreferences } from './NotificationPreferencesContext'
 import { connectChatHub, disconnectChatHub, onChatMessage } from '../lib/chatHubConnection'
 import { playNotificationSound } from '../lib/sound'
 import { showBrowserNotification } from '../lib/browserNotifications'
+import { useIsMobile } from '../lib/useIsMobile'
 
 const MAX_OPEN_CHATS = 4
 const CHAT_WINDOW_OFFSET_REM = 25 // window width (24rem) + gap (1rem)
@@ -40,6 +41,16 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null)
   const [notificationToast, setNotificationToast] = useState<string | null>(null)
   const [unreadConversationIds, setUnreadConversationIds] = useState<Set<string>>(new Set())
+  const isMobile = useIsMobile()
+
+  // On mobile a chat window is fullscreen, so stacking several of them just
+  // buries all but the last one under an identical `inset-0` overlay. Render
+  // only the most recently opened chat; the rest stay in state (so closing the
+  // top one reveals the previous) but unmount, which also stops their polling.
+  const visibleChats = useMemo(
+    () => (isMobile ? openChats.slice(-1) : openChats),
+    [isMobile, openChats],
+  )
 
   useEffect(() => {
     if (!token) {
@@ -58,7 +69,10 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     return onChatMessage((message: ChatMessage) => {
       if (message.senderUserId === user.id) return
 
-      const isConversationActiveOnScreen = openChats.some(
+      // Must mirror what is actually rendered, not what is merely in state.
+      // On mobile only the last chat is mounted, so a conversation that is
+      // "open" but hidden still needs to raise a notification.
+      const isConversationActiveOnScreen = visibleChats.some(
         (chat) => chat.conversation.id === message.conversationId && !chat.isMinimized,
       )
       const shouldNotify = document.hidden || !document.hasFocus() || !isConversationActiveOnScreen
@@ -82,7 +96,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         setNotificationToast(`${message.senderDisplayName}: ${message.body}`)
       }
     })
-  }, [user, openChats, preferences])
+  }, [user, visibleChats, preferences])
 
   const showConversation = useCallback((conversation: Conversation, successMessage: string | null) => {
     setOpenChats((prev) => {
@@ -151,7 +165,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       }}
     >
       {children}
-      {openChats.map((chat, index) => (
+      {visibleChats.map((chat, index) => (
         <ChatWindow
           key={chat.conversation.id}
           conversation={chat.conversation}

@@ -6,6 +6,8 @@ import { EmojiPickerButton } from './EmojiPickerButton'
 import { getMessages, sendMessage, type ChatMessage, type Conversation } from '../api/chatApi'
 import { getProfile, type ProfileStatus } from '../api/profilesApi'
 import { useAuth } from '../context/AuthContext'
+import { useIsMobile } from '../lib/useIsMobile'
+import { useVisualViewportHeight } from '../lib/useVisualViewportHeight'
 
 const statusAvatarMap: Record<ProfileStatus, AvatarStatus> = {
   Online: 'online',
@@ -41,6 +43,20 @@ export function ChatWindow({
   const [error, setError] = useState<string | null>(null)
   const [otherStatus, setOtherStatus] = useState<ProfileStatus | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
+
+  const isMobile = useIsMobile()
+  // Only relevant for the fullscreen mobile layout; the docked desktop window
+  // has a fixed height and sits above the keyboard anyway.
+  const isFullscreen = isMobile && !isMinimized
+  const viewport = useVisualViewportHeight(isFullscreen)
+
+  // iOS Safari keeps the layout viewport at full height when the keyboard
+  // opens, so `h-dvh` alone would leave the composer underneath it. Pin the
+  // window to the visual viewport instead when we can measure it.
+  const viewportStyle: CSSProperties =
+    isFullscreen && viewport
+      ? { top: viewport.offsetTop, height: viewport.height, bottom: 'auto' }
+      : {}
 
   useEffect(() => {
     let cancelled = false
@@ -115,9 +131,11 @@ export function ChatWindow({
 
   return (
     <div
-      style={{ '--chat-right': style?.right ?? '1rem' } as CSSProperties}
+      style={{ '--chat-right': style?.right ?? '1rem', ...viewportStyle } as CSSProperties}
       className={`fixed inset-0 z-50 flex flex-col border border-border bg-surface shadow-2xl transition-all sm:inset-auto sm:bottom-4 sm:right-[var(--chat-right)] sm:w-96 sm:max-w-[calc(100vw-2rem)] sm:rounded-xl ${
-        isMinimized ? 'max-sm:inset-auto max-sm:bottom-4 max-sm:left-4 max-sm:right-4 max-sm:rounded-xl h-auto' : 'h-full sm:h-[28rem]'
+        isMinimized
+          ? 'max-sm:inset-auto max-sm:bottom-4 max-sm:left-4 max-sm:right-4 max-sm:rounded-xl h-auto'
+          : 'h-dvh sm:h-[28rem]'
       }`}
     >
       <div
@@ -131,7 +149,9 @@ export function ChatWindow({
           }
         }}
         aria-expanded={!isMinimized}
-        className="flex cursor-pointer items-center gap-3 rounded-t-xl border-b border-border bg-surface-raised px-4 py-3"
+        className={`flex cursor-pointer items-center gap-3 rounded-t-xl border-b border-border bg-surface-raised px-4 py-3 ${
+          isFullscreen ? 'pt-[max(0.75rem,env(safe-area-inset-top))]' : ''
+        }`}
       >
         <Avatar
           src={conversation.otherParticipant.avatarUrl ?? undefined}
@@ -207,7 +227,7 @@ export function ChatWindow({
 
           {error && <p className="px-4 pb-2 text-xs text-frustrated">{error}</p>}
 
-          <div className="flex items-center gap-2 border-t border-border p-3 overflow-visible rounded-b-xl">
+          <div className="flex items-center gap-2 border-t border-border p-3 max-sm:pb-[max(0.75rem,env(safe-area-inset-bottom))] overflow-visible rounded-b-xl">
             <input
               value={body}
               onChange={(event) => setBody(event.target.value.slice(0, 1000))}

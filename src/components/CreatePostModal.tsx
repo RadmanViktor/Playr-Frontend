@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { X } from 'lucide-react'
 import { Button } from './ui/Button'
 import { MediaGalleryUploadInput } from './MediaGalleryUploadInput'
@@ -11,6 +11,8 @@ import { createPost, type PostFeedItem } from '../api/postsApi'
 import { ApiError } from '../api/http'
 import { MOOD_OPTIONS, moodOptionToApi, type MoodOption } from '../lib/mood'
 import { addRecentGameId } from '../lib/recentGames'
+import { useBodyScrollLock } from '../lib/useBodyScrollLock'
+import { useOverlayDismiss } from '../lib/useOverlayDismiss'
 
 interface CreatePostModalProps {
   onClose: () => void
@@ -45,15 +47,6 @@ export function CreatePostModal({ onClose, onPostCreated }: CreatePostModalProps
   }, [gamesLoadKey])
 
   useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') requestClose()
-    }
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [text, mediaFiles])
-
-  useEffect(() => {
     function handlePaste(e: ClipboardEvent) {
       const items = e.clipboardData?.items
       if (!items) return
@@ -78,13 +71,16 @@ export function CreatePostModal({ onClose, onPostCreated }: CreatePostModalProps
 
   const hasUnsavedContent = text.trim() !== '' || mediaFiles.length > 0
 
-  function requestClose() {
+  const requestClose = useCallback(() => {
     if (hasUnsavedContent) {
       setConfirmingDiscard(true)
       return
     }
     onClose()
-  }
+  }, [hasUnsavedContent, onClose])
+
+  useBodyScrollLock()
+  const { backdropProps } = useOverlayDismiss({ onDismiss: requestClose })
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -116,14 +112,11 @@ export function CreatePostModal({ onClose, onPostCreated }: CreatePostModalProps
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 cursor-pointer"
-      onClick={requestClose}
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 p-4 cursor-pointer sm:items-center"
+      {...backdropProps}
     >
-      <div
-        className="w-full max-w-xl rounded-xl border border-border bg-surface p-5 cursor-default"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <div className="mb-4 flex items-center justify-between">
+      <div className="my-auto flex max-h-[90svh] w-full max-w-xl cursor-default flex-col overflow-y-auto overscroll-contain rounded-xl border border-border bg-surface p-5">
+        <div className="sticky top-0 z-10 -mx-5 -mt-5 mb-4 flex items-center justify-between bg-surface px-5 pb-3 pt-5">
           <h2 className="text-lg font-semibold text-text">Create Post</h2>
           <button
             type="button"
@@ -186,7 +179,7 @@ export function CreatePostModal({ onClose, onPostCreated }: CreatePostModalProps
               <div className="relative">
                 <textarea
                   aria-label="Post text"
-                  className="w-full rounded-lg border border-border bg-surface-raised px-3 py-2 pr-10 text-text resize-none h-32 outline-none focus:border-primary"
+                  className="w-full rounded-lg border border-border bg-surface-raised px-3 py-2 pr-10 text-text resize-none min-h-24 max-h-40 outline-none focus:border-primary"
                   value={text}
                   maxLength={1000}
                   onChange={(e) => setText(e.target.value)}
@@ -218,9 +211,11 @@ export function CreatePostModal({ onClose, onPostCreated }: CreatePostModalProps
 
             {submitError && <p className="text-frustrated text-sm">{submitError}</p>}
 
-            <Button type="submit" disabled={isSubmitting} className="w-full">
-              {isSubmitting ? 'Posting…' : 'Post'}
-            </Button>
+            <div className="sticky bottom-0 -mx-5 -mb-5 bg-surface px-5 pb-5 pt-3">
+              <Button type="submit" disabled={isSubmitting} className="w-full">
+                {isSubmitting ? 'Posting…' : 'Post'}
+              </Button>
+            </div>
           </form>
         )}
       </div>
