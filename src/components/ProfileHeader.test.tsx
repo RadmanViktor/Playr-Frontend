@@ -43,29 +43,29 @@ describe('ProfileHeader', () => {
     expect(link).toHaveAttribute('target', '_blank')
   })
 
-  it('shows Edit Profile button when isOwner', () => {
+  it('shows Settings button when isOwner', () => {
     render(<ProfileHeader profile={profile} isOwner={true} onEditClick={vi.fn()} />)
-    expect(screen.getByRole('button', { name: /edit profile/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /settings/i })).toBeInTheDocument()
   })
 
-  it('shows Sign out button under Edit Profile when owner can sign out', () => {
+  it('shows Sign out button under Settings when owner can sign out', () => {
     render(<ProfileHeader profile={profile} isOwner={true} onEditClick={vi.fn()} onSignOutClick={vi.fn()} />)
-    const editButton = screen.getByRole('button', { name: /edit profile/i })
+    const settingsButton = screen.getByRole('button', { name: /settings/i })
     const signOutButton = screen.getByRole('button', { name: /sign out/i })
-    expect(editButton.compareDocumentPosition(signOutButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(settingsButton.compareDocumentPosition(signOutButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 
-  it('hides Edit Profile button when not isOwner', () => {
+  it('hides Settings button when not isOwner', () => {
     render(<ProfileHeader profile={profile} isOwner={false} onEditClick={vi.fn()} />)
-    expect(screen.queryByRole('button', { name: /edit profile/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /settings/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /sign out/i })).not.toBeInTheDocument()
   })
 
-  it('calls onEditClick when Edit Profile is clicked', async () => {
+  it('calls onEditClick when Settings is clicked', async () => {
     const onEditClick = vi.fn()
     const user = userEvent.setup()
     render(<ProfileHeader profile={profile} isOwner={true} onEditClick={onEditClick} />)
-    await user.click(screen.getByRole('button', { name: /edit profile/i }))
+    await user.click(screen.getByRole('button', { name: /settings/i }))
     expect(onEditClick).toHaveBeenCalledOnce()
   })
 

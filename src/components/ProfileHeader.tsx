@@ -69,7 +69,7 @@ export function ProfileHeader({
           {isOwner && (
             <div className="flex flex-col items-start gap-2 sm:items-end">
               <Button variant="secondary" size="sm" onClick={onEditClick}>
-                Edit Profile
+                Settings
               </Button>
               {onSignOutClick && (
                 <Button variant="ghost" size="sm" onClick={onSignOutClick}>

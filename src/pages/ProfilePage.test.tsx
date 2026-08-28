@@ -63,15 +63,15 @@ describe('ProfilePage', () => {
     await waitFor(() => expect(screen.getByText('Player One')).toBeInTheDocument())
   })
 
-  it('shows Edit Profile button for own profile', async () => {
+  it('shows Settings button for own profile', async () => {
     renderProfile('player')
-    await waitFor(() => expect(screen.getByRole('button', { name: /edit profile/i })).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByRole('button', { name: /settings/i })).toBeInTheDocument())
   })
 
-  it('hides Edit Profile button for other profiles', async () => {
+  it('hides Settings button for other profiles', async () => {
     vi.mocked(profilesApi.getProfile).mockResolvedValueOnce({ ...profile, userId: 'other-user', username: 'other' })
     renderProfile('other')
-    await waitFor(() => expect(screen.queryByRole('button', { name: /edit profile/i })).not.toBeInTheDocument())
+    await waitFor(() => expect(screen.queryByRole('button', { name: /settings/i })).not.toBeInTheDocument())
   })
 
   it('shows not found message on 404', async () => {
@@ -81,11 +81,11 @@ describe('ProfilePage', () => {
     await waitFor(() => expect(screen.getByText(/not found/i)).toBeInTheDocument())
   })
 
-  it('navigates to settings on Edit Profile click', async () => {
+  it('navigates to settings on Settings click', async () => {
     const user = userEvent.setup()
     renderProfile()
-    await waitFor(() => screen.getByRole('button', { name: /edit profile/i }))
-    await user.click(screen.getByRole('button', { name: /edit profile/i }))
+    await waitFor(() => screen.getByRole('button', { name: /settings/i }))
+    await user.click(screen.getByRole('button', { name: /settings/i }))
     expect(screen.getByText('Settings page')).toBeInTheDocument()
   })
 
