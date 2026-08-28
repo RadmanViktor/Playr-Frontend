@@ -1,0 +1,5 @@
+# CI runs on Linux. Checking these out with CRLF breaks them: bash reads a lone
+# \r as a command, so a workflow's `run:` block fails in confusing ways.
+*.yml text eol=lf
+*.yaml text eol=lf
+*.sh text eol=lf
