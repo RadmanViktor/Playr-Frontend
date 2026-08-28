@@ -134,7 +134,7 @@ export default function FriendsPage() {
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Friend requests</h2>
           {requestActionError && <p className="text-sm text-frustrated">{requestActionError}</p>}
           {incomingRequests.map((request) => (
-            <Card key={request.id} className="flex items-center justify-between gap-4">
+            <Card key={request.id} className="flex flex-wrap items-center justify-between gap-4">
               <div className="flex min-w-0 items-center gap-3">
                 <Avatar src={request.senderAvatarUrl ?? undefined} alt={request.senderDisplayName} />
                 <div className="min-w-0">
@@ -174,7 +174,7 @@ export default function FriendsPage() {
       )}
 
       {friends.map((friend) => (
-        <Card key={friend.userId} className="flex items-center justify-between gap-4">
+        <Card key={friend.userId} className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex min-w-0 items-center gap-3">
             <Avatar
               src={friend.avatarUrl ?? undefined}

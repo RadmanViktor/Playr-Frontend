@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, type MouseEvent as ReactMouseEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Mail } from 'lucide-react'
+import { Mail, Menu } from 'lucide-react'
 import { IconButton } from '../ui/IconButton'
 import { Avatar } from '../ui/Avatar'
 import { useAuth } from '../../context/AuthContext'
@@ -46,7 +46,7 @@ const statusAvatarMap = {
   Offline: 'offline',
 } as const
 
-export function TopBar() {
+export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
   const { user, token } = useAuth()
   const { status, avatarUrl } = useStatus()
   const { openChatWithUser } = useChat()
@@ -348,8 +348,11 @@ export function TopBar() {
   }
 
   return (
-    <header className="flex items-center gap-4 border-b border-border bg-surface px-6 py-3">
-      <div className="relative w-full max-w-md" ref={containerRef}>
+    <header className="flex items-center gap-2 border-b border-border bg-surface px-3 py-3 sm:gap-4 sm:px-6">
+      <IconButton aria-label="Open menu" onClick={onMenuClick} className="md:hidden">
+        <Menu className="h-5 w-5" aria-hidden="true" />
+      </IconButton>
+      <div className="relative w-full min-w-0 flex-1 sm:max-w-md" ref={containerRef}>
         <div className="flex items-center gap-2 rounded-lg border border-border bg-surface-raised px-3 py-2">
           <Search className="h-4 w-4 text-muted" aria-hidden="true" />
           <input
@@ -442,7 +445,7 @@ export function TopBar() {
             </span>
           )}
           {isInvitationsOpen && (
-            <div className="absolute right-0 top-full z-50 mt-1 w-80 rounded-lg border border-border bg-surface shadow-lg overflow-hidden">
+            <div className="absolute right-0 top-full z-50 mt-1 w-[min(20rem,calc(100vw-1.5rem))] rounded-lg border border-border bg-surface shadow-lg overflow-hidden">
               <div className="border-b border-border px-4 py-2">
                 <p className="text-sm font-semibold text-text">Invitations</p>
               </div>

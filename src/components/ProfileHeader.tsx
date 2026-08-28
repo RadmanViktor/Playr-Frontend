@@ -55,7 +55,7 @@ export function ProfileHeader({
       </div>
 
       <div className="flex flex-col gap-4 px-6 pb-6 pt-16">
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col items-start justify-between gap-4 sm:flex-row">
           <div>
             <h1 className="text-xl font-bold text-text">
               {profile.displayName.toLowerCase() === profile.username.toLowerCase()
@@ -67,7 +67,7 @@ export function ProfileHeader({
             )}
           </div>
           {isOwner && (
-            <div className="flex flex-col items-end gap-2">
+            <div className="flex flex-col items-start gap-2 sm:items-end">
               <Button variant="secondary" size="sm" onClick={onEditClick}>
                 Edit Profile
               </Button>
@@ -79,7 +79,7 @@ export function ProfileHeader({
             </div>
           )}
           {!isOwner && (
-            <div className="flex flex-col items-end gap-2">
+            <div className="flex flex-col items-start gap-2 sm:items-end">
               {onMessageClick && (
                 <Button variant="secondary" size="sm" onClick={onMessageClick}>
                   Message
@@ -111,7 +111,7 @@ export function ProfileHeader({
         </div>
 
         {/* Stats row */}
-        <div className="flex items-center gap-5 text-sm text-muted">
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted">
           <span className="flex items-center gap-1.5">
             <FileText className="h-4 w-4" aria-hidden="true" />
             <span className="font-semibold text-text">{postCount}</span> posts

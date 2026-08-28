@@ -115,9 +115,9 @@ export function ChatWindow({
 
   return (
     <div
-      style={style}
-      className={`fixed bottom-4 z-50 flex w-96 max-w-[calc(100vw-2rem)] flex-col rounded-xl border border-border bg-surface shadow-2xl transition-all ${
-        isMinimized ? 'h-auto' : 'h-[28rem]'
+      style={{ '--chat-right': style?.right ?? '1rem' } as CSSProperties}
+      className={`fixed inset-0 z-50 flex flex-col border border-border bg-surface shadow-2xl transition-all sm:inset-auto sm:bottom-4 sm:right-[var(--chat-right)] sm:w-96 sm:max-w-[calc(100vw-2rem)] sm:rounded-xl ${
+        isMinimized ? 'max-sm:inset-auto max-sm:bottom-4 max-sm:left-4 max-sm:right-4 max-sm:rounded-xl h-auto' : 'h-full sm:h-[28rem]'
       }`}
     >
       <div

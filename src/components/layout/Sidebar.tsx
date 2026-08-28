@@ -38,7 +38,12 @@ const statusTextColorMap: Record<ProfileStatus, string> = {
   Offline: 'text-muted',
 }
 
-export function Sidebar() {
+interface SidebarProps {
+  className?: string
+  onNavigate?: () => void
+}
+
+export function Sidebar({ className = '', onNavigate }: SidebarProps) {
   const { user } = useAuth()
   const { status, avatarUrl, lookingForGameName } = useStatus()
   const { hasUnread } = useChat()
@@ -46,7 +51,7 @@ export function Sidebar() {
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false)
 
   return (
-    <aside className="flex w-64 shrink-0 flex-col gap-6 border-r border-border bg-surface p-4">
+    <aside className={`flex w-64 shrink-0 flex-col gap-6 border-r border-border bg-surface p-4 ${className}`}>
       <div className="flex items-center gap-2 px-2">
         <span className="text-2xl font-bold tracking-tight text-primary">PLAYR</span>
       </div>
@@ -75,6 +80,7 @@ export function Sidebar() {
             key={to}
             to={to}
             end={end}
+            onClick={onNavigate}
             className={({ isActive }) =>
               `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                 isActive
@@ -92,7 +98,7 @@ export function Sidebar() {
         ))}
       </nav>
 
-      <Button className="w-full" onClick={openCreatePost}>
+      <Button className="w-full" onClick={() => { onNavigate?.(); openCreatePost() }}>
         <Plus className="h-4 w-4" aria-hidden="true" />
         Create Post
       </Button>

@@ -81,7 +81,7 @@ export function ConversationsList() {
         return (
           <Card
             key={conversation.id}
-            className="flex cursor-pointer items-center justify-between gap-4"
+            className="flex flex-wrap cursor-pointer items-center justify-between gap-4"
             onClick={() => openConversation(conversation)}
           >
             <div className="flex min-w-0 items-center gap-3">

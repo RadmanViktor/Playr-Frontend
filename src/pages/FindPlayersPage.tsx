@@ -113,7 +113,7 @@ export default function FindPlayersPage() {
       ) : (
         <div className="flex flex-col gap-2">
           {players.map((player) => (
-            <Card key={player.userId} className="flex items-center justify-between gap-4">
+            <Card key={player.userId} className="flex flex-wrap items-center justify-between gap-4">
               <div
                 className="group flex min-w-0 cursor-pointer items-center gap-3"
                 onClick={() => navigate(`/profile/${player.username}`)}
