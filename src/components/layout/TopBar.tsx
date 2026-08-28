@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Bell, Mail } from 'lucide-react'
+import { Mail } from 'lucide-react'
 import { IconButton } from '../ui/IconButton'
 import { Avatar } from '../ui/Avatar'
 import { useAuth } from '../../context/AuthContext'
@@ -14,10 +14,23 @@ import {
   cancelInvitation,
   type Invitation,
 } from '../../api/invitationsApi'
+import {
+  getIncomingFriendRequests,
+  getSentFriendRequests,
+  acceptFriendRequest,
+  declineFriendRequest,
+  cancelFriendRequest,
+  type FriendRequest,
+} from '../../api/friendRequestsApi'
 import { ApiError } from '../../api/http'
 import { Search } from 'lucide-react'
 import { useChat } from '../../context/ChatContext'
-import { onInvitationReceived, onInvitationUpdated } from '../../lib/chatHubConnection'
+import {
+  onInvitationReceived,
+  onInvitationUpdated,
+  onFriendRequestReceived,
+  onFriendRequestUpdated,
+} from '../../lib/chatHubConnection'
 
 const statusAvatarMap = {
   Online: 'online',
@@ -39,13 +52,72 @@ export function TopBar() {
 
   const [invitations, setInvitations] = useState<Invitation[]>([])
   const [sentInvitations, setSentInvitations] = useState<Invitation[]>([])
+  const [incomingFriendRequests, setIncomingFriendRequests] = useState<FriendRequest[]>([])
+  const [sentFriendRequests, setSentFriendRequests] = useState<FriendRequest[]>([])
   const [invitationTab, setInvitationTab] = useState<'incoming' | 'sent'>('incoming')
   const [isInvitationsOpen, setIsInvitationsOpen] = useState(false)
   const [invitationsLoading, setInvitationsLoading] = useState(false)
   const [invitationsError, setInvitationsError] = useState<string | null>(null)
   const [respondingId, setRespondingId] = useState<string | null>(null)
   const invitationsRef = useRef<HTMLDivElement>(null)
-  const incomingInvitationCount = invitations.length
+  const incomingInvitationCount = invitations.length + incomingFriendRequests.length
+
+  type PendingItem = {
+    id: string
+    kind: 'invitation' | 'friendRequest'
+    avatarUrl: string | null
+    displayName: string
+    username: string
+    message: string | null
+    status: Invitation['status'] | FriendRequest['status']
+    createdAt: string
+  }
+
+  const incomingItems: PendingItem[] = [
+    ...invitations.map((i) => ({
+      id: i.id,
+      kind: 'invitation' as const,
+      avatarUrl: i.senderAvatarUrl,
+      displayName: i.senderDisplayName,
+      username: i.senderUsername,
+      message: i.message,
+      status: i.status,
+      createdAt: i.createdAt,
+    })),
+    ...incomingFriendRequests.map((r) => ({
+      id: r.id,
+      kind: 'friendRequest' as const,
+      avatarUrl: r.senderAvatarUrl,
+      displayName: r.senderDisplayName,
+      username: r.senderUsername,
+      message: null,
+      status: r.status,
+      createdAt: r.createdAt,
+    })),
+  ].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
+
+  const sentItems: PendingItem[] = [
+    ...sentInvitations.map((i) => ({
+      id: i.id,
+      kind: 'invitation' as const,
+      avatarUrl: i.recipientAvatarUrl,
+      displayName: i.recipientDisplayName,
+      username: i.recipientUsername,
+      message: i.message,
+      status: i.status,
+      createdAt: i.createdAt,
+    })),
+    ...sentFriendRequests.map((r) => ({
+      id: r.id,
+      kind: 'friendRequest' as const,
+      avatarUrl: r.recipientAvatarUrl,
+      displayName: r.recipientDisplayName,
+      username: r.recipientUsername,
+      message: null,
+      status: r.status,
+      createdAt: r.createdAt,
+    })),
+  ].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
 
   // Debounced search
   useEffect(() => {
@@ -69,17 +141,20 @@ export function TopBar() {
     return () => clearTimeout(timer)
   }, [query])
 
-  // Fetch incoming invitations on mount / token change so the badge count
-  // is correct without requiring the user to open the invitations dropdown.
+  // Fetch incoming invitations and friend requests on mount / token change so the
+  // badge count is correct without requiring the user to open the invitations dropdown.
   useEffect(() => {
     if (!token) {
       setInvitations([])
+      setIncomingFriendRequests([])
       return
     }
     let cancelled = false
-    getIncomingInvitations(token)
-      .then((incoming) => {
-        if (!cancelled) setInvitations(incoming)
+    Promise.all([getIncomingInvitations(token), getIncomingFriendRequests(token)])
+      .then(([incoming, incomingRequests]) => {
+        if (cancelled) return
+        setInvitations(incoming)
+        setIncomingFriendRequests(incomingRequests)
       })
       .catch(() => {
         // Silently ignore; the dropdown fetch will surface errors if opened.
@@ -89,8 +164,8 @@ export function TopBar() {
     }
   }, [token])
 
-  // Live-update invitations pushed over the chat hub, so the badge/dropdown
-  // reflect new/accepted/declined/cancelled invitations without a page reload.
+  // Live-update invitations and friend requests pushed over the chat hub, so the
+  // badge/dropdown reflect new/accepted/declined/cancelled items without a page reload.
   useEffect(() => {
     if (!user) return
 
@@ -108,9 +183,27 @@ export function TopBar() {
       setSentInvitations((prev) => prev.map((i) => (i.id === invitation.id ? invitation : i)))
     })
 
+    const unsubscribeFriendRequestReceived = onFriendRequestReceived((friendRequest) => {
+      if (friendRequest.recipientUserId !== user.id) return
+      setIncomingFriendRequests((prev) =>
+        prev.some((r) => r.id === friendRequest.id) ? prev : [friendRequest, ...prev],
+      )
+    })
+
+    const unsubscribeFriendRequestUpdated = onFriendRequestUpdated((friendRequest) => {
+      if (friendRequest.status !== 'Pending') {
+        setIncomingFriendRequests((prev) => prev.filter((r) => r.id !== friendRequest.id))
+      }
+      setSentFriendRequests((prev) =>
+        prev.map((r) => (r.id === friendRequest.id ? friendRequest : r)),
+      )
+    })
+
     return () => {
       unsubscribeReceived()
       unsubscribeUpdated()
+      unsubscribeFriendRequestReceived()
+      unsubscribeFriendRequestUpdated()
     }
   }, [user])
 
@@ -139,12 +232,16 @@ export function TopBar() {
       setInvitationsLoading(true)
       setInvitationsError(null)
       try {
-        const [incoming, sent] = await Promise.all([
+        const [incoming, sent, incomingRequests, sentRequests] = await Promise.all([
           getIncomingInvitations(token),
           getSentInvitations(token),
+          getIncomingFriendRequests(token),
+          getSentFriendRequests(token),
         ])
         setInvitations(incoming)
         setSentInvitations(sent)
+        setIncomingFriendRequests(incomingRequests)
+        setSentFriendRequests(sentRequests)
       } catch {
         setInvitationsError('Failed to load invitations.')
       } finally {
@@ -165,15 +262,20 @@ export function TopBar() {
     return () => document.removeEventListener('mousedown', handleMouseDown)
   }, [isInvitationsOpen])
 
-  async function handleAccept(invitationId: string) {
+  async function handleAccept(item: PendingItem) {
     if (!token) return
-    setRespondingId(invitationId)
+    setRespondingId(item.id)
     try {
-      const invitation = await acceptInvitation(token, invitationId)
-      setInvitations((prev) => prev.filter((i) => i.id !== invitationId))
-      await openChatWithUser(invitation.senderUserId, {
-        successMessage: `You're now chatting with ${invitation.senderDisplayName}. Happy gaming! :D`,
-      })
+      if (item.kind === 'invitation') {
+        const invitation = await acceptInvitation(token, item.id)
+        setInvitations((prev) => prev.filter((i) => i.id !== item.id))
+        await openChatWithUser(invitation.senderUserId, {
+          successMessage: `You're now chatting with ${invitation.senderDisplayName}. Happy gaming! :D`,
+        })
+      } else {
+        await acceptFriendRequest(token, item.id)
+        setIncomingFriendRequests((prev) => prev.filter((r) => r.id !== item.id))
+      }
       setIsInvitationsOpen(false)
     } catch (err) {
       setInvitationsError(err instanceof ApiError ? err.message : 'Failed to accept invitation.')
@@ -182,12 +284,17 @@ export function TopBar() {
     }
   }
 
-  async function handleDecline(invitationId: string) {
+  async function handleDecline(item: PendingItem) {
     if (!token) return
-    setRespondingId(invitationId)
+    setRespondingId(item.id)
     try {
-      await declineInvitation(token, invitationId)
-      setInvitations((prev) => prev.filter((i) => i.id !== invitationId))
+      if (item.kind === 'invitation') {
+        await declineInvitation(token, item.id)
+        setInvitations((prev) => prev.filter((i) => i.id !== item.id))
+      } else {
+        await declineFriendRequest(token, item.id)
+        setIncomingFriendRequests((prev) => prev.filter((r) => r.id !== item.id))
+      }
     } catch (err) {
       setInvitationsError(err instanceof ApiError ? err.message : 'Failed to decline invitation.')
     } finally {
@@ -195,12 +302,17 @@ export function TopBar() {
     }
   }
 
-  async function handleCancel(invitationId: string) {
+  async function handleCancel(item: PendingItem) {
     if (!token) return
-    setRespondingId(invitationId)
+    setRespondingId(item.id)
     try {
-      await cancelInvitation(token, invitationId)
-      setSentInvitations((prev) => prev.filter((i) => i.id !== invitationId))
+      if (item.kind === 'invitation') {
+        await cancelInvitation(token, item.id)
+        setSentInvitations((prev) => prev.filter((i) => i.id !== item.id))
+      } else {
+        await cancelFriendRequest(token, item.id)
+        setSentFriendRequests((prev) => prev.filter((r) => r.id !== item.id))
+      }
     } catch (err) {
       setInvitationsError(err instanceof ApiError ? err.message : 'Failed to cancel invitation.')
     } finally {
@@ -246,9 +358,6 @@ export function TopBar() {
       </div>
 
       <div className="ml-auto flex items-center gap-2">
-        <IconButton aria-label="Notifications">
-          <Bell className="h-5 w-5" aria-hidden="true" />
-        </IconButton>
         <div className="relative" ref={invitationsRef}>
           <IconButton aria-label="Messages" onClick={toggleInvitations}>
             <Mail className="h-5 w-5" aria-hidden="true" />
@@ -287,42 +396,45 @@ export function TopBar() {
                 <p className="px-4 py-3 text-sm text-muted">Loading...</p>
               ) : invitationsError ? (
                 <p className="px-4 py-3 text-sm text-frustrated">{invitationsError}</p>
-              ) : invitationTab === 'incoming' && invitations.length === 0 ? (
+              ) : invitationTab === 'incoming' && incomingItems.length === 0 ? (
                 <p className="px-4 py-3 text-sm text-muted">No incoming invitations</p>
-              ) : invitationTab === 'sent' && sentInvitations.length === 0 ? (
+              ) : invitationTab === 'sent' && sentItems.length === 0 ? (
                 <p className="px-4 py-3 text-sm text-muted">No sent invitations</p>
               ) : invitationTab === 'incoming' ? (
                 <div className="max-h-96 overflow-y-auto">
-                  {invitations.map((invitation) => (
-                    <div key={invitation.id} className="flex gap-3 border-b border-border px-4 py-3 last:border-b-0">
-                      <Avatar
-                        src={invitation.senderAvatarUrl ?? undefined}
-                        alt={invitation.senderDisplayName}
-                        size="sm"
-                      />
+                  {incomingItems.map((item) => (
+                    <div key={item.id} className="flex gap-3 border-b border-border px-4 py-3 last:border-b-0">
+                      <Avatar src={item.avatarUrl ?? undefined} alt={item.displayName} size="sm" />
                       <div className="min-w-0 flex-1">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setIsInvitationsOpen(false)
-                            navigate(`/profile/${invitation.senderUsername}`)
-                          }}
-                          className="truncate text-left text-sm font-medium text-text hover:underline cursor-pointer"
-                        >
-                          {invitation.senderDisplayName}
-                        </button>
-                        <p className="mt-0.5 text-xs text-muted break-words">{invitation.message}</p>
+                        <div className="flex items-center justify-between gap-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setIsInvitationsOpen(false)
+                              navigate(`/profile/${item.username}`)
+                            }}
+                            className="truncate text-left text-sm font-medium text-text hover:underline cursor-pointer"
+                          >
+                            {item.displayName}
+                          </button>
+                          <span className="shrink-0 rounded-full bg-surface-raised px-2 py-0.5 text-[11px] font-medium text-muted">
+                            {item.kind === 'invitation' ? 'Game invite' : 'Friend request'}
+                          </span>
+                        </div>
+                        {item.message && (
+                          <p className="mt-0.5 text-xs text-muted break-words">{item.message}</p>
+                        )}
                         <div className="mt-2 flex gap-2">
                           <button
-                            onClick={() => handleAccept(invitation.id)}
-                            disabled={respondingId === invitation.id}
+                            onClick={() => handleAccept(item)}
+                            disabled={respondingId === item.id}
                             className="rounded-md bg-primary px-2.5 py-1 text-xs font-medium text-white hover:bg-primary-hover disabled:opacity-50 cursor-pointer"
                           >
                             Accept
                           </button>
                           <button
-                            onClick={() => handleDecline(invitation.id)}
-                            disabled={respondingId === invitation.id}
+                            onClick={() => handleDecline(item)}
+                            disabled={respondingId === item.id}
                             className="rounded-md bg-surface-raised px-2.5 py-1 text-xs font-medium text-text hover:bg-border disabled:opacity-50 cursor-pointer"
                           >
                             Decline
@@ -334,26 +446,24 @@ export function TopBar() {
                 </div>
               ) : (
                 <div className="max-h-96 overflow-y-auto">
-                  {sentInvitations.map((invitation) => (
-                    <div key={invitation.id} className="flex gap-3 border-b border-border px-4 py-3 last:border-b-0">
-                      <Avatar
-                        src={invitation.recipientAvatarUrl ?? undefined}
-                        alt={invitation.recipientDisplayName}
-                        size="sm"
-                      />
+                  {sentItems.map((item) => (
+                    <div key={item.id} className="flex gap-3 border-b border-border px-4 py-3 last:border-b-0">
+                      <Avatar src={item.avatarUrl ?? undefined} alt={item.displayName} size="sm" />
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-2">
-                          <p className="truncate text-sm font-medium text-text">{invitation.recipientDisplayName}</p>
+                          <p className="truncate text-sm font-medium text-text">{item.displayName}</p>
                           <span className="shrink-0 rounded-full bg-surface-raised px-2 py-0.5 text-[11px] font-medium text-muted">
-                            {invitation.status}
+                            {item.kind === 'invitation' ? 'Game invite' : 'Friend request'} · {item.status}
                           </span>
                         </div>
-                        <p className="mt-0.5 text-xs text-muted break-words">{invitation.message}</p>
-                        {invitation.status === 'Pending' && (
+                        {item.message && (
+                          <p className="mt-0.5 text-xs text-muted break-words">{item.message}</p>
+                        )}
+                        {item.status === 'Pending' && (
                           <div className="mt-2 flex gap-2">
                             <button
-                              onClick={() => handleCancel(invitation.id)}
-                              disabled={respondingId === invitation.id}
+                              onClick={() => handleCancel(item)}
+                              disabled={respondingId === item.id}
                               className="rounded-md bg-surface-raised px-2.5 py-1 text-xs font-medium text-text hover:bg-border disabled:opacity-50 cursor-pointer"
                             >
                               Cancel

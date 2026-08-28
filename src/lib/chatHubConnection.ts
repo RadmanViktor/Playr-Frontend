@@ -2,15 +2,19 @@ import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } fro
 import { API_BASE_URL } from '../api/http'
 import type { ChatMessage } from '../api/chatApi'
 import type { Invitation } from '../api/invitationsApi'
+import type { FriendRequest } from '../api/friendRequestsApi'
 
 type MessageListener = (message: ChatMessage) => void
 type InvitationListener = (invitation: Invitation) => void
+type FriendRequestListener = (friendRequest: FriendRequest) => void
 
 let connection: HubConnection | null = null
 let currentToken: string | null = null
 const messageListeners = new Set<MessageListener>()
 const invitationReceivedListeners = new Set<InvitationListener>()
 const invitationUpdatedListeners = new Set<InvitationListener>()
+const friendRequestReceivedListeners = new Set<FriendRequestListener>()
+const friendRequestUpdatedListeners = new Set<FriendRequestListener>()
 
 function buildConnection(token: string): HubConnection {
   return new HubConnectionBuilder()
@@ -40,6 +44,12 @@ export async function connectChatHub(token: string): Promise<void> {
   })
   hub.on('InvitationUpdated', (invitation: Invitation) => {
     invitationUpdatedListeners.forEach((listener) => listener(invitation))
+  })
+  hub.on('FriendRequestReceived', (friendRequest: FriendRequest) => {
+    friendRequestReceivedListeners.forEach((listener) => listener(friendRequest))
+  })
+  hub.on('FriendRequestUpdated', (friendRequest: FriendRequest) => {
+    friendRequestUpdatedListeners.forEach((listener) => listener(friendRequest))
   })
 
   try {
@@ -78,4 +88,16 @@ export function onInvitationReceived(listener: InvitationListener): () => void {
 export function onInvitationUpdated(listener: InvitationListener): () => void {
   invitationUpdatedListeners.add(listener)
   return () => invitationUpdatedListeners.delete(listener)
+}
+
+/** Subscribe to friend requests pushed to the current user right after they're created. */
+export function onFriendRequestReceived(listener: FriendRequestListener): () => void {
+  friendRequestReceivedListeners.add(listener)
+  return () => friendRequestReceivedListeners.delete(listener)
+}
+
+/** Subscribe to friend request status changes (accepted/declined/cancelled), pushed to both parties. */
+export function onFriendRequestUpdated(listener: FriendRequestListener): () => void {
+  friendRequestUpdatedListeners.add(listener)
+  return () => friendRequestUpdatedListeners.delete(listener)
 }
