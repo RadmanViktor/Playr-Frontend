@@ -37,7 +37,28 @@ describe('getProfilePosts', () => {
     mockFetch.mockResolvedValueOnce({ ok: true, json: async () => [] })
     const result = await getProfilePosts('player')
     expect(result).toEqual([])
-    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/api/profiles/player/posts'))
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/api/profiles/player/posts'),
+      expect.anything(),
+    )
+  })
+
+  it('sends the bearer token when one is given', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => [] })
+    await getProfilePosts('player', 'my-token')
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/api/profiles/player/posts'),
+      expect.objectContaining({ headers: { Authorization: 'Bearer my-token' } }),
+    )
+  })
+
+  it('omits the auth header when called anonymously', async () => {
+    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => [] })
+    await getProfilePosts('player')
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.anything(),
+      expect.objectContaining({ headers: undefined }),
+    )
   })
 })
 

@@ -1,6 +1,7 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 import FindPlayersPage from './FindPlayersPage'
 import * as profilesApi from '../api/profilesApi'
 
@@ -35,9 +36,18 @@ describe('FindPlayersPage', () => {
     vi.mocked(profilesApi.getLookingForGamePlayers).mockResolvedValue(players)
   })
 
+  function renderPage() {
+    // The page navigates to profiles, so it needs router context.
+    return render(
+      <MemoryRouter>
+        <FindPlayersPage />
+      </MemoryRouter>,
+    )
+  }
+
   it('shows success feedback after sending an invitation', async () => {
     const user = userEvent.setup()
-    render(<FindPlayersPage />)
+    renderPage()
 
     await waitFor(() => expect(screen.getByText('Nexus Nova')).toBeInTheDocument())
     await user.click(screen.getByRole('button', { name: /invite/i }))

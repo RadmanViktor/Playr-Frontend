@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
+import type { ReactElement } from 'react'
 import { PostCard } from './PostCard'
 import type { PostFeedItem } from '../api/postsApi'
 import * as postsApi from '../api/postsApi'
@@ -22,58 +24,77 @@ const base: PostFeedItem = {
 
 beforeEach(() => { vi.resetAllMocks() })
 
+// PostCard links the author avatar and name to the profile page, so every
+// render needs router context.
+function renderCard(ui: ReactElement) {
+  return render(<MemoryRouter>{ui}</MemoryRouter>)
+}
+
 describe('PostCard — read mode', () => {
-  it('renders author display name and username', () => {
-    render(<PostCard post={base} />)
-    expect(screen.getByText('NexusNova')).toBeInTheDocument()
+  it('renders both names when the display name differs from the username', () => {
+    renderCard(<PostCard post={{ ...base, authorDisplayName: 'Nexus Nova' }} />)
+    expect(screen.getByText('Nexus Nova')).toBeInTheDocument()
     expect(screen.getByText('@nexusnova')).toBeInTheDocument()
   })
 
+  it('shows only the handle when the display name merely repeats the username', () => {
+    // base has displayName 'NexusNova' vs username 'nexusnova' - the same name,
+    // so rendering both would just be noise.
+    renderCard(<PostCard post={base} />)
+    expect(screen.getByText('@nexusnova')).toBeInTheDocument()
+    expect(screen.queryByText('NexusNova')).not.toBeInTheDocument()
+  })
+
+  it('links the author to their profile', () => {
+    renderCard(<PostCard post={base} />)
+    expect(screen.getAllByRole('link')[0]).toHaveAttribute('href', '/profile/nexusnova')
+  })
+
   it('renders game name', () => {
-    render(<PostCard post={base} />)
+    renderCard(<PostCard post={base} />)
     expect(screen.getByText('Elden Ring')).toBeInTheDocument()
   })
 
   it('renders text content', () => {
-    render(<PostCard post={base} />)
+    renderCard(<PostCard post={base} />)
     expect(screen.getByText('Finally beat Radahn!')).toBeInTheDocument()
   })
 
   it('renders mood badge', () => {
-    render(<PostCard post={base} />)
+    renderCard(<PostCard post={base} />)
     expect(screen.getByText('Enjoying')).toBeInTheDocument()
   })
 
   it('renders no mood badge when mood is null', () => {
-    render(<PostCard post={{ ...base, mood: null }} />)
+    renderCard(<PostCard post={{ ...base, mood: null }} />)
     expect(screen.queryByText('Enjoying')).not.toBeInTheDocument()
   })
 
   it('maps NeedHelp mood to need-help badge variant', () => {
-    render(<PostCard post={{ ...base, mood: 'NeedHelp' }} />)
+    renderCard(<PostCard post={{ ...base, mood: 'NeedHelp' }} />)
     expect(screen.getByText('Need Help')).toHaveAttribute('data-variant', 'need-help')
   })
 
   it('renders a relative timestamp', () => {
-    render(<PostCard post={base} />)
+    renderCard(<PostCard post={base} />)
     expect(screen.getByText(/ago/i)).toBeInTheDocument()
   })
 })
 
 describe('PostCard — ... menu', () => {
   it('does not show ... button when currentUserId differs from authorId', () => {
-    render(<PostCard post={base} currentUserId="other-user" />)
+    renderCard(<PostCard post={base} currentUserId="other-user" />)
     expect(screen.queryByRole('button', { name: /post options/i })).not.toBeInTheDocument()
   })
 
   it('shows ... button when currentUserId matches authorId', () => {
-    render(<PostCard post={base} currentUserId="a1" />)
+    renderCard(<PostCard post={base} currentUserId="a1" />)
     expect(screen.getByRole('button', { name: /post options/i })).toBeInTheDocument()
   })
 
   it('opens dropdown with Edit and Delete on ... click', async () => {
     const user = userEvent.setup()
-    render(<PostCard post={base} currentUserId="a1" />)
+    renderCard(<PostCard post={base} currentUserId="a1" />)
     await user.click(screen.getByRole('button', { name: /post options/i }))
     expect(screen.getByRole('button', { name: /^edit$/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /^delete$/i })).toBeInTheDocument()
@@ -83,7 +104,7 @@ describe('PostCard — ... menu', () => {
 describe('PostCard — edit mode', () => {
   it('switches to editing on Edit click with pre-filled textarea', async () => {
     const user = userEvent.setup()
-    render(<PostCard post={base} currentUserId="a1" />)
+    renderCard(<PostCard post={base} currentUserId="a1" />)
     await user.click(screen.getByRole('button', { name: /post options/i }))
     await user.click(screen.getByRole('button', { name: /^edit$/i }))
     const textarea = screen.getByRole('textbox', { name: /edit post text/i })
@@ -92,7 +113,7 @@ describe('PostCard — edit mode', () => {
 
   it('Cancel in edit mode returns to read state', async () => {
     const user = userEvent.setup()
-    render(<PostCard post={base} currentUserId="a1" />)
+    renderCard(<PostCard post={base} currentUserId="a1" />)
     await user.click(screen.getByRole('button', { name: /post options/i }))
     await user.click(screen.getByRole('button', { name: /^edit$/i }))
     await user.click(screen.getByRole('button', { name: /cancel/i }))
@@ -105,7 +126,7 @@ describe('PostCard — edit mode', () => {
     vi.mocked(postsApi.updatePost).mockResolvedValueOnce(updatedPost)
     const onUpdate = vi.fn()
     const user = userEvent.setup()
-    render(<PostCard post={base} currentUserId="a1" onUpdate={onUpdate} />)
+    renderCard(<PostCard post={base} currentUserId="a1" onUpdate={onUpdate} />)
     await user.click(screen.getByRole('button', { name: /post options/i }))
     await user.click(screen.getByRole('button', { name: /^edit$/i }))
     const textarea = screen.getByRole('textbox', { name: /edit post text/i })
@@ -119,7 +140,7 @@ describe('PostCard — edit mode', () => {
 describe('PostCard — delete confirm', () => {
   it('switches to confirming-delete on Delete click', async () => {
     const user = userEvent.setup()
-    render(<PostCard post={base} currentUserId="a1" />)
+    renderCard(<PostCard post={base} currentUserId="a1" />)
     await user.click(screen.getByRole('button', { name: /post options/i }))
     await user.click(screen.getByRole('button', { name: /^delete$/i }))
     expect(screen.getByText(/delete this post/i)).toBeInTheDocument()
@@ -127,7 +148,7 @@ describe('PostCard — delete confirm', () => {
 
   it('Cancel in confirm mode returns to read state', async () => {
     const user = userEvent.setup()
-    render(<PostCard post={base} currentUserId="a1" />)
+    renderCard(<PostCard post={base} currentUserId="a1" />)
     await user.click(screen.getByRole('button', { name: /post options/i }))
     await user.click(screen.getByRole('button', { name: /^delete$/i }))
     await user.click(screen.getByRole('button', { name: /cancel/i }))
@@ -139,7 +160,7 @@ describe('PostCard — delete confirm', () => {
     vi.mocked(postsApi.deletePost).mockResolvedValueOnce(undefined)
     const onDelete = vi.fn()
     const user = userEvent.setup()
-    render(<PostCard post={base} currentUserId="a1" onDelete={onDelete} />)
+    renderCard(<PostCard post={base} currentUserId="a1" onDelete={onDelete} />)
     await user.click(screen.getByRole('button', { name: /post options/i }))
     await user.click(screen.getByRole('button', { name: /^delete$/i }))
     await user.click(screen.getByRole('button', { name: /confirm delete/i }))
