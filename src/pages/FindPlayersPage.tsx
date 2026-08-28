@@ -6,6 +6,7 @@ import { Avatar } from '../components/ui/Avatar'
 import { Badge } from '../components/ui/Badge'
 import { Button } from '../components/ui/Button'
 import { InviteModal } from '../components/ui/InviteModal'
+import { LookingForGamePanel } from '../components/LookingForGamePanel'
 import { useAuth } from '../context/AuthContext'
 import { getLookingForGamePlayers, type LookingForGamePlayer } from '../api/profilesApi'
 import { cancelInvitation } from '../api/invitationsApi'
@@ -94,6 +95,8 @@ export default function FindPlayersPage() {
         </p>
       </div>
 
+      <LookingForGamePanel onChanged={loadPlayers} />
+
       {successMessage && (
         <div className="rounded-xl border border-enjoying/40 bg-enjoying/10 px-4 py-3 text-sm text-enjoying">
           {successMessage}
@@ -135,6 +138,9 @@ export default function FindPlayersPage() {
                       </Badge>
                     )}
                   </div>
+                  {player.lookingForGameNote && (
+                    <p className="mt-1 line-clamp-2 text-xs text-muted">{player.lookingForGameNote}</p>
+                  )}
                 </div>
               </div>
 

@@ -4,10 +4,22 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import FindPlayersPage from './FindPlayersPage'
 import * as profilesApi from '../api/profilesApi'
+import * as gamesApi from '../api/gamesApi'
 
 vi.mock('../api/profilesApi')
+vi.mock('../api/gamesApi')
 vi.mock('../context/AuthContext', () => ({
   useAuth: () => ({ token: 'token' }),
+}))
+vi.mock('../context/StatusContext', () => ({
+  useStatus: () => ({
+    status: 'Online',
+    lookingForGameId: null,
+    lookingForGameName: null,
+    lookingForPlayStyle: null,
+    lookingForGameNote: null,
+    updateStatus: vi.fn().mockResolvedValue(undefined),
+  }),
 }))
 vi.mock('../components/ui/InviteModal', () => ({
   InviteModal: ({ onSent }: { onSent: () => void }) => (
@@ -26,7 +38,7 @@ const players: profilesApi.LookingForGamePlayer[] = [
     lookingForGameId: 'game-1',
     lookingForGameName: 'Apex Legends',
     lookingForPlayStyle: 'Chill',
-    lookingForGameNote: null,
+    lookingForGameNote: 'looking for a duo partner',
     relationshipStatus: 'None',
     pendingInvitationId: null,
   },
@@ -35,6 +47,7 @@ const players: profilesApi.LookingForGamePlayer[] = [
 describe('FindPlayersPage', () => {
   beforeEach(() => {
     vi.mocked(profilesApi.getLookingForGamePlayers).mockResolvedValue(players)
+    vi.mocked(gamesApi.getGames).mockResolvedValue([])
   })
 
   function renderPage() {
@@ -56,5 +69,12 @@ describe('FindPlayersPage', () => {
 
     expect(screen.getByText('Invitation sent to Nexus Nova.')).toBeInTheDocument()
     expect(screen.getByText('Invited')).toBeInTheDocument()
+  })
+
+  it('shows the looking-for-game note on a player card', async () => {
+    renderPage()
+
+    await waitFor(() => expect(screen.getByText('Nexus Nova')).toBeInTheDocument())
+    expect(screen.getByText('looking for a duo partner')).toBeInTheDocument()
   })
 })
