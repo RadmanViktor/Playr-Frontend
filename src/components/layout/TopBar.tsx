@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, type MouseEvent as ReactMouseEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Mail } from 'lucide-react'
 import { IconButton } from '../ui/IconButton'
@@ -6,6 +6,13 @@ import { Avatar } from '../ui/Avatar'
 import { useAuth } from '../../context/AuthContext'
 import { useStatus } from '../../context/StatusContext'
 import { searchProfiles, type ProfileSearchResult } from '../../api/profilesApi'
+import {
+  getRecentSearches,
+  addRecentSearch,
+  removeRecentSearch,
+  clearRecentSearches,
+  type RecentSearch,
+} from '../../lib/recentSearches'
 import {
   getIncomingInvitations,
   getSentInvitations,
@@ -23,7 +30,7 @@ import {
   type FriendRequest,
 } from '../../api/friendRequestsApi'
 import { ApiError } from '../../api/http'
-import { Search } from 'lucide-react'
+import { Search, X } from 'lucide-react'
 import { useChat } from '../../context/ChatContext'
 import {
   onInvitationReceived,
@@ -48,6 +55,7 @@ export function TopBar() {
   const [results, setResults] = useState<ProfileSearchResult[]>([])
   const [isOpen, setIsOpen] = useState(false)
   const [noResults, setNoResults] = useState(false)
+  const [recentSearches, setRecentSearches] = useState<RecentSearch[]>(() => getRecentSearches())
   const containerRef = useRef<HTMLDivElement>(null)
 
   const [invitations, setInvitations] = useState<Invitation[]>([])
@@ -123,7 +131,6 @@ export function TopBar() {
   useEffect(() => {
     const trimmed = query.trim()
     if (trimmed.length < 2) {
-      setIsOpen(false)
       setResults([])
       setNoResults(false)
       return
@@ -140,6 +147,8 @@ export function TopBar() {
     }, 300)
     return () => clearTimeout(timer)
   }, [query])
+
+  const showRecent = isOpen && query.trim().length === 0
 
   // Fetch incoming invitations and friend requests on mount / token change so the
   // badge count is correct without requiring the user to open the invitations dropdown.
@@ -219,10 +228,28 @@ export function TopBar() {
     return () => document.removeEventListener('mousedown', handleMouseDown)
   }, [isOpen])
 
-  function handleSelect(username: string) {
+  function handleSelect(profile: ProfileSearchResult) {
+    addRecentSearch({
+      userId: profile.userId,
+      username: profile.username,
+      displayName: profile.displayName,
+      avatarUrl: profile.avatarUrl,
+    })
+    setRecentSearches(getRecentSearches())
     setIsOpen(false)
     setQuery('')
-    navigate(`/profile/${username}`)
+    navigate(`/profile/${profile.username}`)
+  }
+
+  function handleRemoveRecent(e: ReactMouseEvent, userId: string) {
+    e.stopPropagation()
+    removeRecentSearch(userId)
+    setRecentSearches(getRecentSearches())
+  }
+
+  function handleClearRecent() {
+    clearRecentSearches()
+    setRecentSearches([])
   }
 
   async function toggleInvitations() {
@@ -331,18 +358,65 @@ export function TopBar() {
             placeholder="Search PLAYR"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            onFocus={() => {
+              if (query.trim().length === 0) {
+                setRecentSearches(getRecentSearches())
+                setIsOpen(true)
+              }
+            }}
             className="w-full bg-transparent text-sm text-text outline-none placeholder:text-muted"
           />
         </div>
         {isOpen && (
           <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-lg border border-border bg-surface shadow-lg overflow-hidden">
-            {noResults ? (
+            {showRecent ? (
+              recentSearches.length === 0 ? (
+                <p className="px-4 py-3 text-sm text-muted">Inga senaste sökningar</p>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between px-4 pt-3 pb-1">
+                    <p className="text-xs font-medium uppercase text-muted">Senaste sökningar</p>
+                    <button
+                      type="button"
+                      onClick={handleClearRecent}
+                      className="text-xs font-medium text-muted hover:text-text cursor-pointer"
+                    >
+                      Rensa alla
+                    </button>
+                  </div>
+                  {recentSearches.map((r) => (
+                    <div
+                      key={r.userId}
+                      className="group flex w-full items-center gap-3 px-4 py-2.5 hover:bg-surface-raised transition-colors"
+                    >
+                      <button
+                        onClick={() => handleSelect(r)}
+                        className="flex flex-1 items-center gap-3 text-left cursor-pointer"
+                      >
+                        <Avatar src={r.avatarUrl ?? undefined} alt={r.displayName} size="sm" />
+                        <div>
+                          <p className="text-sm font-medium text-text">{r.displayName}</p>
+                          <p className="text-xs text-muted">@{r.username}</p>
+                        </div>
+                      </button>
+                      <button
+                        aria-label={`Ta bort ${r.displayName} från senaste sökningar`}
+                        onClick={(e) => handleRemoveRecent(e, r.userId)}
+                        className="rounded p-1 text-muted opacity-0 group-hover:opacity-100 hover:bg-border hover:text-text cursor-pointer"
+                      >
+                        <X className="h-3.5 w-3.5" aria-hidden="true" />
+                      </button>
+                    </div>
+                  ))}
+                </>
+              )
+            ) : noResults ? (
               <p className="px-4 py-3 text-sm text-muted">Ingen användare hittades</p>
             ) : (
               results.map((r) => (
                 <button
                   key={r.userId}
-                  onClick={() => handleSelect(r.username)}
+                  onClick={() => handleSelect(r)}
                   className="flex w-full items-center gap-3 px-4 py-2.5 text-left hover:bg-surface-raised transition-colors cursor-pointer"
                 >
                   <Avatar src={r.avatarUrl ?? undefined} alt={r.displayName} size="sm" />
