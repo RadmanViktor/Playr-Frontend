@@ -76,4 +76,18 @@ describe('Modal', () => {
 
     expect(onClose).toHaveBeenCalledTimes(1)
   })
+
+  it('renders into a portal attached to document.body, not an ancestor node', () => {
+    const { container } = render(
+      <div data-testid="transformed-ancestor" style={{ transform: 'translateX(0)' }}>
+        <Modal title="Settings" onClose={vi.fn()}>
+          <p>Body</p>
+        </Modal>
+      </div>,
+    )
+
+    const heading = screen.getByRole('heading', { name: 'Settings' })
+    expect(container.contains(heading)).toBe(false)
+    expect(document.body.contains(heading)).toBe(true)
+  })
 })

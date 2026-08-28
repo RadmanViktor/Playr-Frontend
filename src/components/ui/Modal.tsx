@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 import { useBodyScrollLock } from '../../lib/useBodyScrollLock'
 import { useOverlayDismiss } from '../../lib/useOverlayDismiss'
@@ -14,7 +15,7 @@ export function Modal({ title, onClose, children, maxWidthClassName = 'max-w-md'
   useBodyScrollLock()
   const { backdropProps } = useOverlayDismiss({ onDismiss: onClose })
 
-  return (
+  return createPortal(
     <div
       // items-start on mobile: centring tall content pushes it off *both* the
       // top and the bottom of a short viewport, making it unreachable.
@@ -38,6 +39,7 @@ export function Modal({ title, onClose, children, maxWidthClassName = 'max-w-md'
 
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
