@@ -18,6 +18,7 @@ vi.mock('../../context/StatusContext', () => ({
     lookingForGameId: null,
     lookingForGameName: null,
     lookingForPlayStyle: null,
+    lookingForGameNote: null,
     isLoading: false,
     updateStatus: vi.fn(),
   }),
