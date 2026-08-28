@@ -50,7 +50,7 @@ function renderProfile(username = 'player') {
     <MemoryRouter initialEntries={[`/profile/${username}`]}>
       <Routes>
         <Route path="/profile/:username" element={<ProfilePage />} />
-        <Route path="/settings" element={<p>Settings page</p>} />
+        <Route path="/settings/profile" element={<p>Settings page</p>} />
         <Route path="/login" element={<p>Login page</p>} />
       </Routes>
     </MemoryRouter>

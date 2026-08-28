@@ -140,7 +140,7 @@ export default function ProfilePage() {
       <ProfileHeader
         profile={profile}
         isOwner={isOwner}
-        onEditClick={() => navigate('/settings')}
+        onEditClick={() => navigate('/settings/profile')}
         onSignOutClick={handleSignOut}
         postCount={posts.length}
         onAddFriendClick={handleAddFriend}

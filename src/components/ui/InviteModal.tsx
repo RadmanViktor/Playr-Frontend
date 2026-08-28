@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { X } from 'lucide-react'
 import { Button } from './Button'
+import { Modal } from './Modal'
 import { Avatar } from './Avatar'
 import { useAuth } from '../../context/AuthContext'
 import { sendInvitation } from '../../api/invitationsApi'
@@ -64,26 +64,7 @@ export function InviteModal({
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 cursor-pointer"
-      onClick={onClose}
-    >
-      <div
-        className="w-full max-w-md rounded-xl border border-border bg-surface p-5 cursor-default"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-text">{title}</h2>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close"
-            className="rounded-lg p-1 text-muted hover:bg-surface-raised hover:text-text cursor-pointer"
-          >
-            <X className="h-5 w-5" aria-hidden="true" />
-          </button>
-        </div>
-
+    <Modal title={title} onClose={onClose}>
         <div className="mb-4 flex items-center gap-3">
           <Avatar src={recipientAvatarUrl ?? undefined} alt={recipientDisplayName} size="md" />
           <p className="text-sm text-text">
@@ -116,7 +97,6 @@ export function InviteModal({
             {isSending ? 'Sending...' : actionLabel}
           </Button>
         </div>
-      </div>
-    </div>
+    </Modal>
   )
 }

@@ -8,6 +8,9 @@ import FindPlayersPage from './pages/FindPlayersPage'
 import ChatsPage from './pages/ChatsPage'
 import ProfilePage from './pages/ProfilePage'
 import SettingsPage from './pages/SettingsPage'
+import NotificationSettingsPage from './pages/settings/NotificationSettingsPage'
+import SteamAccountSettingsPage from './pages/settings/SteamAccountSettingsPage'
+import ProfileSettingsPage from './pages/settings/ProfileSettingsPage'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { AppShell } from './components/layout/AppShell'
 
@@ -36,6 +39,9 @@ function App() {
         <Route path="/find-players" element={<FindPlayersPage />} />
         <Route path="/chats" element={<ChatsPage />} />
         <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/settings/notifications" element={<NotificationSettingsPage />} />
+        <Route path="/settings/steam" element={<SteamAccountSettingsPage />} />
+        <Route path="/settings/profile" element={<ProfileSettingsPage />} />
       </Route>
     </Routes>
   )

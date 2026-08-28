@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Gamepad2, Moon, Circle, EyeOff, X } from 'lucide-react'
+import { Gamepad2, Moon, Circle, EyeOff } from 'lucide-react'
 import { Button } from './Button'
+import { Modal } from './Modal'
 import { Select } from './Select'
 import { getGames, type Game } from '../../api/gamesApi'
 import type { PlayStyle, ProfileStatus } from '../../api/profilesApi'
@@ -72,26 +73,7 @@ export function StatusModal({ onClose }: StatusModalProps) {
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 cursor-pointer"
-      onClick={onClose}
-    >
-      <div
-        className="w-full max-w-md rounded-xl border border-border bg-surface p-5 cursor-default"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-text">Set your status</h2>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close"
-            className="rounded-lg p-1 text-muted hover:bg-surface-raised hover:text-text cursor-pointer"
-          >
-            <X className="h-5 w-5" aria-hidden="true" />
-          </button>
-        </div>
-
+    <Modal title="Set your status" onClose={onClose}>
         <div className="flex flex-col gap-2">
           {statusOptions.map(({ value, label, description, icon: Icon }) => (
             <button
@@ -161,7 +143,6 @@ export function StatusModal({ onClose }: StatusModalProps) {
             {isSaving ? 'Saving...' : 'Save'}
           </Button>
         </div>
-      </div>
-    </div>
+    </Modal>
   )
 }
