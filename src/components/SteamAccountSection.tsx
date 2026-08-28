@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Button } from './ui/Button'
 import { getSteamStatus, startSteamLink, unlinkSteam, type SteamAccount } from '../api/steamApi'
-import { ApiError } from '../api/http'
+import { ApiError, resolveMediaUrl } from '../api/http'
 
 interface SteamAccountSectionProps {
   token: string
@@ -55,7 +55,7 @@ export function SteamAccountSection({ token }: SteamAccountSectionProps) {
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             {account.avatarUrl && (
-              <img src={account.avatarUrl} alt="" className="h-10 w-10 rounded-full" />
+              <img src={resolveMediaUrl(account.avatarUrl)!} alt="" className="h-10 w-10 rounded-full" />
             )}
             <div>
               <p className="text-text">{account.displayName ?? account.steamId}</p>

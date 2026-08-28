@@ -2,11 +2,8 @@ import { API_BASE_URL, ApiError, parseErrorMessage } from './http'
 
 export type Mood = 'Enjoying' | 'Frustrated' | 'Completed' | 'NeedHelp'
 
-export function resolveMediaUrl(url: string | null): string | null {
-  if (!url) return null
-  if (url.startsWith('http://') || url.startsWith('https://')) return url
-  return `${API_BASE_URL}${url}`
-}
+// Lives in ./http next to API_BASE_URL; re-exported here for existing callers.
+export { resolveMediaUrl } from './http'
 
 export interface PostMediaItem {
   id: string
