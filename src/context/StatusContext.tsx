@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
-import { getProfile, updateProfileStatus, type PlayStyle, type ProfileStatus } from '../api/profilesApi'
+import { getProfile, updateProfileStatus, type PlayStyle, type ProfileData, type ProfileStatus } from '../api/profilesApi'
 import { useAuth } from './AuthContext'
 
 export interface StatusContextValue {
@@ -17,6 +17,7 @@ export interface StatusContextValue {
     lookingForPlayStyle?: PlayStyle | null,
     lookingForGameNote?: string | null,
   ) => Promise<void>
+  setProfileSnapshot: (profile: ProfileData) => void
 }
 
 const StatusContext = createContext<StatusContextValue | null>(null)
@@ -101,6 +102,15 @@ export function StatusProvider({ children }: { children: ReactNode }) {
     [token],
   )
 
+  const setProfileSnapshot = useCallback((profile: ProfileData) => {
+    setStatus(profile.status)
+    setAvatarUrl(profile.avatarUrl)
+    setLookingForGameId(profile.lookingForGameId)
+    setLookingForGameName(profile.lookingForGameName)
+    setLookingForPlayStyle(profile.lookingForPlayStyle)
+    setLookingForGameNote(profile.lookingForGameNote)
+  }, [])
+
   return (
     <StatusContext.Provider
       value={{
@@ -112,6 +122,7 @@ export function StatusProvider({ children }: { children: ReactNode }) {
         lookingForGameNote,
         isLoading,
         updateStatus,
+        setProfileSnapshot,
       }}
     >
       {children}

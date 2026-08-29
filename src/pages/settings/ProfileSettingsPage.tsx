@@ -4,9 +4,11 @@ import { EditProfileForm } from '../../components/EditProfileForm'
 import { SettingsSectionHeader } from '../../components/SettingsSectionHeader'
 import { getProfile, type ProfileData } from '../../api/profilesApi'
 import { useAuth } from '../../context/AuthContext'
+import { useStatus } from '../../context/StatusContext'
 
 export default function ProfileSettingsPage() {
   const { user, token } = useAuth()
+  const { setProfileSnapshot } = useStatus()
   const navigate = useNavigate()
   const [profile, setProfile] = useState<ProfileData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -29,6 +31,7 @@ export default function ProfileSettingsPage() {
         token={token}
         onSave={(updated) => {
           setProfile(updated)
+          setProfileSnapshot(updated)
           navigate(`/profile/${updated.username}`)
         }}
         onCancel={() => navigate('/settings')}
