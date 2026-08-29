@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Card } from './ui/Card'
 import { Badge } from './ui/Badge'
 import { Button } from './ui/Button'
-import { Select } from './ui/Select'
+import { GamePickerInput } from './GamePickerInput'
 import { getGames, type Game } from '../api/gamesApi'
 import type { PlayStyle } from '../api/profilesApi'
 import { useStatus } from '../context/StatusContext'
@@ -28,6 +28,8 @@ export function LookingForGamePanel({ onChanged }: LookingForGamePanelProps) {
   } = useStatus()
 
   const [games, setGames] = useState<Game[]>([])
+  const [gamesError, setGamesError] = useState<string | null>(null)
+  const [gamesLoadKey, setGamesLoadKey] = useState(0)
   const [selectedGameId, setSelectedGameId] = useState<string | null>(null)
   const [selectedPlayStyle, setSelectedPlayStyle] = useState<PlayStyle | null>(null)
   const [note, setNote] = useState('')
@@ -37,17 +39,18 @@ export function LookingForGamePanel({ onChanged }: LookingForGamePanelProps) {
 
   useEffect(() => {
     let cancelled = false
+    setGamesError(null)
     getGames()
       .then((result) => {
         if (!cancelled) setGames(result)
       })
       .catch(() => {
-        if (!cancelled) setGames([])
+        if (!cancelled) setGamesError('Failed to load games.')
       })
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [gamesLoadKey])
 
   const isActive = status === 'LookingForGame'
 
@@ -145,12 +148,13 @@ export function LookingForGamePanel({ onChanged }: LookingForGamePanelProps) {
               <label htmlFor="lfg-game" className="mb-1 block text-xs font-medium text-muted">
                 Game
               </label>
-              <Select
-                id="lfg-game"
+              <GamePickerInput
+                games={games}
                 value={selectedGameId ?? ''}
-                onChange={(val) => setSelectedGameId(val || null)}
-                placeholder="Select a game"
-                options={games.map((game) => ({ value: game.id, label: game.name }))}
+                onChange={setSelectedGameId}
+                error={gamesError}
+                onRetry={() => setGamesLoadKey((k) => k + 1)}
+                onGameAdded={(game) => setGames((current) => [...current, game].sort((a, b) => a.name.localeCompare(b.name)))}
               />
             </div>
 

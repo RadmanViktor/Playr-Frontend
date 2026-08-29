@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ChevronDown, Gamepad2, Plus, RefreshCw } from 'lucide-react'
-import type { Game } from '../api/gamesApi'
+import { ChevronDown, Gamepad2, Loader2, RefreshCw } from 'lucide-react'
+import { createGame, searchExternalGames, type ExternalGameSearchResult, type Game } from '../api/gamesApi'
 import { resolveMediaUrl } from '../api/http'
+import { useAuth } from '../context/AuthContext'
 import { getRecentGameIds } from '../lib/recentGames'
 import { useIsMobile } from '../lib/useIsMobile'
-import { AddGameModal } from './AddGameModal'
 
 interface GamePickerInputProps {
   games: Game[]
@@ -17,10 +17,14 @@ interface GamePickerInputProps {
 }
 
 export function GamePickerInput({ games, value, onChange, error, onRetry, disabled, onGameAdded }: GamePickerInputProps) {
+  const { token } = useAuth()
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
   const [highlightedIndex, setHighlightedIndex] = useState(0)
-  const [showAddGameModal, setShowAddGameModal] = useState(false)
+  const [externalResults, setExternalResults] = useState<ExternalGameSearchResult[]>([])
+  const [externalSearching, setExternalSearching] = useState(false)
+  const [externalError, setExternalError] = useState<string | null>(null)
+  const [addingRawgId, setAddingRawgId] = useState<number | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const isMobile = useIsMobile()
 
@@ -40,6 +44,45 @@ export function GamePickerInput({ games, value, onChange, error, onRetry, disabl
     if (!trimmed) return orderedGames
     return orderedGames.filter((g) => g.name.toLowerCase().includes(trimmed))
   }, [orderedGames, query])
+
+  // Search RAWG's full game catalog whenever the user types, so any game can
+  // be found even if it isn't in our local catalog yet.
+  useEffect(() => {
+    const trimmed = query.trim()
+    if (!trimmed || !token) {
+      setExternalResults([])
+      setExternalError(null)
+      setExternalSearching(false)
+      return
+    }
+
+    let cancelled = false
+    setExternalSearching(true)
+    setExternalError(null)
+    const timeoutId = setTimeout(() => {
+      searchExternalGames(token, trimmed)
+        .then((r) => {
+          if (!cancelled) setExternalResults(r)
+        })
+        .catch(() => {
+          if (!cancelled) setExternalError('Failed to search games.')
+        })
+        .finally(() => {
+          if (!cancelled) setExternalSearching(false)
+        })
+    }, 300)
+
+    return () => {
+      cancelled = true
+      clearTimeout(timeoutId)
+    }
+  }, [query, token])
+
+  // Hide RAWG results that already match a game we're showing from the local list.
+  const filteredExternalResults = useMemo(() => {
+    const shownNames = new Set(filteredGames.map((g) => g.name.trim().toLowerCase()))
+    return externalResults.filter((r) => !shownNames.has(r.name.trim().toLowerCase()))
+  }, [externalResults, filteredGames])
 
   useEffect(() => {
     setHighlightedIndex(0)
@@ -63,11 +106,21 @@ export function GamePickerInput({ games, value, onChange, error, onRetry, disabl
     setQuery('')
   }
 
-  function handleGameAdded(game: Game) {
-    onGameAdded?.(game)
-    setShowAddGameModal(false)
-    selectGame(game.id)
+  async function selectExternalGame(result: ExternalGameSearchResult) {
+    if (!token) return
+    setAddingRawgId(result.rawgId)
+    try {
+      const game = await createGame(token, result)
+      onGameAdded?.(game)
+      selectGame(game.id)
+    } catch {
+      setExternalError('Failed to add game. Please try again.')
+    } finally {
+      setAddingRawgId(null)
+    }
   }
+
+  const combinedCount = filteredGames.length + filteredExternalResults.length
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (!open) {
@@ -79,14 +132,19 @@ export function GamePickerInput({ games, value, onChange, error, onRetry, disabl
     }
     if (e.key === 'ArrowDown') {
       e.preventDefault()
-      setHighlightedIndex((i) => Math.min(i + 1, filteredGames.length - 1))
+      setHighlightedIndex((i) => Math.min(i + 1, combinedCount - 1))
     } else if (e.key === 'ArrowUp') {
       e.preventDefault()
       setHighlightedIndex((i) => Math.max(i - 1, 0))
     } else if (e.key === 'Enter') {
       e.preventDefault()
-      const game = filteredGames[highlightedIndex]
-      if (game) selectGame(game.id)
+      if (highlightedIndex < filteredGames.length) {
+        const game = filteredGames[highlightedIndex]
+        if (game) selectGame(game.id)
+      } else {
+        const result = filteredExternalResults[highlightedIndex - filteredGames.length]
+        if (result) void selectExternalGame(result)
+      }
     } else if (e.key === 'Escape') {
       setOpen(false)
       setQuery('')
@@ -146,47 +204,67 @@ export function GamePickerInput({ games, value, onChange, error, onRetry, disabl
             className="w-full border-b border-border bg-transparent px-3 py-2 text-sm text-text outline-none placeholder:text-muted"
           />
           <div className="max-h-56 overflow-y-auto">
-            {filteredGames.length === 0 ? (
+            {filteredGames.length === 0 && filteredExternalResults.length === 0 && !externalSearching ? (
               <p className="px-3 py-2 text-sm text-muted">No games found.</p>
             ) : (
-              filteredGames.map((game, index) => (
-                <button
-                  key={game.id}
-                  type="button"
-                  onClick={() => selectGame(game.id)}
-                  onMouseEnter={() => setHighlightedIndex(index)}
-                  className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm cursor-pointer ${
-                    index === highlightedIndex ? 'bg-surface-raised text-text' : 'text-muted hover:text-text'
-                  }`}
-                >
-                  {game.coverImageUrl ? (
-                    <img src={resolveMediaUrl(game.coverImageUrl)!} alt="" className="h-6 w-6 rounded object-cover" />
-                  ) : (
-                    <Gamepad2 className="h-5 w-5 shrink-0" aria-hidden="true" />
-                  )}
-                  <span className="truncate">{game.name}</span>
-                </button>
-              ))
+              <>
+                {filteredGames.map((game, index) => (
+                  <button
+                    key={game.id}
+                    type="button"
+                    onClick={() => selectGame(game.id)}
+                    onMouseEnter={() => setHighlightedIndex(index)}
+                    className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm cursor-pointer ${
+                      index === highlightedIndex ? 'bg-surface-raised text-text' : 'text-muted hover:text-text'
+                    }`}
+                  >
+                    {game.coverImageUrl ? (
+                      <img src={resolveMediaUrl(game.coverImageUrl)!} alt="" className="h-6 w-6 rounded object-cover" />
+                    ) : (
+                      <Gamepad2 className="h-5 w-5 shrink-0" aria-hidden="true" />
+                    )}
+                    <span className="truncate">{game.name}</span>
+                  </button>
+                ))}
+
+                {filteredExternalResults.map((result, resultIndex) => {
+                  const index = filteredGames.length + resultIndex
+                  return (
+                    <button
+                      key={result.rawgId}
+                      type="button"
+                      disabled={addingRawgId !== null}
+                      onClick={() => void selectExternalGame(result)}
+                      onMouseEnter={() => setHighlightedIndex(index)}
+                      className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm cursor-pointer disabled:opacity-50 ${
+                        index === highlightedIndex ? 'bg-surface-raised text-text' : 'text-muted hover:text-text'
+                      }`}
+                    >
+                      {result.coverImageUrl ? (
+                        <img src={resolveMediaUrl(result.coverImageUrl)!} alt="" className="h-6 w-6 rounded object-cover" />
+                      ) : (
+                        <Gamepad2 className="h-5 w-5 shrink-0" aria-hidden="true" />
+                      )}
+                      <span className="flex-1 truncate">{result.name}</span>
+                      {addingRawgId === result.rawgId && (
+                        <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden="true" />
+                      )}
+                    </button>
+                  )
+                })}
+              </>
             )}
-            {onGameAdded && (
-              <button
-                type="button"
-                onClick={() => {
-                  setShowAddGameModal(true)
-                  setOpen(false)
-                }}
-                className="flex w-full items-center gap-2 border-t border-border px-3 py-2 text-left text-sm text-primary hover:bg-surface-raised cursor-pointer"
-              >
-                <Plus className="h-4 w-4 shrink-0" aria-hidden="true" />
-                <span>Can't find your game? Add it</span>
-              </button>
+
+            {externalSearching && (
+              <div className="flex items-center gap-2 px-3 py-2 text-sm text-muted">
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                Searching…
+              </div>
             )}
+
+            {externalError && <p className="px-3 py-2 text-sm text-frustrated">{externalError}</p>}
           </div>
         </div>
-      )}
-
-      {showAddGameModal && (
-        <AddGameModal onClose={() => setShowAddGameModal(false)} onGameAdded={handleGameAdded} />
       )}
     </div>
   )
