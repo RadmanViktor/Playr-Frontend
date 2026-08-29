@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
+import ConfirmEmailPage from './pages/ConfirmEmailPage'
 import HomePage from './pages/HomePage'
 import FriendsPage from './pages/FriendsPage'
 import FeedPage from './pages/FeedPage'
@@ -19,6 +20,7 @@ function App() {
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/confirm-email" element={<ConfirmEmailPage />} />
 
       {/* Public routes inside AppShell (no auth required) */}
       <Route element={<AppShell />}>

@@ -47,6 +47,7 @@ describe('LoginPage', () => {
       email: 'a@b.com',
       username: 'someone',
       displayName: null,
+      emailConfirmed: true,
     })
 
     const user = userEvent.setup()

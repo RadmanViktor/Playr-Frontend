@@ -6,6 +6,7 @@ export interface UserResponse {
   email: string
   username: string
   displayName: string | null
+  emailConfirmed: boolean
 }
 
 export interface LoginResponse {
@@ -58,4 +59,37 @@ export async function getMe(token: string): Promise<UserResponse> {
   }
 
   return response.json()
+}
+
+export async function confirmEmail(userId: string, token: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/auth/confirm-email`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, token }),
+  })
+
+  if (!response.ok) {
+    const message = await parseErrorMessage(
+      response,
+      'This confirmation link is invalid or has expired.'
+    )
+    throw new ApiError(response.status, message)
+  }
+}
+
+/**
+ * Always resolves for any syntactically valid address - the server deliberately
+ * does not reveal whether an account exists.
+ */
+export async function resendConfirmation(email: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/auth/resend-confirmation`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  })
+
+  if (!response.ok) {
+    const message = await parseErrorMessage(response, 'Could not send the confirmation email.')
+    throw new ApiError(response.status, message)
+  }
 }

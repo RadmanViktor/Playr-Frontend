@@ -32,6 +32,7 @@ describe('AuthContext', () => {
       email: 'a@b.com',
       username: 'someone',
       displayName: null,
+      emailConfirmed: true,
     })
 
     render(
@@ -54,6 +55,7 @@ describe('AuthContext', () => {
       email: 'a@b.com',
       username: 'someone',
       displayName: null,
+      emailConfirmed: true,
     })
 
     const user = userEvent.setup()
@@ -70,22 +72,17 @@ describe('AuthContext', () => {
     expect(localStorage.getItem('playr_token')).toBe('abc123')
   })
 
-  it('register calls register then login and loads the user', async () => {
+  it('register does not log the user in, since the email must be confirmed first', async () => {
     vi.spyOn(authApi, 'register').mockResolvedValue({
       id: '1',
       email: 'a@b.com',
       username: 'someone',
       displayName: null,
+      emailConfirmed: false,
     })
     vi.spyOn(authApi, 'login').mockResolvedValue({
       accessToken: 'abc123',
       expiresAt: '2026-01-01T00:00:00Z',
-    })
-    vi.spyOn(authApi, 'getMe').mockResolvedValue({
-      id: '1',
-      email: 'a@b.com',
-      username: 'someone',
-      displayName: null,
     })
 
     const user = userEvent.setup()
@@ -98,9 +95,12 @@ describe('AuthContext', () => {
     await waitFor(() => expect(screen.getByTestId('loading')).toHaveTextContent('idle'))
     await user.click(screen.getByText('register'))
 
-    await waitFor(() => expect(screen.getByTestId('user')).toHaveTextContent('someone'))
-    expect(authApi.register).toHaveBeenCalledWith('a@b.com', 'someone', 'password123')
-    expect(authApi.login).toHaveBeenCalledWith('someone', 'password123')
+    await waitFor(() =>
+      expect(authApi.register).toHaveBeenCalledWith('a@b.com', 'someone', 'password123')
+    )
+    expect(authApi.login).not.toHaveBeenCalled()
+    expect(screen.getByTestId('user')).toHaveTextContent('none')
+    expect(localStorage.getItem('playr_token')).toBeNull()
   })
 
   it('logout clears the token and user', async () => {
@@ -113,6 +113,7 @@ describe('AuthContext', () => {
       email: 'a@b.com',
       username: 'someone',
       displayName: null,
+      emailConfirmed: true,
     })
 
     const user = userEvent.setup()

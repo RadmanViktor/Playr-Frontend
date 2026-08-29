@@ -44,6 +44,7 @@ describe('ProtectedRoute', () => {
       email: 'a@b.com',
       username: 'someone',
       displayName: null,
+      emailConfirmed: true,
     })
 
     renderWithRoute('/')
@@ -69,6 +70,7 @@ describe('ProtectedRoute', () => {
       email: 'a@b.com',
       username: 'someone',
       displayName: null,
+      emailConfirmed: true,
     })
 
     await waitFor(() => expect(screen.getByText('secret dashboard')).toBeInTheDocument())

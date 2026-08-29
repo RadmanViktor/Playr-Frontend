@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { AuthPanel } from '../components/AuthPanel'
 import { Button } from '../components/ui/Button'
 import { useAuth } from '../context/AuthContext'
-import { ApiError } from '../api/authApi'
+import { ApiError, resendConfirmation } from '../api/authApi'
 
 interface FieldErrors {
   usernameOrEmail?: string
@@ -22,6 +22,8 @@ export default function LoginPage() {
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [generalError, setGeneralError] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [needsConfirmation, setNeedsConfirmation] = useState(false)
+  const [resendState, setResendState] = useState<'idle' | 'sending' | 'sent'>('idle')
 
   function validate(): FieldErrors {
     const errors: FieldErrors = {}
@@ -37,6 +39,7 @@ export default function LoginPage() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setGeneralError(null)
+    setNeedsConfirmation(false)
 
     const errors = validate()
     setFieldErrors(errors)
@@ -49,10 +52,27 @@ export default function LoginPage() {
       await login(usernameOrEmail, password)
       navigate('/')
     } catch (err) {
-      const message = err instanceof ApiError ? err.message : 'Something went wrong.'
-      setGeneralError(message)
+      // 403 means the credentials were correct but the email is still unconfirmed.
+      if (err instanceof ApiError && err.status === 403) {
+        setNeedsConfirmation(true)
+        setGeneralError(err.message)
+      } else {
+        const message = err instanceof ApiError ? err.message : 'Something went wrong.'
+        setGeneralError(message)
+      }
     } finally {
       setIsSubmitting(false)
+    }
+  }
+
+  async function handleResend() {
+    setResendState('sending')
+    try {
+      await resendConfirmation(usernameOrEmail.trim())
+      setResendState('sent')
+    } catch {
+      setResendState('idle')
+      setGeneralError('Could not send the confirmation email. Please try again.')
     }
   }
 
@@ -88,6 +108,24 @@ export default function LoginPage() {
             )}
           </label>
           {generalError && <p className="text-frustrated">{generalError}</p>}
+          {needsConfirmation &&
+            (resendState === 'sent' ? (
+              <p className="text-sm text-enjoying" role="status">
+                Confirmation email sent. Check your inbox.
+              </p>
+            ) : (
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={handleResend}
+                disabled={resendState === 'sending' || !usernameOrEmail.includes('@')}
+                className="w-full"
+              >
+                {usernameOrEmail.includes('@')
+                  ? 'Resend confirmation email'
+                  : 'Enter your email above to resend'}
+              </Button>
+            ))}
           <Button type="submit" disabled={isSubmitting} className="mt-2 w-full">
             Log In
           </Button>

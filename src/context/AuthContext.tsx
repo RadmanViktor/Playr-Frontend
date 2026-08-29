@@ -63,10 +63,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const register = useCallback(async (email: string, username: string, password: string) => {
+    // No auto-login: the account cannot be used until the emailed link is followed.
     await apiRegister(email, username, password)
-    const result = await apiLogin(username, password)
-    localStorage.setItem(TOKEN_STORAGE_KEY, result.accessToken)
-    setToken(result.accessToken)
   }, [])
 
   const logout = useCallback(() => {
