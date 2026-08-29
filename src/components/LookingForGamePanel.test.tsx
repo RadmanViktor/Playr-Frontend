@@ -43,12 +43,14 @@ describe('LookingForGamePanel', () => {
     const onChanged = vi.fn()
     render(<LookingForGamePanel onChanged={onChanged} />)
 
+    await user.click(screen.getByRole('button', { name: 'Make me available!' }))
+
     await waitFor(() => expect(screen.getByText('Select a game')).toBeInTheDocument())
     await user.click(screen.getByText('Select a game'))
     await user.click(screen.getByRole('option', { name: 'Apex Legends' }))
     await user.click(screen.getByRole('button', { name: 'Competitive' }))
-    await user.type(screen.getByPlaceholderText('Anything specific? (optional)'), 'need a 4th')
-    await user.click(screen.getByRole('button', { name: 'Start looking' }))
+    await user.type(screen.getByPlaceholderText('Anything specific?'), 'need a 4th')
+    await user.click(screen.getByRole('button', { name: 'Make me available!' }))
 
     await waitFor(() =>
       expect(updateStatus).toHaveBeenCalledWith('LookingForGame', 'game-1', 'Competitive', 'need a 4th'),
@@ -60,7 +62,8 @@ describe('LookingForGamePanel', () => {
     const user = userEvent.setup()
     render(<LookingForGamePanel onChanged={vi.fn()} />)
 
-    await user.click(screen.getByRole('button', { name: 'Start looking' }))
+    await user.click(screen.getByRole('button', { name: 'Make me available!' }))
+    await user.click(screen.getByRole('button', { name: 'Make me available!' }))
 
     expect(screen.getByText('Choose a game and a play style.')).toBeInTheDocument()
     expect(updateStatus).not.toHaveBeenCalled()
@@ -80,7 +83,7 @@ describe('LookingForGamePanel', () => {
     expect(screen.getByText('Apex Legends')).toBeInTheDocument()
     expect(screen.getByText('need a 4th')).toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: 'Stop looking' }))
+    await user.click(screen.getByRole('button', { name: 'Stop showing me' }))
 
     await waitFor(() => expect(updateStatus).toHaveBeenCalledWith('Online', null, null, null))
     expect(onChanged).toHaveBeenCalled()

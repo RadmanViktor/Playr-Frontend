@@ -89,9 +89,9 @@ export default function FindPlayersPage() {
     <div className="flex flex-col gap-4">
       <div className="mb-2 border-l-4 border-primary pl-4">
         <p className="mb-1 text-xs font-semibold uppercase tracking-[0.22em] text-primary">Discover your squad</p>
-        <h1 className="text-3xl font-bold tracking-tight text-text">Find Your Party</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-text sm:text-3xl">Find Players</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-          Meet new friends, chase new adventures, and find players ready to squad up.
+          Meet new friends and find players ready to squad up.
         </p>
       </div>
 
@@ -116,7 +116,7 @@ export default function FindPlayersPage() {
       ) : (
         <div className="flex flex-col gap-2">
           {players.map((player) => (
-            <Card key={player.userId} className="flex flex-wrap items-center justify-between gap-4">
+            <Card key={player.userId} className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-4">
               <div
                 className="group flex min-w-0 cursor-pointer items-center gap-3"
                 onClick={() => navigate(`/profile/${player.username}`)}
@@ -144,12 +144,13 @@ export default function FindPlayersPage() {
                 </div>
               </div>
 
-              <div className="flex shrink-0 items-center gap-2">
+              <div className="flex items-center gap-2 sm:shrink-0">
                 {player.relationshipStatus === 'Friends' && (
                   <>
                     <Badge variant="completed">Friend</Badge>
                     <Button
                       size="sm"
+                      className="flex-1 sm:flex-none"
                       onClick={() => {
                         setSuccessMessage(null)
                         setInvitePlayer(player)
@@ -166,6 +167,7 @@ export default function FindPlayersPage() {
                       <Button
                         variant="ghost"
                         size="sm"
+                        className="flex-1 sm:flex-none"
                         onClick={() => handleCancelInvite(player)}
                         disabled={cancellingUserId === player.userId}
                       >
@@ -177,6 +179,7 @@ export default function FindPlayersPage() {
                 {player.relationshipStatus === 'None' && (
                   <Button
                     size="sm"
+                    className="flex-1 sm:flex-none"
                     onClick={() => {
                       setSuccessMessage(null)
                       setInvitePlayer(player)
