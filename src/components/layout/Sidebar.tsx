@@ -21,6 +21,7 @@ const statusAvatarMap: Record<ProfileStatus, AvatarStatus> = {
   Online: 'online',
   LookingForGame: 'looking-for-game',
   Busy: 'busy',
+  Inactive: 'inactive',
   Offline: 'offline',
 }
 
@@ -28,6 +29,7 @@ const statusLabelMap: Record<ProfileStatus, string> = {
   Online: 'Online',
   LookingForGame: 'Looking for game',
   Busy: 'Busy',
+  Inactive: 'Inactive',
   Offline: 'Offline',
 }
 
@@ -35,6 +37,7 @@ const statusTextColorMap: Record<ProfileStatus, string> = {
   Online: 'text-enjoying',
   LookingForGame: 'text-need-help',
   Busy: 'text-frustrated',
+  Inactive: 'text-muted',
   Offline: 'text-muted',
 }
 

@@ -7,6 +7,10 @@ import type { ProfileStatus } from '../api/profilesApi'
 
 vi.mock('../api/gamesApi')
 
+vi.mock('../context/AuthContext', () => ({
+  useAuth: () => ({ token: null, user: null, isLoading: false, login: vi.fn(), register: vi.fn(), logout: vi.fn() }),
+}))
+
 const updateStatus = vi.fn().mockResolvedValue(undefined)
 const statusState = vi.hoisted(() => ({
   status: 'Online' as ProfileStatus,
@@ -47,7 +51,7 @@ describe('LookingForGamePanel', () => {
 
     await waitFor(() => expect(screen.getByText('Select a game')).toBeInTheDocument())
     await user.click(screen.getByText('Select a game'))
-    await user.click(screen.getByRole('option', { name: 'Apex Legends' }))
+    await user.click(screen.getByRole('button', { name: 'Apex Legends' }))
     await user.click(screen.getByRole('button', { name: 'Competitive' }))
     await user.type(screen.getByPlaceholderText('Anything specific?'), 'need a 4th')
     await user.click(screen.getByRole('button', { name: 'Make me available!' }))

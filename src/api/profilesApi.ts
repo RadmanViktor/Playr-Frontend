@@ -1,7 +1,7 @@
 import { API_BASE_URL, ApiError, parseErrorMessage } from './http'
 import type { PostFeedItem } from './postsApi'
 
-export type ProfileStatus = 'Online' | 'LookingForGame' | 'Busy' | 'Offline'
+export type ProfileStatus = 'Online' | 'LookingForGame' | 'Busy' | 'Inactive' | 'Offline'
 export type PlayStyle = 'Competitive' | 'Chill'
 export type RelationshipStatus = 'None' | 'InvitePending' | 'Friends'
 

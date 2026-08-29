@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { resolveMediaUrl } from '../../api/http'
 
 type Size = 'sm' | 'md' | 'lg' | 'xl'
-export type AvatarStatus = 'online' | 'looking-for-game' | 'busy' | 'offline'
+export type AvatarStatus = 'online' | 'looking-for-game' | 'busy' | 'inactive' | 'offline'
 
 interface AvatarProps {
   src?: string
@@ -22,6 +22,7 @@ const statusColor: Record<AvatarStatus, string> = {
   online: 'bg-enjoying',
   'looking-for-game': 'bg-need-help',
   busy: 'bg-frustrated',
+  inactive: 'bg-muted',
   offline: 'bg-muted',
 }
 

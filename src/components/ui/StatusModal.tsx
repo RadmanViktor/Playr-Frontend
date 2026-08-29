@@ -19,7 +19,7 @@ export function StatusModal({ onClose }: StatusModalProps) {
   const { status, updateStatus } = useStatus()
 
   const [selectedStatus, setSelectedStatus] = useState<ProfileStatus>(
-    status === 'LookingForGame' ? 'Online' : status,
+    status === 'LookingForGame' || status === 'Inactive' ? 'Online' : status,
   )
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
