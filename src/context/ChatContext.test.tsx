@@ -16,17 +16,37 @@ vi.mock('./NotificationPreferencesContext', () => ({
   }),
 }))
 
+let chatMessageHandler: ((message: unknown) => void) | null = null
+
 vi.mock('../lib/chatHubConnection', () => ({
   connectChatHub: vi.fn(),
   disconnectChatHub: vi.fn(),
-  onChatMessage: vi.fn(() => () => {}),
+  onChatMessage: vi.fn((handler: (message: unknown) => void) => {
+    chatMessageHandler = handler
+    return () => {
+      chatMessageHandler = null
+    }
+  }),
 }))
 
 // Stand-in so the test asserts on mounting, not on ChatWindow internals
 // (which poll the API on an interval).
 vi.mock('../components/ChatWindow', () => ({
-  ChatWindow: ({ conversation }: { conversation: Conversation }) => (
-    <div data-testid="chat-window">{conversation.otherParticipant.displayName}</div>
+  ChatWindow: ({
+    conversation,
+    isMinimized,
+    onToggleMinimize,
+  }: {
+    conversation: Conversation
+    isMinimized: boolean
+    onToggleMinimize: () => void
+  }) => (
+    <div data-testid="chat-window" data-minimized={isMinimized}>
+      {conversation.otherParticipant.displayName}
+      <button type="button" onClick={onToggleMinimize}>
+        Toggle {conversation.otherParticipant.displayName}
+      </button>
+    </div>
   ),
 }))
 
@@ -107,5 +127,60 @@ describe('ChatProvider window stacking', () => {
     act(() => setMatchMedia(MOBILE_MEDIA_QUERY, true))
 
     await waitFor(() => expect(screen.getAllByTestId('chat-window')).toHaveLength(1))
+  })
+})
+
+describe('ChatProvider incoming messages', () => {
+  function incomingMessage(overrides: Partial<Record<string, unknown>> = {}) {
+    return {
+      id: 'm1',
+      conversationId: 'new-conv',
+      senderUserId: 'other-user',
+      senderUsername: 'newuser',
+      senderDisplayName: 'New User',
+      senderAvatarUrl: null,
+      body: 'Hello!',
+      createdAt: '2024-01-01T00:00:00Z',
+      readAt: null,
+      ...overrides,
+    }
+  }
+
+  it('auto-opens a chat window for a conversation that is not open yet', async () => {
+    setMatchMedia(MOBILE_MEDIA_QUERY, false)
+    renderProvider()
+
+    act(() => {
+      chatMessageHandler?.(incomingMessage())
+    })
+
+    await waitFor(() => expect(screen.getByTestId('chat-window')).toHaveTextContent('New User'))
+  })
+
+  it('un-minimizes an already-open chat window when a new message arrives', async () => {
+    setMatchMedia(MOBILE_MEDIA_QUERY, false)
+    renderProvider()
+
+    await userEvent.click(screen.getByRole('button', { name: 'Open three' }))
+    await waitFor(() => expect(screen.getAllByTestId('chat-window')).toHaveLength(3))
+
+    await userEvent.click(screen.getByRole('button', { name: 'Toggle Ada' }))
+    await waitFor(() =>
+      expect(screen.getByText('Ada').closest('[data-testid="chat-window"]')).toHaveAttribute(
+        'data-minimized',
+        'true',
+      ),
+    )
+
+    act(() => {
+      chatMessageHandler?.(incomingMessage({ conversationId: 'a', senderUserId: 'u-a', senderDisplayName: 'Ada' }))
+    })
+
+    await waitFor(() =>
+      expect(screen.getByText('Ada').closest('[data-testid="chat-window"]')).toHaveAttribute(
+        'data-minimized',
+        'false',
+      ),
+    )
   })
 })

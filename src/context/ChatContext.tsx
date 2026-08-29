@@ -63,6 +63,21 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     }
   }, [token])
 
+  const showConversation = useCallback((conversation: Conversation, successMessage: string | null) => {
+    setOpenChats((prev) => {
+      const existingIndex = prev.findIndex((chat) => chat.conversation.id === conversation.id)
+      const withoutExisting = existingIndex >= 0 ? prev.filter((chat) => chat.conversation.id !== conversation.id) : prev
+      const next = [...withoutExisting, { conversation, successMessage, isMinimized: false }]
+      return next.length > MAX_OPEN_CHATS ? next.slice(next.length - MAX_OPEN_CHATS) : next
+    })
+    setUnreadConversationIds((prev) => {
+      if (!prev.has(conversation.id)) return prev
+      const next = new Set(prev)
+      next.delete(conversation.id)
+      return next
+    })
+  }, [])
+
   useEffect(() => {
     if (!user) return
 
@@ -75,10 +90,35 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       const isConversationActiveOnScreen = visibleChats.some(
         (chat) => chat.conversation.id === message.conversationId && !chat.isMinimized,
       )
+
+      // Pop the chat window open (or un-minimize it) whenever it isn't
+      // already visible on screen, so the user never has to hunt for a new
+      // message - it always surfaces itself.
+      if (!isConversationActiveOnScreen) {
+        const conversation: Conversation = {
+          id: message.conversationId,
+          otherParticipant: {
+            userId: message.senderUserId,
+            username: message.senderUsername,
+            displayName: message.senderDisplayName,
+            avatarUrl: message.senderAvatarUrl,
+          },
+          lastMessage: message.body,
+          lastMessageAt: message.createdAt,
+          createdAt: message.createdAt,
+          updatedAt: message.createdAt,
+        }
+        showConversation(conversation, null)
+      }
+
       const shouldNotify = document.hidden || !document.hasFocus() || !isConversationActiveOnScreen
 
       if (!shouldNotify) return
 
+      // The window may have just been opened/un-minimized above (which
+      // clears unread state), but if the tab itself is hidden/unfocused the
+      // user still hasn't actually seen the message, so keep the unread
+      // indicator (e.g. sidebar badge, conversation list) lit until they do.
       setUnreadConversationIds((prev) => {
         if (prev.has(message.conversationId)) return prev
         const next = new Set(prev)
@@ -96,22 +136,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         setNotificationToast(`${message.senderDisplayName}: ${message.body}`)
       }
     })
-  }, [user, visibleChats, preferences])
-
-  const showConversation = useCallback((conversation: Conversation, successMessage: string | null) => {
-    setOpenChats((prev) => {
-      const existingIndex = prev.findIndex((chat) => chat.conversation.id === conversation.id)
-      const withoutExisting = existingIndex >= 0 ? prev.filter((chat) => chat.conversation.id !== conversation.id) : prev
-      const next = [...withoutExisting, { conversation, successMessage, isMinimized: false }]
-      return next.length > MAX_OPEN_CHATS ? next.slice(next.length - MAX_OPEN_CHATS) : next
-    })
-    setUnreadConversationIds((prev) => {
-      if (!prev.has(conversation.id)) return prev
-      const next = new Set(prev)
-      next.delete(conversation.id)
-      return next
-    })
-  }, [])
+  }, [user, visibleChats, preferences, showConversation])
 
   const openChatWithUser = useCallback(
     async (userId: string, options?: OpenChatOptions) => {
