@@ -21,6 +21,7 @@ const statusAvatarMap: Record<ProfileData['status'], AvatarStatus> = {
   Online: 'online',
   LookingForGame: 'looking-for-game',
   Busy: 'busy',
+  Inactive: 'inactive',
   Offline: 'offline',
 }
 

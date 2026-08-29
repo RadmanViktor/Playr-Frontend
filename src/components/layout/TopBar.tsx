@@ -44,6 +44,7 @@ const statusAvatarMap = {
   Online: 'online',
   LookingForGame: 'looking-for-game',
   Busy: 'busy',
+  Inactive: 'inactive',
   Offline: 'offline',
 } as const
 

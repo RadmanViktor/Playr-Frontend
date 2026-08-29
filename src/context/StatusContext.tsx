@@ -1,7 +1,10 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { getProfile, updateProfileStatus, type PlayStyle, type ProfileData, type ProfileStatus } from '../api/profilesApi'
 import { useAuth } from './AuthContext'
+import { useIdleTimer } from '../lib/useIdleTimer'
+
+const IDLE_TIMEOUT_MS = 5 * 60 * 1000
 
 export interface StatusContextValue {
   status: ProfileStatus
@@ -110,6 +113,32 @@ export function StatusProvider({ children }: { children: ReactNode }) {
     setLookingForPlayStyle(profile.lookingForPlayStyle)
     setLookingForGameNote(profile.lookingForGameNote)
   }, [])
+
+  // Keeps the idle-timer callbacks below reading the latest status without
+  // needing to be re-subscribed (and thus reset) every time it changes.
+  const statusRef = useRef(status)
+  statusRef.current = status
+
+  useIdleTimer({
+    timeoutMs: IDLE_TIMEOUT_MS,
+    enabled: !!user,
+    onIdle: useCallback(() => {
+      // Only auto-manage the plain "Online" status - a manually chosen
+      // Busy/LookingForGame/Offline status is left alone.
+      if (statusRef.current === 'Online') {
+        updateStatus('Inactive', null, null, null).catch(() => {
+          // Best-effort; a failed heartbeat update isn't worth surfacing to the user.
+        })
+      }
+    }, [updateStatus]),
+    onActive: useCallback(() => {
+      if (statusRef.current === 'Inactive') {
+        updateStatus('Online', null, null, null).catch(() => {
+          // Best-effort; a failed heartbeat update isn't worth surfacing to the user.
+        })
+      }
+    }, [updateStatus]),
+  })
 
   return (
     <StatusContext.Provider
