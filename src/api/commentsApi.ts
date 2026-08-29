@@ -1,4 +1,7 @@
 import { API_BASE_URL, ApiError, parseErrorMessage } from './http'
+import type { MentionItem } from './postsApi'
+
+export type { MentionItem }
 
 export type ReactionType = 'Like' | 'Haha' | 'Wow' | 'Sad' | 'Angry'
 
@@ -26,6 +29,7 @@ export interface CommentItem {
   createdAt: string
   updatedAt: string | null
   reactions: CommentReactions
+  mentions: MentionItem[]
 }
 
 export interface PagedComments {
@@ -43,14 +47,19 @@ export async function getComments(postId: string, skip: number, take: number): P
   return response.json()
 }
 
-export async function createComment(token: string, postId: string, textContent: string): Promise<CommentItem> {
+export async function createComment(
+  token: string,
+  postId: string,
+  textContent: string,
+  mentionedUserIds?: string[],
+): Promise<CommentItem> {
   const response = await fetch(`${API_BASE_URL}/api/posts/${postId}/comments`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ textContent }),
+    body: JSON.stringify({ textContent, mentionedUserIds }),
   })
   if (!response.ok) {
     const message = await parseErrorMessage(response, 'Failed to post comment.')

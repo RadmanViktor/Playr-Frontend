@@ -5,6 +5,7 @@ import { MediaGalleryUploadInput } from './MediaGalleryUploadInput'
 import { validateMediaFile } from './MediaUploadInput'
 import { EmojiPickerButton } from './EmojiPickerButton'
 import { GamePickerInput } from './GamePickerInput'
+import { MentionInput, type MentionDraft } from './MentionInput'
 import { useAuth } from '../context/AuthContext'
 import { getGames, type Game } from '../api/gamesApi'
 import { createPost, type PostFeedItem } from '../api/postsApi'
@@ -28,6 +29,7 @@ export function CreatePostModal({ onClose, onPostCreated }: CreatePostModalProps
   const [selectedGameId, setSelectedGameId] = useState('')
   const [selectedMood, setSelectedMood] = useState<MoodOption>('None')
   const [text, setText] = useState('')
+  const [mentions, setMentions] = useState<MentionDraft[]>([])
   const [textError, setTextError] = useState<string | null>(null)
   const [mediaFiles, setMediaFiles] = useState<File[]>([])
   const [mediaError, setMediaError] = useState<string | null>(null)
@@ -97,7 +99,13 @@ export function CreatePostModal({ onClose, onPostCreated }: CreatePostModalProps
     try {
       const post = await createPost(
         token!,
-        { gameId: selectedGameId, textContent: trimmed, mood: moodOptionToApi(selectedMood), media: mediaFiles },
+        {
+          gameId: selectedGameId,
+          textContent: trimmed,
+          mood: moodOptionToApi(selectedMood),
+          media: mediaFiles,
+          mentionedUserIds: mentions.map((m) => m.userId),
+        },
         mediaFiles.length > 0 ? setUploadProgress : undefined
       )
       addRecentGameId(selectedGameId)
@@ -150,6 +158,7 @@ export function CreatePostModal({ onClose, onPostCreated }: CreatePostModalProps
                 onChange={setSelectedGameId}
                 error={gamesError}
                 onRetry={() => setGamesLoadKey((k) => k + 1)}
+                onGameAdded={(game) => setGames((current) => [...current, game].sort((a, b) => a.name.localeCompare(b.name)))}
               />
             </label>
 
@@ -176,18 +185,22 @@ export function CreatePostModal({ onClose, onPostCreated }: CreatePostModalProps
 
             <label className="flex flex-col gap-1 text-sm text-muted">
               What happened?
-              <div className="relative">
-                <textarea
-                  aria-label="Post text"
-                  className="w-full rounded-lg border border-border bg-surface-raised px-3 py-2 pr-10 text-text resize-none min-h-24 max-h-40 outline-none focus:border-primary"
-                  value={text}
-                  maxLength={1000}
-                  onChange={(e) => setText(e.target.value)}
-                />
-                <div className="absolute bottom-2 right-2">
-                  <EmojiPickerButton onSelect={(emoji) => setText((t) => t + emoji)} />
-                </div>
-              </div>
+              <MentionInput
+                ariaLabel="Post text"
+                className="w-full rounded-lg border border-border bg-surface-raised px-3 py-2 pr-10 text-text resize-none min-h-24 max-h-40 outline-none focus:border-primary"
+                value={text}
+                mentions={mentions}
+                maxLength={1000}
+                onChange={(value, nextMentions) => {
+                  setText(value)
+                  setMentions(nextMentions)
+                }}
+                rightSlot={
+                  <div className="absolute bottom-2 right-2">
+                    <EmojiPickerButton onSelect={(emoji) => setText((t) => t + emoji)} />
+                  </div>
+                }
+              />
               <span className="text-xs text-muted self-end">{text.length} / 1000</span>
             </label>
 

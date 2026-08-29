@@ -16,6 +16,7 @@ const baseComment: CommentItemType = {
   createdAt: new Date(Date.now() - 60_000).toISOString(),
   updatedAt: null,
   reactions: { counts: { like: 0, haha: 0, wow: 0, sad: 0, angry: 0 }, currentUserReaction: null },
+  mentions: [],
 }
 
 function renderComment(props: Partial<React.ComponentProps<typeof CommentItem>> = {}) {

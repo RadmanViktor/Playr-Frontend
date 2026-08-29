@@ -5,6 +5,7 @@ import ConfirmEmailPage from './pages/ConfirmEmailPage'
 import HomePage from './pages/HomePage'
 import FriendsPage from './pages/FriendsPage'
 import FeedPage from './pages/FeedPage'
+import PostDetailPage from './pages/PostDetailPage'
 import FindPlayersPage from './pages/FindPlayersPage'
 import ChatsPage from './pages/ChatsPage'
 import ProfilePage from './pages/ProfilePage'
@@ -38,6 +39,7 @@ function App() {
         <Route index element={<HomePage />} />
         <Route path="/friends" element={<FriendsPage />} />
         <Route path="/feed" element={<FeedPage />} />
+        <Route path="/posts/:postId" element={<PostDetailPage />} />
         <Route path="/find-players" element={<FindPlayersPage />} />
         <Route path="/chats" element={<ChatsPage />} />
         <Route path="/settings" element={<SettingsPage />} />

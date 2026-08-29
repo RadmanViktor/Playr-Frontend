@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ChevronDown, Gamepad2, RefreshCw } from 'lucide-react'
+import { ChevronDown, Gamepad2, Plus, RefreshCw } from 'lucide-react'
 import type { Game } from '../api/gamesApi'
 import { resolveMediaUrl } from '../api/http'
 import { getRecentGameIds } from '../lib/recentGames'
 import { useIsMobile } from '../lib/useIsMobile'
+import { AddGameModal } from './AddGameModal'
 
 interface GamePickerInputProps {
   games: Game[]
@@ -12,12 +13,14 @@ interface GamePickerInputProps {
   error?: string | null
   onRetry?: () => void
   disabled?: boolean
+  onGameAdded?: (game: Game) => void
 }
 
-export function GamePickerInput({ games, value, onChange, error, onRetry, disabled }: GamePickerInputProps) {
+export function GamePickerInput({ games, value, onChange, error, onRetry, disabled, onGameAdded }: GamePickerInputProps) {
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
   const [highlightedIndex, setHighlightedIndex] = useState(0)
+  const [showAddGameModal, setShowAddGameModal] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const isMobile = useIsMobile()
 
@@ -58,6 +61,12 @@ export function GamePickerInput({ games, value, onChange, error, onRetry, disabl
     onChange(gameId)
     setOpen(false)
     setQuery('')
+  }
+
+  function handleGameAdded(game: Game) {
+    onGameAdded?.(game)
+    setShowAddGameModal(false)
+    selectGame(game.id)
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
@@ -159,8 +168,25 @@ export function GamePickerInput({ games, value, onChange, error, onRetry, disabl
                 </button>
               ))
             )}
+            {onGameAdded && (
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAddGameModal(true)
+                  setOpen(false)
+                }}
+                className="flex w-full items-center gap-2 border-t border-border px-3 py-2 text-left text-sm text-primary hover:bg-surface-raised cursor-pointer"
+              >
+                <Plus className="h-4 w-4 shrink-0" aria-hidden="true" />
+                <span>Can't find your game? Add it</span>
+              </button>
+            )}
           </div>
         </div>
+      )}
+
+      {showAddGameModal && (
+        <AddGameModal onClose={() => setShowAddGameModal(false)} onGameAdded={handleGameAdded} />
       )}
     </div>
   )

@@ -3,10 +3,12 @@ import { API_BASE_URL } from '../api/http'
 import type { ChatMessage } from '../api/chatApi'
 import type { Invitation } from '../api/invitationsApi'
 import type { FriendRequest } from '../api/friendRequestsApi'
+import type { NotificationItem } from '../api/notificationsApi'
 
 type MessageListener = (message: ChatMessage) => void
 type InvitationListener = (invitation: Invitation) => void
 type FriendRequestListener = (friendRequest: FriendRequest) => void
+type NotificationListener = (notification: NotificationItem) => void
 
 let connection: HubConnection | null = null
 let currentToken: string | null = null
@@ -15,6 +17,7 @@ const invitationReceivedListeners = new Set<InvitationListener>()
 const invitationUpdatedListeners = new Set<InvitationListener>()
 const friendRequestReceivedListeners = new Set<FriendRequestListener>()
 const friendRequestUpdatedListeners = new Set<FriendRequestListener>()
+const notificationReceivedListeners = new Set<NotificationListener>()
 
 function buildConnection(token: string): HubConnection {
   return new HubConnectionBuilder()
@@ -50,6 +53,9 @@ export async function connectChatHub(token: string): Promise<void> {
   })
   hub.on('FriendRequestUpdated', (friendRequest: FriendRequest) => {
     friendRequestUpdatedListeners.forEach((listener) => listener(friendRequest))
+  })
+  hub.on('NotificationReceived', (notification: NotificationItem) => {
+    notificationReceivedListeners.forEach((listener) => listener(notification))
   })
 
   try {
@@ -100,4 +106,10 @@ export function onFriendRequestReceived(listener: FriendRequestListener): () => 
 export function onFriendRequestUpdated(listener: FriendRequestListener): () => void {
   friendRequestUpdatedListeners.add(listener)
   return () => friendRequestUpdatedListeners.delete(listener)
+}
+
+/** Subscribe to notifications (e.g. @mentions) pushed to the current user right after they're created. */
+export function onNotificationReceived(listener: NotificationListener): () => void {
+  notificationReceivedListeners.add(listener)
+  return () => notificationReceivedListeners.delete(listener)
 }

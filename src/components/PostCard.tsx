@@ -44,9 +44,11 @@ interface PostCardProps {
   currentUserId?: string
   onDelete?: (postId: string) => void
   onUpdate?: (post: PostFeedItem) => void
+  defaultCommentsOpen?: boolean
+  highlightCommentId?: string
 }
 
-export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardProps) {
+export function PostCard({ post, currentUserId, onDelete, onUpdate, defaultCommentsOpen = false, highlightCommentId }: PostCardProps) {
   const { token } = useAuth()
   const [state, setState] = useState<CardState>('read')
   const [editText, setEditText] = useState(post.textContent)
@@ -61,7 +63,7 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardPr
   const [liked, setLiked] = useState(post.likedByCurrentUser)
   const [isLiking, setIsLiking] = useState(false)
   const [commentsCount, setCommentsCount] = useState(post.commentsCount)
-  const [commentsOpen, setCommentsOpen] = useState(false)
+  const [commentsOpen, setCommentsOpen] = useState(defaultCommentsOpen)
   const menuRef = useRef<HTMLDivElement>(null)
 
   const isOwner = currentUserId != null && currentUserId === post.authorId
@@ -269,7 +271,7 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardPr
         </div>
       ) : (
         <div className="flex flex-col gap-3">
-          <p className="text-sm text-text leading-relaxed whitespace-pre-wrap">{linkify(post.textContent)}</p>
+          <p className="text-sm text-text leading-relaxed whitespace-pre-wrap">{linkify(post.textContent, post.mentions)}</p>
           <PostMediaCarousel media={post.media} />
         </div>
       )}
@@ -307,6 +309,7 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate }: PostCardPr
           postId={post.id}
           currentUserId={currentUserId}
           onCountChange={(delta) => setCommentsCount((count) => count + delta)}
+          highlightCommentId={highlightCommentId}
         />
       )}
     </div>

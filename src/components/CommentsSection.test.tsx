@@ -8,6 +8,14 @@ import type { CommentItem, PagedComments } from '../api/commentsApi'
 
 vi.mock('../api/commentsApi')
 
+vi.mock('../context/AuthContext', () => ({
+  useAuth: () => ({ token: 'test-token' }),
+}))
+
+vi.mock('../api/friendsApi', () => ({
+  getFriends: vi.fn(async () => []),
+}))
+
 const sampleComment: CommentItem = {
   id: 'c1',
   postId: 'p1',
@@ -19,6 +27,7 @@ const sampleComment: CommentItem = {
   createdAt: new Date().toISOString(),
   updatedAt: null,
   reactions: { counts: { like: 0, haha: 0, wow: 0, sad: 0, angry: 0 }, currentUserReaction: null },
+  mentions: [],
 }
 
 const pagedComments: PagedComments = { items: [sampleComment], totalCount: 1, hasMore: false }

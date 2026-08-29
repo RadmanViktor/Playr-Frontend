@@ -24,6 +24,8 @@ export interface ChatMessage {
   senderDisplayName: string
   senderAvatarUrl: string | null
   body: string
+  mediaUrl: string | null
+  mediaType: 'Image' | 'Video' | null
   createdAt: string
   readAt: string | null
 }
@@ -69,11 +71,20 @@ export async function getMessages(token: string, conversationId: string): Promis
   return response.json()
 }
 
-export async function sendMessage(token: string, conversationId: string, body: string): Promise<ChatMessage> {
+export async function sendMessage(
+  token: string,
+  conversationId: string,
+  body: string,
+  media?: File | null
+): Promise<ChatMessage> {
+  const form = new FormData()
+  form.append('Body', body)
+  if (media) form.append('Media', media)
+
   const response = await fetch(`${API_BASE_URL}/api/conversations/${conversationId}/messages`, {
     method: 'POST',
-    headers: authHeaders(token),
-    body: JSON.stringify({ body }),
+    headers: { Authorization: `Bearer ${token}` },
+    body: form,
   })
   if (!response.ok) {
     const message = await parseErrorMessage(response, 'Failed to send message.')

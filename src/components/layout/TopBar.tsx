@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef, type MouseEvent as ReactMouseEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Mail, Menu } from 'lucide-react'
+import { Mail, Menu, Bell } from 'lucide-react'
 import { IconButton } from '../ui/IconButton'
 import { Avatar } from '../ui/Avatar'
 import { useAuth } from '../../context/AuthContext'
 import { useStatus } from '../../context/StatusContext'
+import { useNotifications } from '../../context/NotificationContext'
 import { searchProfiles, type ProfileSearchResult } from '../../api/profilesApi'
 import {
   getRecentSearches,
@@ -50,6 +51,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
   const { user, token } = useAuth()
   const { status, avatarUrl } = useStatus()
   const { openChatWithUser } = useChat()
+  const { notifications, unreadCount, hasMore, isLoading: notificationsLoading, loadMore: loadMoreNotifications, markRead, markAllRead } = useNotifications()
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<ProfileSearchResult[]>([])
@@ -69,6 +71,8 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
   const [respondingId, setRespondingId] = useState<string | null>(null)
   const invitationsRef = useRef<HTMLDivElement>(null)
   const incomingInvitationCount = invitations.length + incomingFriendRequests.length
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
+  const notificationsRef = useRef<HTMLDivElement>(null)
 
   type PendingItem = {
     id: string
@@ -289,6 +293,33 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
     return () => document.removeEventListener('mousedown', handleMouseDown)
   }, [isInvitationsOpen])
 
+  // Close notifications dropdown on outside click
+  useEffect(() => {
+    if (!isNotificationsOpen) return
+    function handleMouseDown(e: MouseEvent) {
+      if (notificationsRef.current && !notificationsRef.current.contains(e.target as Node)) {
+        setIsNotificationsOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleMouseDown)
+    return () => document.removeEventListener('mousedown', handleMouseDown)
+  }, [isNotificationsOpen])
+
+  async function handleNotificationClick(notificationId: string, postId: string, commentId: string | null) {
+    setIsNotificationsOpen(false)
+    await markRead(notificationId)
+    navigate(commentId ? `/posts/${postId}?commentId=${commentId}` : `/posts/${postId}`)
+  }
+
+  function formatNotificationTime(createdAt: string): string {
+    const diffMs = Date.now() - new Date(createdAt).getTime()
+    const diffMin = Math.floor(diffMs / 60_000)
+    if (diffMin < 60) return `${Math.max(diffMin, 1)}m ago`
+    const diffH = Math.floor(diffMin / 60)
+    if (diffH < 24) return `${diffH}h ago`
+    return `${Math.floor(diffH / 24)}d ago`
+  }
+
   async function handleAccept(item: PendingItem) {
     if (!token) return
     setRespondingId(item.id)
@@ -435,6 +466,73 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
       </div>
 
       <div className="ml-auto flex items-center gap-2">
+        <div className="relative" ref={notificationsRef}>
+          <IconButton aria-label="Notifications" onClick={() => setIsNotificationsOpen((open) => !open)}>
+            <Bell className="h-5 w-5" aria-hidden="true" />
+          </IconButton>
+          {unreadCount > 0 && (
+            <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-frustrated px-1 text-[10px] font-bold leading-none text-white">
+              {unreadCount > 9 ? '9+' : unreadCount}
+            </span>
+          )}
+          {isNotificationsOpen && (
+            <div className="absolute right-0 top-full z-50 mt-1 w-[min(20rem,calc(100vw-1.5rem))] rounded-lg border border-border bg-surface shadow-lg overflow-hidden">
+              <div className="flex items-center justify-between border-b border-border px-4 py-2">
+                <p className="text-sm font-semibold text-text">Notifications</p>
+                {unreadCount > 0 && (
+                  <button
+                    type="button"
+                    onClick={markAllRead}
+                    className="text-xs font-medium text-muted hover:text-text cursor-pointer"
+                  >
+                    Mark all as read
+                  </button>
+                )}
+              </div>
+              {notificationsLoading && notifications.length === 0 ? (
+                <p className="px-4 py-3 text-sm text-muted">Loading...</p>
+              ) : notifications.length === 0 ? (
+                <p className="px-4 py-3 text-sm text-muted">No notifications yet</p>
+              ) : (
+                <div className="max-h-96 overflow-y-auto">
+                  {notifications.map((notification) => (
+                    <button
+                      key={notification.id}
+                      type="button"
+                      onClick={() => handleNotificationClick(notification.id, notification.postId, notification.commentId)}
+                      className={`flex w-full items-start gap-3 border-b border-border px-4 py-3 text-left last:border-b-0 hover:bg-surface-raised cursor-pointer ${
+                        notification.isRead ? '' : 'bg-surface-raised/60'
+                      }`}
+                    >
+                      <Avatar
+                        src={notification.actor.avatarUrl ?? undefined}
+                        alt={notification.actor.displayName}
+                        size="sm"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm text-text">
+                          <span className="font-medium">{notification.actor.displayName}</span>{' '}
+                          tagged you in a {notification.type === 'CommentMention' ? 'comment' : 'post'}
+                        </p>
+                        <p className="mt-0.5 text-xs text-muted">{formatNotificationTime(notification.createdAt)}</p>
+                      </div>
+                    </button>
+                  ))}
+                  {hasMore && (
+                    <button
+                      type="button"
+                      onClick={loadMoreNotifications}
+                      disabled={notificationsLoading}
+                      className="w-full px-4 py-2 text-center text-xs font-medium text-muted hover:text-text disabled:opacity-50 cursor-pointer"
+                    >
+                      {notificationsLoading ? 'Loading...' : 'Load more'}
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
         <div className="relative" ref={invitationsRef}>
           <IconButton aria-label="Messages" onClick={toggleInvitations}>
             <Mail className="h-5 w-5" aria-hidden="true" />

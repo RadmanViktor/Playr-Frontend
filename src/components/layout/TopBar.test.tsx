@@ -34,6 +34,18 @@ vi.mock('../../context/ChatContext', () => ({
   }),
 }))
 
+vi.mock('../../context/NotificationContext', () => ({
+  useNotifications: () => ({
+    notifications: [],
+    unreadCount: 0,
+    hasMore: false,
+    isLoading: false,
+    loadMore: vi.fn(),
+    markRead: vi.fn(),
+    markAllRead: vi.fn(),
+  }),
+}))
+
 describe('TopBar', () => {
   beforeEach(() => {
     localStorage.clear()

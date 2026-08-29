@@ -12,6 +12,12 @@ export interface PostMediaItem {
   sortOrder: number
 }
 
+export interface MentionItem {
+  userId: string
+  username: string
+  displayName: string
+}
+
 export interface PostFeedItem {
   id: string
   authorId: string
@@ -28,11 +34,12 @@ export interface PostFeedItem {
   likesCount: number
   likedByCurrentUser: boolean
   commentsCount: number
+  mentions: MentionItem[]
 }
 
 export async function createPost(
   token: string,
-  data: { gameId: string; textContent: string; mood?: string | null; media?: File[] },
+  data: { gameId: string; textContent: string; mood?: string | null; media?: File[]; mentionedUserIds?: string[] },
   onProgress?: (percent: number) => void
 ): Promise<PostFeedItem> {
   const form = new FormData()
@@ -40,6 +47,7 @@ export async function createPost(
   form.append('TextContent', data.textContent)
   if (data.mood) form.append('Mood', data.mood)
   for (const file of data.media ?? []) form.append('Media', file)
+  for (const userId of data.mentionedUserIds ?? []) form.append('MentionedUserIds', userId)
 
   if (!onProgress) {
     const response = await fetch(`${API_BASE_URL}/api/posts`, {
@@ -95,6 +103,17 @@ export async function getFeed(token?: string | null): Promise<PostFeedItem[]> {
   })
   if (!response.ok) {
     const message = await parseErrorMessage(response, 'Failed to load feed.')
+    throw new ApiError(response.status, message)
+  }
+  return response.json()
+}
+
+export async function getPost(postId: string, token?: string | null): Promise<PostFeedItem> {
+  const response = await fetch(`${API_BASE_URL}/api/posts/${postId}`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+  })
+  if (!response.ok) {
+    const message = await parseErrorMessage(response, 'Failed to load post.')
     throw new ApiError(response.status, message)
   }
   return response.json()

@@ -61,6 +61,18 @@ vi.mock('../../api/profilesApi', () => ({
   searchProfiles: vi.fn(async () => []),
 }))
 
+vi.mock('../../context/NotificationContext', () => ({
+  useNotifications: () => ({
+    notifications: [],
+    unreadCount: 0,
+    hasMore: false,
+    isLoading: false,
+    loadMore: vi.fn(),
+    markRead: vi.fn(),
+    markAllRead: vi.fn(),
+  }),
+}))
+
 function renderShell() {
   return render(
     <MemoryRouter initialEntries={['/']}>

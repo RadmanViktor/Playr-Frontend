@@ -6,6 +6,7 @@ import App from './App.tsx'
 import { AuthProvider } from './context/AuthContext.tsx'
 import { StatusProvider } from './context/StatusContext.tsx'
 import { NotificationPreferencesProvider } from './context/NotificationPreferencesContext.tsx'
+import { NotificationProvider } from './context/NotificationContext.tsx'
 import { ChatProvider } from './context/ChatContext.tsx'
 import { CreatePostModalProvider } from './context/CreatePostModalContext.tsx'
 
@@ -15,11 +16,13 @@ createRoot(document.getElementById('root')!).render(
       <AuthProvider>
         <StatusProvider>
           <NotificationPreferencesProvider>
-            <ChatProvider>
-              <CreatePostModalProvider>
-                <App />
-              </CreatePostModalProvider>
-            </ChatProvider>
+            <NotificationProvider>
+              <ChatProvider>
+                <CreatePostModalProvider>
+                  <App />
+                </CreatePostModalProvider>
+              </ChatProvider>
+            </NotificationProvider>
           </NotificationPreferencesProvider>
         </StatusProvider>
       </AuthProvider>

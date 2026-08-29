@@ -6,6 +6,7 @@ import { IconButton } from './ui/IconButton'
 import { MoreHorizontal } from 'lucide-react'
 import { EmojiPickerButton } from './EmojiPickerButton'
 import { CommentReactions } from './CommentReactions'
+import { linkify } from '../lib/linkify'
 import type { CommentItem as CommentItemType, ReactionType } from '../api/commentsApi'
 
 function formatRelativeTime(createdAt: string): string {
@@ -125,7 +126,7 @@ export function CommentItem({ comment, currentUserId, onSave, onDelete, onReact,
             </div>
           </div>
         ) : (
-          <p className="text-sm text-text">{comment.textContent}</p>
+          <p className="text-sm text-text">{linkify(comment.textContent, comment.mentions)}</p>
         )}
       </div>
       {!isEditing && (
