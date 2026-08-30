@@ -1,31 +1,35 @@
 import { NavLink } from 'react-router-dom'
 import { Bell, Gamepad2, UserCog, ChevronRight } from 'lucide-react'
-
-const settingsItems = [
-  {
-    to: '/settings/notifications',
-    label: 'Notifications',
-    description: 'Sound and browser notification preferences.',
-    icon: Bell,
-  },
-  {
-    to: '/settings/steam',
-    label: 'Account linking',
-    description: 'Connect or disconnect your Steam account.',
-    icon: Gamepad2,
-  },
-  {
-    to: '/settings/profile',
-    label: 'Edit profile',
-    description: 'Display name, bio, avatar, platforms and links.',
-    icon: UserCog,
-  },
-]
+import { useTranslation } from 'react-i18next'
+import LanguageSwitcher from '../components/LanguageSwitcher'
 
 export default function SettingsPage() {
+  const { t } = useTranslation('settings')
+
+  const settingsItems = [
+    {
+      to: '/settings/notifications',
+      label: t('items.notifications.label'),
+      description: t('items.notifications.description'),
+      icon: Bell,
+    },
+    {
+      to: '/settings/steam',
+      label: t('items.steam.label'),
+      description: t('items.steam.description'),
+      icon: Gamepad2,
+    },
+    {
+      to: '/settings/profile',
+      label: t('items.profile.label'),
+      description: t('items.profile.description'),
+      icon: UserCog,
+    },
+  ]
+
   return (
     <div className="flex flex-col gap-4 max-w-xl">
-      <h1 className="text-2xl font-bold text-text">Settings</h1>
+      <h1 className="text-2xl font-bold text-text">{t('title')}</h1>
 
       <nav className="flex flex-col gap-2 rounded-xl border border-border bg-surface p-2">
         {settingsItems.map(({ to, label, description, icon: Icon }) => (
@@ -47,6 +51,8 @@ export default function SettingsPage() {
           </NavLink>
         ))}
       </nav>
+
+      <LanguageSwitcher />
     </div>
   )
 }

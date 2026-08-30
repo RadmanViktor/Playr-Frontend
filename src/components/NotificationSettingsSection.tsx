@@ -1,14 +1,16 @@
 import { Bell, BellOff, Volume2, VolumeX } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useNotificationPreferences } from '../context/NotificationPreferencesContext'
 
 export function NotificationSettingsSection() {
+  const { t } = useTranslation('componentsB')
   const { preferences, isLoading, permission, setChatSoundEnabled, setChatBrowserNotificationsEnabled } =
     useNotificationPreferences()
 
   return (
     <section className="flex flex-col gap-4 rounded-xl border border-border bg-surface p-4">
-      <h2 className="text-lg font-semibold text-text">Notifications</h2>
-      <p className="text-sm text-muted">Control how you're notified when a friend sends you a chat message.</p>
+      <h2 className="text-lg font-semibold text-text">{t('notificationSettingsSection.title')}</h2>
+      <p className="text-sm text-muted">{t('notificationSettingsSection.description')}</p>
 
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
@@ -18,8 +20,8 @@ export function NotificationSettingsSection() {
             <VolumeX className="h-5 w-5 text-muted" aria-hidden="true" />
           )}
           <div>
-            <p className="text-sm font-medium text-text">Notification sound</p>
-            <p className="text-xs text-muted">Play a sound when you receive a new chat message.</p>
+            <p className="text-sm font-medium text-text">{t('notificationSettingsSection.soundTitle')}</p>
+            <p className="text-xs text-muted">{t('notificationSettingsSection.soundDescription')}</p>
           </div>
         </div>
         <button
@@ -48,12 +50,12 @@ export function NotificationSettingsSection() {
             <BellOff className="h-5 w-5 text-muted" aria-hidden="true" />
           )}
           <div>
-            <p className="text-sm font-medium text-text">Browser notifications</p>
+            <p className="text-sm font-medium text-text">{t('notificationSettingsSection.browserTitle')}</p>
             <p className="text-xs text-muted">
-              Show a desktop notification for new messages, even if the tab isn't focused.
+              {t('notificationSettingsSection.browserDescription')}
               {permission === 'denied' && (
                 <span className="mt-1 block text-frustrated">
-                  Notifications are blocked in your browser settings.
+                  {t('notificationSettingsSection.browserBlocked')}
                 </span>
               )}
             </p>

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Rss, Users, MessageSquare, Plus, UserRoundCheck } from 'lucide-react'
 import { Button } from '../ui/Button'
 import { Avatar, type AvatarStatus } from '../ui/Avatar'
@@ -11,11 +12,11 @@ import { useCreatePostModal } from '../../context/CreatePostModalContext'
 import type { ProfileStatus } from '../../api/profilesApi'
 
 const navItems = [
-  { to: '/feed', label: 'Feed', icon: Rss, end: false },
-  { to: '/find-players', label: 'Find Players', icon: Users, end: false },
-  { to: '/chats', label: 'Chats', icon: MessageSquare, end: false },
-  { to: '/friends', label: 'Friends', icon: UserRoundCheck, end: false },
-]
+  { to: '/feed', labelKey: 'sidebar.nav.feed', icon: Rss, end: false },
+  { to: '/find-players', labelKey: 'sidebar.nav.findPlayers', icon: Users, end: false },
+  { to: '/chats', labelKey: 'sidebar.nav.chats', icon: MessageSquare, end: false },
+  { to: '/friends', labelKey: 'sidebar.nav.friends', icon: UserRoundCheck, end: false },
+] as const
 
 const statusAvatarMap: Record<ProfileStatus, AvatarStatus> = {
   Online: 'online',
@@ -25,12 +26,12 @@ const statusAvatarMap: Record<ProfileStatus, AvatarStatus> = {
   Offline: 'offline',
 }
 
-const statusLabelMap: Record<ProfileStatus, string> = {
-  Online: 'Online',
-  LookingForGame: 'Looking for game',
-  Busy: 'Busy',
-  Inactive: 'Inactive',
-  Offline: 'Offline',
+const statusLabelKeyMap: Record<ProfileStatus, string> = {
+  Online: 'sidebar.status.online',
+  LookingForGame: 'sidebar.status.lookingForGame',
+  Busy: 'sidebar.status.busy',
+  Inactive: 'sidebar.status.inactive',
+  Offline: 'sidebar.status.offline',
 }
 
 const statusTextColorMap: Record<ProfileStatus, string> = {
@@ -47,6 +48,7 @@ interface SidebarProps {
 }
 
 export function Sidebar({ className = '', onNavigate }: SidebarProps) {
+  const { t } = useTranslation('layout')
   const { user } = useAuth()
   const { status, avatarUrl, lookingForGameName } = useStatus()
   const { hasUnread } = useChat()
@@ -70,15 +72,15 @@ export function Sidebar({ className = '', onNavigate }: SidebarProps) {
             <p className="truncate text-sm font-semibold text-text">{user.username}</p>
             <p className={`truncate text-xs ${statusTextColorMap[status]}`}>
               {status === 'LookingForGame' && lookingForGameName
-                ? `Looking for ${lookingForGameName}`
-                : statusLabelMap[status]}
+                ? t('sidebar.lookingForGameName', { game: lookingForGameName })
+                : t(statusLabelKeyMap[status])}
             </p>
           </div>
         </button>
       )}
 
       <nav className="flex flex-col gap-1">
-        {navItems.map(({ to, label, icon: Icon, end }) => (
+        {navItems.map(({ to, labelKey, icon: Icon, end }) => (
           <NavLink
             key={to}
             to={to}
@@ -93,17 +95,17 @@ export function Sidebar({ className = '', onNavigate }: SidebarProps) {
             }
           >
             <Icon className="h-5 w-5" aria-hidden="true" />
-            {label}
+            {t(labelKey)}
             {to === '/chats' && hasUnread && (
-              <span className="ml-auto h-2 w-2 shrink-0 rounded-full bg-frustrated" aria-label="Unread messages" />
+              <span className="ml-auto h-2 w-2 shrink-0 rounded-full bg-frustrated" aria-label={t('sidebar.unreadMessages')} />
             )}
           </NavLink>
         ))}
       </nav>
 
-      <Button className="w-full" onClick={() => { onNavigate?.(); openCreatePost() }}>
+      <Button className="hidden w-full md:flex" onClick={() => { onNavigate?.(); openCreatePost() }}>
         <Plus className="h-4 w-4" aria-hidden="true" />
-        Create Post
+        {t('sidebar.createPost')}
       </Button>
 
       {isStatusModalOpen && <StatusModal onClose={() => setIsStatusModalOpen(false)} />}

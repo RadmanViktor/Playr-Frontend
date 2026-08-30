@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import { Plus } from 'lucide-react'
 import { ProfileHeader } from '../components/ProfileHeader'
 import { PostCard } from '../components/PostCard'
 import { SteamGamesList } from '../components/SteamGamesList'
 import { MyGamesLibrary } from '../components/MyGamesLibrary'
+import { Button } from '../components/ui/Button'
 import { getProfile, getProfilePosts, type ProfileData } from '../api/profilesApi'
 import {
   sendFriendRequest,
@@ -14,11 +17,14 @@ import { type PostFeedItem } from '../api/postsApi'
 import { ApiError } from '../api/http'
 import { useAuth } from '../context/AuthContext'
 import { useChat } from '../context/ChatContext'
+import { useCreatePostModal } from '../context/CreatePostModalContext'
 
 export default function ProfilePage() {
+  const { t } = useTranslation('pagesA')
   const { username } = useParams<{ username: string }>()
   const { user, token, logout } = useAuth()
   const { openChatWithUser } = useChat()
+  const { openCreatePost, subscribePostCreated } = useCreatePostModal()
   const navigate = useNavigate()
 
   const [profile, setProfile] = useState<ProfileData | null>(null)
@@ -43,7 +49,7 @@ export default function ProfilePage() {
       .then(([p, ps]) => { setProfile(p); setPosts(ps) })
       .catch((err) => {
         if (err instanceof ApiError && err.status === 404) setNotFound(true)
-        else setError('Failed to load profile.')
+        else setError(t('profile.loadError'))
       })
       .finally(() => setIsLoading(false))
   }, [username, token])
@@ -72,6 +78,15 @@ export default function ProfilePage() {
 
   const isOwner = !!user && !!profile && user.id === profile.userId
 
+  useEffect(() => {
+    if (!profile) return
+    return subscribePostCreated((post) => {
+      if (post.scope === 'Profile' && post.authorId === profile.userId) {
+        setPosts((prev) => [post, ...prev])
+      }
+    })
+  }, [subscribePostCreated, profile])
+
   function handleSignOut() {
     logout()
     navigate('/login', { replace: true })
@@ -84,9 +99,9 @@ export default function ProfilePage() {
     try {
       const request = await sendFriendRequest(token, profile.userId)
       setPendingFriendRequestId(request.id)
-      setSuccessMessage('Friend request sent.')
+      setSuccessMessage(t('profile.friendRequestSent'))
     } catch (err) {
-      setFriendRequestError(err instanceof ApiError ? err.message : 'Failed to send friend request.')
+      setFriendRequestError(err instanceof ApiError ? err.message : t('profile.friendRequestSendError'))
     } finally {
       setIsSendingFriendRequest(false)
     }
@@ -99,9 +114,9 @@ export default function ProfilePage() {
     try {
       await cancelFriendRequest(token, pendingFriendRequestId)
       setPendingFriendRequestId(null)
-      setSuccessMessage('Friend request cancelled.')
+      setSuccessMessage(t('profile.friendRequestCancelled'))
     } catch (err) {
-      setFriendRequestError(err instanceof ApiError ? err.message : 'Failed to cancel friend request.')
+      setFriendRequestError(err instanceof ApiError ? err.message : t('profile.friendRequestCancelError'))
     } finally {
       setIsCancellingFriendRequest(false)
     }
@@ -131,8 +146,8 @@ export default function ProfilePage() {
     }
   }
 
-  if (isLoading) return <p className="text-muted">Loading…</p>
-  if (notFound) return <p className="text-muted">Profile not found.</p>
+  if (isLoading) return <p className="text-muted">{t('profile.loading')}</p>
+  if (notFound) return <p className="text-muted">{t('profile.notFound')}</p>
   if (error) return <p className="text-frustrated">{error}</p>
   if (!profile) return null
 
@@ -180,7 +195,7 @@ export default function ProfilePage() {
           }`}
           onClick={() => handleTabChange('posts')}
         >
-          Posts
+          {t('profile.tabs.posts')}
         </button>
         <button
           className={`relative z-10 flex-1 rounded-md px-4 py-2 text-base font-semibold transition-colors duration-300 ${
@@ -188,7 +203,7 @@ export default function ProfilePage() {
           }`}
           onClick={() => handleTabChange('games')}
         >
-          Steam
+          {t('profile.tabs.steam')}
         </button>
         <button
           className={`relative z-10 flex-1 rounded-md px-4 py-2 text-base font-semibold transition-colors duration-300 ${
@@ -196,31 +211,52 @@ export default function ProfilePage() {
           }`}
           onClick={() => handleTabChange('library')}
         >
-          Games
+          {t('profile.tabs.games')}
         </button>
       </div>
 
       <div key={activeTab} className="animate-tab-content flex flex-col gap-4">
         {activeTab === 'posts' ? (
-          posts.length === 0 ? (
-            <p className="text-muted">No posts yet.</p>
-          ) : (
-            posts.map((post) => (
-              <PostCard
-                key={post.id}
-                post={post}
-                currentUserId={user?.id}
-                onUpdate={(updated) => setPosts((prev) => prev.map((p) => (p.id === updated.id ? updated : p)))}
-                onDelete={(postId) => setPosts((prev) => prev.filter((p) => p.id !== postId))}
-              />
-            ))
-          )
+          <>
+            {isOwner && (
+              <div className="hidden justify-end md:flex">
+                <Button onClick={() => openCreatePost('Profile')}>
+                  <Plus className="h-4 w-4" aria-hidden="true" />
+                  {t('profile.createPost')}
+                </Button>
+              </div>
+            )}
+            {posts.length === 0 ? (
+              <p className="text-muted">{t('profile.noPosts')}</p>
+            ) : (
+              posts.map((post) => (
+                <PostCard
+                  key={post.id}
+                  post={post}
+                  currentUserId={user?.id}
+                  onUpdate={(updated) => setPosts((prev) => prev.map((p) => (p.id === updated.id ? updated : p)))}
+                  onDelete={(postId) => setPosts((prev) => prev.filter((p) => p.id !== postId))}
+                />
+              ))
+            )}
+          </>
         ) : activeTab === 'games' ? (
           <SteamGamesList userId={profile.userId} />
         ) : (
           <MyGamesLibrary username={profile.username} isOwner={isOwner} />
         )}
       </div>
+
+      {isOwner && activeTab === 'posts' && (
+        <button
+          type="button"
+          aria-label={t('profile.createPost')}
+          onClick={() => openCreatePost('Profile')}
+          className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg transition-transform hover:scale-105 active:scale-95 md:hidden"
+        >
+          <Plus className="h-6 w-6" aria-hidden="true" />
+        </button>
+      )}
     </div>
   )
 }

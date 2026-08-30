@@ -1,4 +1,5 @@
 import { Globe, Link as LinkIcon, FileText, Calendar } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Avatar, type AvatarStatus } from './ui/Avatar'
 import { Badge } from './ui/Badge'
 import { Button } from './ui/Button'
@@ -41,6 +42,7 @@ export function ProfileHeader({
   onMessageClick,
   isFriendRequestPending = false,
 }: ProfileHeaderProps) {
+  const { t } = useTranslation('componentsB')
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-surface">
       {/* Gradient banner */}
@@ -70,11 +72,11 @@ export function ProfileHeader({
           {isOwner && (
             <div className="flex flex-col items-start gap-2 sm:items-end">
               <Button variant="secondary" size="sm" onClick={onEditClick}>
-                Settings
+                {t('profileHeader.settings')}
               </Button>
               {onSignOutClick && (
                 <Button variant="ghost" size="sm" onClick={onSignOutClick}>
-                  Sign out
+                  {t('profileHeader.signOut')}
                 </Button>
               )}
             </div>
@@ -83,13 +85,13 @@ export function ProfileHeader({
             <div className="flex flex-col items-start gap-2 sm:items-end">
               {onMessageClick && (
                 <Button variant="secondary" size="sm" onClick={onMessageClick}>
-                  Message
+                  {t('profileHeader.message')}
                 </Button>
               )}
-              {profile.relationshipStatus === 'Friends' && <Badge variant="completed">Friend</Badge>}
+              {profile.relationshipStatus === 'Friends' && <Badge variant="completed">{t('profileHeader.friend')}</Badge>}
               {profile.relationshipStatus !== 'Friends' && isFriendRequestPending && (
                 <>
-                  <Badge variant="tag">Request sent</Badge>
+                  <Badge variant="tag">{t('profileHeader.requestSent')}</Badge>
                   {onCancelFriendRequestClick && (
                     <Button
                       variant="ghost"
@@ -97,14 +99,14 @@ export function ProfileHeader({
                       onClick={onCancelFriendRequestClick}
                       disabled={isCancellingFriendRequest}
                     >
-                      {isCancellingFriendRequest ? 'Cancelling...' : 'Cancel request'}
+                      {isCancellingFriendRequest ? t('profileHeader.cancelling') : t('profileHeader.cancelRequest')}
                     </Button>
                   )}
                 </>
               )}
               {profile.relationshipStatus !== 'Friends' && !isFriendRequestPending && onAddFriendClick && (
                 <Button size="sm" onClick={onAddFriendClick}>
-                  Add friend
+                  {t('profileHeader.addFriend')}
                 </Button>
               )}
             </div>
@@ -115,7 +117,7 @@ export function ProfileHeader({
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-muted">
           <span className="flex items-center gap-1.5">
             <FileText className="h-4 w-4" aria-hidden="true" />
-            <span className="font-semibold text-text">{postCount}</span> posts
+            <span className="font-semibold text-text">{postCount}</span> {t('profileHeader.posts', { count: postCount })}
           </span>
           {profile.region && (
             <span className="flex items-center gap-1.5">
@@ -125,7 +127,7 @@ export function ProfileHeader({
           )}
           <span className="flex items-center gap-1.5">
             <Calendar className="h-4 w-4" aria-hidden="true" />
-            Joined {formatJoinDate(profile.createdAt)}
+            {t('profileHeader.joined', { date: formatJoinDate(profile.createdAt) })}
           </span>
         </div>
 

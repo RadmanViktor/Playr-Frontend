@@ -1,17 +1,19 @@
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Avatar } from './ui/Avatar'
 import { Camera } from 'lucide-react'
 
 const ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.gif']
 const MAX_BYTES = 10 * 1024 * 1024
 
-export function validateAvatarFile(file: File): string | null {
+export function validateAvatarFile(file: File, t?: (key: string) => string): string | null {
+  const translate = t ?? ((key: string) => key)
   const extension = file.name.slice(file.name.lastIndexOf('.')).toLowerCase()
   if (!ALLOWED_EXTENSIONS.includes(extension)) {
-    return 'Unsupported file type. Allowed: jpg, jpeg, png, webp, gif.'
+    return translate('avatarUploadInput.unsupportedFileType')
   }
   if (file.size > MAX_BYTES) {
-    return 'Images cannot be larger than 10 MB.'
+    return translate('avatarUploadInput.fileTooLarge')
   }
   return null
 }
@@ -33,6 +35,7 @@ export function AvatarUploadInput({
   error = null,
   onError,
 }: AvatarUploadInputProps) {
+  const { t } = useTranslation('componentsB')
   const inputRef = useRef<HTMLInputElement>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
@@ -51,7 +54,7 @@ export function AvatarUploadInput({
       onFileChange(null)
       return
     }
-    const validationError = validateAvatarFile(selected)
+    const validationError = validateAvatarFile(selected, t)
     if (validationError) {
       onError?.(validationError)
       onFileChange(null)
@@ -72,7 +75,7 @@ export function AvatarUploadInput({
           ref={inputRef}
           type="file"
           accept="image/*"
-          aria-label="Upload avatar"
+          aria-label={t('avatarUploadInput.uploadAvatarAriaLabel')}
           className="hidden"
           onChange={(e) => handleFileSelected(e.target.files?.[0] ?? null)}
         />

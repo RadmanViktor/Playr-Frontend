@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Card } from './ui/Card'
 import { Avatar, type AvatarStatus } from './ui/Avatar'
 import { getConversations, type Conversation } from '../api/chatApi'
@@ -14,16 +15,17 @@ const statusAvatarMap: Record<ProfileStatus, AvatarStatus> = {
   Offline: 'offline',
 }
 
-function formatRelativeTime(dateString: string): string {
+function formatRelativeTime(dateString: string, t: (key: string, opts?: Record<string, unknown>) => string): string {
   const diffMs = Date.now() - new Date(dateString).getTime()
   const diffMin = Math.floor(diffMs / 60_000)
-  if (diffMin < 60) return `${Math.max(diffMin, 1)}m ago`
+  if (diffMin < 60) return t('conversationsList.minutesAgo', { count: Math.max(diffMin, 1) })
   const diffH = Math.floor(diffMin / 60)
-  if (diffH < 24) return `${diffH}h ago`
-  return `${Math.floor(diffH / 24)}d ago`
+  if (diffH < 24) return t('conversationsList.hoursAgo', { count: diffH })
+  return t('conversationsList.daysAgo', { count: Math.floor(diffH / 24) })
 }
 
 export function ConversationsList() {
+  const { t } = useTranslation('componentsB')
   const { token } = useAuth()
   const { openConversation, error: chatError, unreadConversationIds } = useChat()
   const [conversations, setConversations] = useState<Conversation[]>([])
@@ -37,7 +39,7 @@ export function ConversationsList() {
     setError(null)
     getConversations(token)
       .then(setConversations)
-      .catch(() => setError('Failed to load chats.'))
+      .catch(() => setError(t('conversationsList.loadError')))
       .finally(() => setIsLoading(false))
   }, [token])
 
@@ -65,7 +67,7 @@ export function ConversationsList() {
     }
   }, [conversations])
 
-  if (isLoading) return <p className="text-muted">Loading chats...</p>
+  if (isLoading) return <p className="text-muted">{t('conversationsList.loading')}</p>
   if (error) return <p className="text-frustrated">{error}</p>
 
   return (
@@ -73,7 +75,7 @@ export function ConversationsList() {
       {chatError && <p className="text-sm text-frustrated">{chatError}</p>}
       {conversations.length === 0 && (
         <Card>
-          <p className="text-muted">No conversations yet. Start a chat with a friend to see it here.</p>
+          <p className="text-muted">{t('conversationsList.emptyState')}</p>
         </Card>
       )}
 
@@ -98,15 +100,15 @@ export function ConversationsList() {
                   {conversation.otherParticipant.displayName}
                 </p>
                 <p className={`truncate text-xs ${isUnread ? 'font-medium text-text' : 'text-muted'}`}>
-                  {conversation.lastMessage ?? 'No messages yet'}
+                  {conversation.lastMessage ?? t('conversationsList.noMessagesYet')}
                 </p>
               </div>
             </div>
             <div className="flex shrink-0 items-center gap-2">
               {conversation.lastMessageAt && (
-                <p className="text-xs text-muted">{formatRelativeTime(conversation.lastMessageAt)}</p>
+                <p className="text-xs text-muted">{formatRelativeTime(conversation.lastMessageAt, t)}</p>
               )}
-              {isUnread && <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-primary" aria-label="Unread" />}
+              {isUnread && <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-primary" aria-label={t('conversationsList.unreadAriaLabel')} />}
             </div>
           </Card>
         )

@@ -1,0 +1,47 @@
+{
+  "modal": {
+    "close": "Close"
+  },
+  "toast": {
+    "dismiss": "Dismiss"
+  },
+  "select": {
+    "placeholder": "Select…"
+  },
+  "searchInput": {
+    "placeholder": "Search PLAYR",
+    "ariaLabel": "Search PLAYR"
+  },
+  "starRating": {
+    "ariaLabel": "Rating",
+    "starLabel_one": "{{count}} star",
+    "starLabel_other": "{{count}} stars"
+  },
+  "inviteModal": {
+    "title": "Send invitation",
+    "promptText": "Invite",
+    "promptSuffix": " to play",
+    "placeholderText": "Say hi and tell them why you'd like to play together...",
+    "actionLabel": "Send invitation",
+    "presentationLabel": "Presentation",
+    "cancel": "Cancel",
+    "sending": "Sending...",
+    "errorEmptyMessage": "Write a short presentation of yourself.",
+    "errorNotLoggedIn": "You must be logged in to send invitations.",
+    "errorGeneric": "Failed to send invitation. Please try again."
+  },
+  "statusModal": {
+    "title": "Set your status",
+    "lookingForGameNotice": "You're looking for a game. Manage that on Find Players.",
+    "statusOnline": "Online",
+    "statusOnlineDescription": "Visible and available",
+    "statusBusy": "Busy",
+    "statusBusyDescription": "Online, but don't disturb",
+    "statusOffline": "Offline",
+    "statusOfflineDescription": "Appear offline to others",
+    "error": "Failed to update status. Please try again.",
+    "cancel": "Cancel",
+    "saving": "Saving...",
+    "save": "Save"
+  }
+}

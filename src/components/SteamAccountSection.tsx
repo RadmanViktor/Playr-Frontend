@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Button } from './ui/Button'
 import { getSteamStatus, startSteamLink, unlinkSteam, type SteamAccount } from '../api/steamApi'
 import { ApiError, resolveMediaUrl } from '../api/http'
@@ -8,6 +9,7 @@ interface SteamAccountSectionProps {
 }
 
 export function SteamAccountSection({ token }: SteamAccountSectionProps) {
+  const { t } = useTranslation('componentsB')
   const [account, setAccount] = useState<SteamAccount | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isBusy, setIsBusy] = useState(false)
@@ -16,7 +18,7 @@ export function SteamAccountSection({ token }: SteamAccountSectionProps) {
   useEffect(() => {
     getSteamStatus(token)
       .then(setAccount)
-      .catch(() => setError('Failed to load Steam status.'))
+      .catch(() => setError(t('steamAccountSection.loadError')))
       .finally(() => setIsLoading(false))
   }, [token])
 
@@ -27,7 +29,7 @@ export function SteamAccountSection({ token }: SteamAccountSectionProps) {
       const redirectUrl = await startSteamLink(token)
       window.location.href = redirectUrl
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Failed to start Steam linking.')
+      setError(err instanceof ApiError ? err.message : t('steamAccountSection.linkError'))
       setIsBusy(false)
     }
   }
@@ -39,7 +41,7 @@ export function SteamAccountSection({ token }: SteamAccountSectionProps) {
       await unlinkSteam(token)
       setAccount(null)
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Failed to unlink Steam account.')
+      setError(err instanceof ApiError ? err.message : t('steamAccountSection.unlinkError'))
     } finally {
       setIsBusy(false)
     }
@@ -49,7 +51,7 @@ export function SteamAccountSection({ token }: SteamAccountSectionProps) {
 
   return (
     <div className="flex flex-col gap-2 rounded-lg border border-border bg-surface-raised p-4">
-        <h2 className="text-lg font-semibold text-text">Steam account</h2>
+        <h2 className="text-lg font-semibold text-text">{t('steamAccountSection.title')}</h2>
       {error && <p className="text-frustrated text-sm">{error}</p>}
       {account ? (
         <div className="flex items-center justify-between gap-4">
@@ -60,19 +62,19 @@ export function SteamAccountSection({ token }: SteamAccountSectionProps) {
             <div>
               <p className="text-text">{account.displayName ?? account.steamId}</p>
               <p className="text-muted text-sm">
-                {account.isPublic ? 'Public game library' : 'Private profile – games cannot be fetched'}
+                {account.isPublic ? t('steamAccountSection.publicLibrary') : t('steamAccountSection.privateProfile')}
               </p>
             </div>
           </div>
           <Button variant="secondary" size="sm" disabled={isBusy} onClick={handleUnlink}>
-            Unlink
+            {t('steamAccountSection.unlink')}
           </Button>
         </div>
       ) : (
         <div className="flex items-center justify-between gap-4">
-          <p className="text-muted text-sm">Connect your Steam account to show your game library on your profile.</p>
+          <p className="text-muted text-sm">{t('steamAccountSection.connectDescription')}</p>
           <Button size="sm" disabled={isBusy} onClick={handleLink}>
-            Connect Steam
+            {t('steamAccountSection.connect')}
           </Button>
         </div>
       )}

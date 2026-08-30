@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { getPasswordStrength, MINIMUM_PASSWORD_SCORE } from '../utils/validation'
 
 const SEGMENT_COLORS = [
@@ -14,16 +15,24 @@ const LABEL_COLORS = [
   'text-enjoying',
 ] as const
 
-const REQUIREMENT_LABELS: Array<[keyof ReturnType<typeof getPasswordStrength>['requirements'], string]> = [
-  ['length', 'at least 8 characters'],
-  ['lowercase', 'a lowercase letter'],
-  ['uppercase', 'an uppercase letter'],
-  ['number', 'a number'],
-  ['symbol', 'a symbol (optional, adds strength)'],
+const REQUIREMENT_KEYS: Array<[keyof ReturnType<typeof getPasswordStrength>['requirements'], string]> = [
+  ['length', 'passwordStrengthMeter.requirementLength'],
+  ['lowercase', 'passwordStrengthMeter.requirementLowercase'],
+  ['uppercase', 'passwordStrengthMeter.requirementUppercase'],
+  ['number', 'passwordStrengthMeter.requirementNumber'],
+  ['symbol', 'passwordStrengthMeter.requirementSymbol'],
 ]
 
+const STRENGTH_LABEL_KEYS = [
+  'passwordStrengthMeter.strengthWeak',
+  'passwordStrengthMeter.strengthFair',
+  'passwordStrengthMeter.strengthGood',
+  'passwordStrengthMeter.strengthStrong',
+] as const
+
 export function PasswordStrengthMeter({ password }: { password: string }) {
-  const { score, label, requirements } = getPasswordStrength(password)
+  const { t } = useTranslation('componentsB')
+  const { score, requirements } = getPasswordStrength(password)
   const isAcceptable = score >= MINIMUM_PASSWORD_SCORE
 
   return (
@@ -41,15 +50,15 @@ export function PasswordStrengthMeter({ password }: { password: string }) {
       </div>
 
       <p role="status" aria-live="polite" className={`text-xs ${LABEL_COLORS[score]}`}>
-        Password strength: {label}
-        {!isAcceptable && ' - please choose a stronger password'}
+        {t('passwordStrengthMeter.strengthLabel', { label: t(STRENGTH_LABEL_KEYS[score]) })}
+        {!isAcceptable && t('passwordStrengthMeter.chooseStrongerPassword')}
       </p>
 
       <ul className="flex flex-col gap-0.5 text-xs text-muted">
-        {REQUIREMENT_LABELS.map(([key, text]) => (
+        {REQUIREMENT_KEYS.map(([key, textKey]) => (
           <li key={key} className={requirements[key] ? 'text-enjoying' : undefined}>
             <span aria-hidden="true">{requirements[key] ? '\u2713' : '\u2022'}</span>{' '}
-            <span>{text}</span>
+            <span>{t(textKey)}</span>
           </li>
         ))}
       </ul>

@@ -1,0 +1,80 @@
+﻿{
+  "chats": {
+    "eyebrow": "Håll kontakten",
+    "title": "Chattar",
+    "subtitle": "Fortsätt konversationen med spelarna du har spelat ihop med — planera sessioner, byt tips och håll er synkade."
+  },
+  "login": {
+    "title": "Logga in på PLAYR",
+    "usernameOrEmailLabel": "Användarnamn eller e-post",
+    "usernameOrEmailAriaLabel": "användarnamn eller e-post",
+    "passwordLabel": "Lösenord",
+    "passwordAriaLabel": "lösenord",
+    "confirmationEmailSent": "Bekräftelsemejl skickat. Kolla din inkorg.",
+    "resendConfirmationEmail": "Skicka bekräftelsemejl igen",
+    "enterEmailToResend": "Fyll i din e-post ovan för att skicka igen",
+    "submit": "Logga in",
+    "registerInstead": "Registrera dig istället",
+    "errors": {
+      "usernameOrEmailRequired": "användarnamn eller e-post krävs",
+      "passwordRequired": "lösenord krävs",
+      "generic": "Något gick fel.",
+      "resendFailed": "Kunde inte skicka bekräftelsemejlet. Försök igen."
+    }
+  },
+  "register": {
+    "title": "Skapa ditt PLAYR-konto",
+    "emailLabel": "E-post",
+    "emailAriaLabel": "e-post",
+    "usernameLabel": "Användarnamn",
+    "usernameAriaLabel": "användarnamn",
+    "passwordLabel": "Lösenord",
+    "passwordAriaLabel": "lösenord",
+    "confirmPasswordLabel": "Bekräfta lösenord",
+    "confirmPasswordAriaLabel": "bekräfta lösenord",
+    "showPassword": "visa lösenord",
+    "hidePassword": "dölj lösenord",
+    "submit": "Registrera",
+    "loginInstead": "Logga in istället",
+    "checkYourEmail": {
+      "title": "Kolla din e-post",
+      "sentTo": "Vi skickade en bekräftelselänk till",
+      "instructions": ". Klicka på den för att aktivera ditt konto och logga sedan in.",
+      "checkSpam": "Inget i inkorgen? Kolla skräpposten först.",
+      "emailSent": "Bekräftelsemejl skickat.",
+      "resendEmail": "Skicka mejl igen",
+      "resendEmailCooldown": "Skicka mejl igen ({{seconds}}s)",
+      "goToLogin": "Gå till inloggning"
+    },
+    "errors": {
+      "passwordTooWeak": "lösenordet är för svagt",
+      "generic": "Något gick fel.",
+      "resendFailed": "Kunde inte skicka bekräftelsemejlet. Försök igen."
+    }
+  },
+  "confirmEmail": {
+    "title": "Bekräfta din e-post",
+    "confirming": "Bekräftar din e-postadress...",
+    "confirmed": "Din e-postadress är bekräftad. Du kan nu logga in.",
+    "goToLogin": "Gå till inloggning",
+    "resendSent": "Om den adressen tillhör ett obekräftat konto är en ny länk på väg.",
+    "enterEmailLabel": "Fyll i din e-post för att få en ny länk",
+    "emailAriaLabel": "e-post",
+    "sendNewLink": "Skicka ny länk",
+    "errors": {
+      "incompleteLink": "Den här bekräftelselänken är ofullständig.",
+      "invalidOrExpired": "Den här bekräftelselänken är ogiltig eller har gått ut.",
+      "resendFailed": "Kunde inte skicka bekräftelsemejlet. Försök igen."
+    }
+  },
+  "steamAccountSettings": {
+    "title": "Kontokoppling"
+  },
+  "profileSettings": {
+    "title": "Redigera profil",
+    "loading": "Laddar…"
+  },
+  "notificationSettings": {
+    "title": "Aviseringar"
+  }
+}

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, type MouseEvent as ReactMouseEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Mail, Menu, Bell } from 'lucide-react'
 import { IconButton } from '../ui/IconButton'
 import { Avatar } from '../ui/Avatar'
@@ -49,6 +50,7 @@ const statusAvatarMap = {
 } as const
 
 export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
+  const { t } = useTranslation('layout')
   const { user, token } = useAuth()
   const { status, avatarUrl } = useStatus()
   const { openChatWithUser } = useChat()
@@ -275,7 +277,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
         setIncomingFriendRequests(incomingRequests)
         setSentFriendRequests(sentRequests)
       } catch {
-        setInvitationsError('Failed to load invitations.')
+        setInvitationsError(t('topBar.invitations.loadError'))
       } finally {
         setInvitationsLoading(false)
       }
@@ -315,10 +317,10 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
   function formatNotificationTime(createdAt: string): string {
     const diffMs = Date.now() - new Date(createdAt).getTime()
     const diffMin = Math.floor(diffMs / 60_000)
-    if (diffMin < 60) return `${Math.max(diffMin, 1)}m ago`
+    if (diffMin < 60) return t('topBar.notifications.timeMinutes', { count: Math.max(diffMin, 1) })
     const diffH = Math.floor(diffMin / 60)
-    if (diffH < 24) return `${diffH}h ago`
-    return `${Math.floor(diffH / 24)}d ago`
+    if (diffH < 24) return t('topBar.notifications.timeHours', { count: diffH })
+    return t('topBar.notifications.timeDays', { count: Math.floor(diffH / 24) })
   }
 
   async function handleAccept(item: PendingItem) {
@@ -329,7 +331,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
         const invitation = await acceptInvitation(token, item.id)
         setInvitations((prev) => prev.filter((i) => i.id !== item.id))
         await openChatWithUser(invitation.senderUserId, {
-          successMessage: `You're now chatting with ${invitation.senderDisplayName}. Happy gaming! :D`,
+          successMessage: t('topBar.invitations.acceptedChatMessage', { name: invitation.senderDisplayName }),
         })
       } else {
         await acceptFriendRequest(token, item.id)
@@ -337,7 +339,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
       }
       setIsInvitationsOpen(false)
     } catch (err) {
-      setInvitationsError(err instanceof ApiError ? err.message : 'Failed to accept invitation.')
+      setInvitationsError(err instanceof ApiError ? err.message : t('topBar.invitations.acceptError'))
     } finally {
       setRespondingId(null)
     }
@@ -355,7 +357,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
         setIncomingFriendRequests((prev) => prev.filter((r) => r.id !== item.id))
       }
     } catch (err) {
-      setInvitationsError(err instanceof ApiError ? err.message : 'Failed to decline invitation.')
+      setInvitationsError(err instanceof ApiError ? err.message : t('topBar.invitations.declineError'))
     } finally {
       setRespondingId(null)
     }
@@ -373,7 +375,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
         setSentFriendRequests((prev) => prev.filter((r) => r.id !== item.id))
       }
     } catch (err) {
-      setInvitationsError(err instanceof ApiError ? err.message : 'Failed to cancel invitation.')
+      setInvitationsError(err instanceof ApiError ? err.message : t('topBar.invitations.cancelError'))
     } finally {
       setRespondingId(null)
     }
@@ -381,7 +383,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
 
   return (
     <header className="flex items-center gap-2 border-b border-border bg-surface py-3 pt-[max(0.75rem,env(safe-area-inset-top))] pl-[max(0.75rem,env(safe-area-inset-left))] pr-[max(0.75rem,env(safe-area-inset-right))] sm:gap-4 sm:pl-[max(1.5rem,env(safe-area-inset-left))] sm:pr-[max(1.5rem,env(safe-area-inset-right))]">
-      <IconButton aria-label="Open menu" onClick={onMenuClick} className="md:hidden">
+      <IconButton aria-label={t('topBar.openMenu')} onClick={onMenuClick} className="md:hidden">
         <Menu className="h-5 w-5" aria-hidden="true" />
       </IconButton>
       <div className="relative w-full min-w-0 flex-1 sm:max-w-md" ref={containerRef}>
@@ -389,8 +391,8 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
           <Search className="h-4 w-4 text-muted" aria-hidden="true" />
           <input
             type="search"
-            aria-label="Search PLAYR"
-            placeholder="Search PLAYR"
+            aria-label={t('topBar.searchAriaLabel')}
+            placeholder={t('topBar.searchPlaceholder')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onFocus={() => {
@@ -406,17 +408,17 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
           <div className="absolute left-0 right-0 top-full z-50 mt-1 rounded-lg border border-border bg-surface shadow-lg overflow-hidden">
             {showRecent ? (
               recentSearches.length === 0 ? (
-                <p className="px-4 py-3 text-sm text-muted">Inga senaste sökningar</p>
+                <p className="px-4 py-3 text-sm text-muted">{t('topBar.search.noRecentSearches')}</p>
               ) : (
                 <>
                   <div className="flex items-center justify-between px-4 pt-3 pb-1">
-                    <p className="text-xs font-medium uppercase text-muted">Senaste sökningar</p>
+                    <p className="text-xs font-medium uppercase text-muted">{t('topBar.search.recentSearches')}</p>
                     <button
                       type="button"
                       onClick={handleClearRecent}
                       className="text-xs font-medium text-muted hover:text-text cursor-pointer"
                     >
-                      Rensa alla
+                      {t('topBar.search.clearAll')}
                     </button>
                   </div>
                   {recentSearches.map((r) => (
@@ -435,7 +437,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
                         </div>
                       </button>
                       <button
-                        aria-label={`Ta bort ${r.displayName} från senaste sökningar`}
+                        aria-label={t('topBar.search.removeRecent', { name: r.displayName })}
                         onClick={(e) => handleRemoveRecent(e, r.userId)}
                         className="rounded p-1 text-muted opacity-0 group-hover:opacity-100 hover:bg-border hover:text-text cursor-pointer"
                       >
@@ -446,7 +448,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
                 </>
               )
             ) : noResults ? (
-              <p className="px-4 py-3 text-sm text-muted">Ingen användare hittades</p>
+              <p className="px-4 py-3 text-sm text-muted">{t('topBar.search.noUsersFound')}</p>
             ) : (
               results.map((r) => (
                 <button
@@ -468,7 +470,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
 
       <div className="ml-auto flex items-center gap-2">
         <div className="relative" ref={notificationsRef}>
-          <IconButton aria-label="Notifications" onClick={() => setIsNotificationsOpen((open) => !open)}>
+          <IconButton aria-label={t('topBar.notifications.ariaLabel')} onClick={() => setIsNotificationsOpen((open) => !open)}>
             <Bell className="h-5 w-5" aria-hidden="true" />
           </IconButton>
           {unreadCount > 0 && (
@@ -479,21 +481,21 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
           {isNotificationsOpen && (
             <div className="absolute right-0 top-full z-50 mt-1 w-[min(20rem,calc(100vw-1.5rem))] rounded-lg border border-border bg-surface shadow-lg overflow-hidden">
               <div className="flex items-center justify-between border-b border-border px-4 py-2">
-                <p className="text-sm font-semibold text-text">Notifications</p>
+                <p className="text-sm font-semibold text-text">{t('topBar.notifications.title')}</p>
                 {unreadCount > 0 && (
                   <button
                     type="button"
                     onClick={markAllRead}
                     className="text-xs font-medium text-muted hover:text-text cursor-pointer"
                   >
-                    Mark all as read
+                    {t('topBar.notifications.markAllRead')}
                   </button>
                 )}
               </div>
               {notificationsLoading && notifications.length === 0 ? (
-                <p className="px-4 py-3 text-sm text-muted">Loading...</p>
+                <p className="px-4 py-3 text-sm text-muted">{t('topBar.loading')}</p>
               ) : notifications.length === 0 ? (
-                <p className="px-4 py-3 text-sm text-muted">No notifications yet</p>
+                <p className="px-4 py-3 text-sm text-muted">{t('topBar.notifications.empty')}</p>
               ) : (
                 <div className="max-h-96 overflow-y-auto">
                   {notifications.map((notification) => (
@@ -513,7 +515,9 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
                       <div className="min-w-0 flex-1">
                         <p className="text-sm text-text">
                           <span className="font-medium">{notification.actor.displayName}</span>{' '}
-                          tagged you in a {notification.type === 'CommentMention' ? 'comment' : 'post'}
+                          {notification.type === 'CommentMention'
+                            ? t('topBar.notifications.taggedInComment')
+                            : t('topBar.notifications.taggedInPost')}
                         </p>
                         <p className="mt-0.5 text-xs text-muted">{formatNotificationTime(notification.createdAt)}</p>
                       </div>
@@ -526,7 +530,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
                       disabled={notificationsLoading}
                       className="w-full px-4 py-2 text-center text-xs font-medium text-muted hover:text-text disabled:opacity-50 cursor-pointer"
                     >
-                      {notificationsLoading ? 'Loading...' : 'Load more'}
+                      {notificationsLoading ? t('topBar.loading') : t('topBar.notifications.loadMore')}
                     </button>
                   )}
                 </div>
@@ -535,7 +539,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
           )}
         </div>
         <div className="relative" ref={invitationsRef}>
-          <IconButton aria-label="Messages" onClick={toggleInvitations}>
+          <IconButton aria-label={t('topBar.invitations.ariaLabel')} onClick={toggleInvitations}>
             <Mail className="h-5 w-5" aria-hidden="true" />
           </IconButton>
           {incomingInvitationCount > 0 && (
@@ -546,7 +550,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
           {isInvitationsOpen && (
             <div className="absolute right-0 top-full z-50 mt-1 w-[min(20rem,calc(100vw-1.5rem))] rounded-lg border border-border bg-surface shadow-lg overflow-hidden">
               <div className="border-b border-border px-4 py-2">
-                <p className="text-sm font-semibold text-text">Invitations</p>
+                <p className="text-sm font-semibold text-text">{t('topBar.invitations.title')}</p>
               </div>
               <div className="flex border-b border-border bg-surface-raised/50 p-1">
                 <button
@@ -556,7 +560,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
                     invitationTab === 'incoming' ? 'bg-surface text-text' : 'text-muted hover:text-text'
                   }`}
                 >
-                  Incoming
+                  {t('topBar.invitations.incoming')}
                 </button>
                 <button
                   type="button"
@@ -565,17 +569,17 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
                     invitationTab === 'sent' ? 'bg-surface text-text' : 'text-muted hover:text-text'
                   }`}
                 >
-                  Sent
+                  {t('topBar.invitations.sent')}
                 </button>
               </div>
               {invitationsLoading ? (
-                <p className="px-4 py-3 text-sm text-muted">Loading...</p>
+                <p className="px-4 py-3 text-sm text-muted">{t('topBar.loading')}</p>
               ) : invitationsError ? (
                 <p className="px-4 py-3 text-sm text-frustrated">{invitationsError}</p>
               ) : invitationTab === 'incoming' && incomingItems.length === 0 ? (
-                <p className="px-4 py-3 text-sm text-muted">No incoming invitations</p>
+                <p className="px-4 py-3 text-sm text-muted">{t('topBar.invitations.noIncoming')}</p>
               ) : invitationTab === 'sent' && sentItems.length === 0 ? (
-                <p className="px-4 py-3 text-sm text-muted">No sent invitations</p>
+                <p className="px-4 py-3 text-sm text-muted">{t('topBar.invitations.noSent')}</p>
               ) : invitationTab === 'incoming' ? (
                 <div className="max-h-96 overflow-y-auto">
                   {incomingItems.map((item) => (
@@ -594,7 +598,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
                             {item.displayName}
                           </button>
                           <span className="shrink-0 rounded-full bg-surface-raised px-2 py-0.5 text-[11px] font-medium text-muted">
-                            {item.kind === 'invitation' ? 'Game invite' : 'Friend request'}
+                            {item.kind === 'invitation' ? t('topBar.invitations.gameInvite') : t('topBar.invitations.friendRequest')}
                           </span>
                         </div>
                         {item.message && (
@@ -606,14 +610,14 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
                             disabled={respondingId === item.id}
                             className="rounded-md bg-primary px-2.5 py-1 text-xs font-medium text-white hover:bg-primary-hover disabled:opacity-50 cursor-pointer"
                           >
-                            Accept
+                            {t('topBar.invitations.accept')}
                           </button>
                           <button
                             onClick={() => handleDecline(item)}
                             disabled={respondingId === item.id}
                             className="rounded-md bg-surface-raised px-2.5 py-1 text-xs font-medium text-text hover:bg-border disabled:opacity-50 cursor-pointer"
                           >
-                            Decline
+                            {t('topBar.invitations.decline')}
                           </button>
                         </div>
                       </div>
@@ -629,7 +633,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
                         <div className="flex items-center justify-between gap-2">
                           <p className="truncate text-sm font-medium text-text">{item.displayName}</p>
                           <span className="shrink-0 rounded-full bg-surface-raised px-2 py-0.5 text-[11px] font-medium text-muted">
-                            {item.kind === 'invitation' ? 'Game invite' : 'Friend request'} · {item.status}
+                            {item.kind === 'invitation' ? t('topBar.invitations.gameInvite') : t('topBar.invitations.friendRequest')} · {item.status}
                           </span>
                         </div>
                         {item.message && (
@@ -642,7 +646,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
                               disabled={respondingId === item.id}
                               className="rounded-md bg-surface-raised px-2.5 py-1 text-xs font-medium text-text hover:bg-border disabled:opacity-50 cursor-pointer"
                             >
-                              Cancel
+                              {t('topBar.invitations.cancel')}
                             </button>
                           </div>
                         )}
@@ -658,7 +662,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
           <button
             onClick={() => navigate(`/profile/${user.username}`)}
             className="rounded-full focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
-            aria-label="My profile"
+            aria-label={t('topBar.myProfile')}
           >
             <Avatar src={avatarUrl ?? undefined} alt={user.displayName ?? user.username} status={statusAvatarMap[status]} />
           </button>

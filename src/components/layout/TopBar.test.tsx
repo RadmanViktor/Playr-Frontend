@@ -79,12 +79,12 @@ describe('TopBar', () => {
     })
     render(<TopBar />, { wrapper: MemoryRouter })
     fireEvent.focus(screen.getByRole('searchbox', { name: 'Search PLAYR' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Ta bort Jane Doe från senaste sökningar' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Remove Jane Doe from recent searches' }))
     expect(screen.queryByText('Jane Doe')).not.toBeInTheDocument()
     expect(getRecentSearches()).toHaveLength(0)
   })
 
-  it('clears all recent searches when "Rensa alla" is clicked', () => {
+  it('clears all recent searches when "Clear all" is clicked', () => {
     addRecentSearch({
       userId: 'u1',
       username: 'jane',
@@ -93,7 +93,7 @@ describe('TopBar', () => {
     })
     render(<TopBar />, { wrapper: MemoryRouter })
     fireEvent.focus(screen.getByRole('searchbox', { name: 'Search PLAYR' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Rensa alla' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Clear all' }))
     expect(screen.queryByText('Jane Doe')).not.toBeInTheDocument()
     expect(getRecentSearches()).toHaveLength(0)
   })

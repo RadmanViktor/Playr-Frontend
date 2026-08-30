@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Moon, Circle, EyeOff } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Button } from './Button'
 import { Modal } from './Modal'
 import type { ProfileStatus } from '../../api/profilesApi'
@@ -9,13 +10,14 @@ interface StatusModalProps {
   onClose: () => void
 }
 
-const statusOptions: { value: ProfileStatus; label: string; description: string; icon: typeof Circle }[] = [
-  { value: 'Online', label: 'Online', description: 'Visible and available', icon: Circle },
-  { value: 'Busy', label: 'Busy', description: "Online, but don't disturb", icon: Moon },
-  { value: 'Offline', label: 'Offline', description: 'Appear offline to others', icon: EyeOff },
+const statusOptions: { value: ProfileStatus; labelKey: string; descriptionKey: string; icon: typeof Circle }[] = [
+  { value: 'Online', labelKey: 'statusModal.statusOnline', descriptionKey: 'statusModal.statusOnlineDescription', icon: Circle },
+  { value: 'Busy', labelKey: 'statusModal.statusBusy', descriptionKey: 'statusModal.statusBusyDescription', icon: Moon },
+  { value: 'Offline', labelKey: 'statusModal.statusOffline', descriptionKey: 'statusModal.statusOfflineDescription', icon: EyeOff },
 ]
 
 export function StatusModal({ onClose }: StatusModalProps) {
+  const { t } = useTranslation('ui')
   const { status, updateStatus } = useStatus()
 
   const [selectedStatus, setSelectedStatus] = useState<ProfileStatus>(
@@ -31,22 +33,22 @@ export function StatusModal({ onClose }: StatusModalProps) {
       await updateStatus(selectedStatus, null, null, null)
       onClose()
     } catch {
-      setError('Failed to update status. Please try again.')
+      setError(t('statusModal.error'))
     } finally {
       setIsSaving(false)
     }
   }
 
   return (
-    <Modal title="Set your status" onClose={onClose}>
+    <Modal title={t('statusModal.title')} onClose={onClose}>
       {status === 'LookingForGame' && (
         <p className="mb-3 rounded-lg border border-border bg-surface-raised p-3 text-xs text-muted">
-          You're looking for a game. Manage that on Find Players.
+          {t('statusModal.lookingForGameNotice')}
         </p>
       )}
 
       <div className="flex flex-col gap-2">
-        {statusOptions.map(({ value, label, description, icon: Icon }) => (
+        {statusOptions.map(({ value, labelKey, descriptionKey, icon: Icon }) => (
           <button
             key={value}
             type="button"
@@ -59,8 +61,8 @@ export function StatusModal({ onClose }: StatusModalProps) {
           >
             <Icon className="h-5 w-5 shrink-0 text-muted" aria-hidden="true" />
             <span>
-              <span className="block text-sm font-medium text-text">{label}</span>
-              <span className="block text-xs text-muted">{description}</span>
+              <span className="block text-sm font-medium text-text">{t(labelKey)}</span>
+              <span className="block text-xs text-muted">{t(descriptionKey)}</span>
             </span>
           </button>
         ))}
@@ -70,10 +72,10 @@ export function StatusModal({ onClose }: StatusModalProps) {
 
       <div className="mt-5 flex justify-end gap-2">
         <Button variant="secondary" onClick={onClose} disabled={isSaving}>
-          Cancel
+          {t('statusModal.cancel')}
         </Button>
         <Button onClick={handleSave} disabled={isSaving}>
-          {isSaving ? 'Saving...' : 'Save'}
+          {isSaving ? t('statusModal.saving') : t('statusModal.save')}
         </Button>
       </div>
     </Modal>

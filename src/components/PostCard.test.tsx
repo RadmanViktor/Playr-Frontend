@@ -17,6 +17,7 @@ const base: PostFeedItem = {
   id: 'p1', authorId: 'a1', authorUsername: 'nexusnova', authorDisplayName: 'NexusNova',
   authorAvatarUrl: null, gameId: 'g1', gameName: 'Elden Ring', gameCoverImageUrl: null,
   textContent: 'Finally beat Radahn!', mood: 'Enjoying',
+  scope: 'Feed',
   media: [],
   createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
   likesCount: 0, likedByCurrentUser: false, commentsCount: 0, mentions: [],

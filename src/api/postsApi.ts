@@ -2,6 +2,8 @@ import { API_BASE_URL, ApiError, parseErrorMessage } from './http'
 
 export type Mood = 'Enjoying' | 'Frustrated' | 'Completed' | 'NeedHelp'
 
+export type PostScope = 'Feed' | 'Profile'
+
 // Lives in ./http next to API_BASE_URL; re-exported here for existing callers.
 export { resolveMediaUrl } from './http'
 
@@ -29,6 +31,7 @@ export interface PostFeedItem {
   gameCoverImageUrl: string | null
   textContent: string
   mood: string | null
+  scope: PostScope
   media: PostMediaItem[]
   createdAt: string
   likesCount: number
@@ -39,13 +42,14 @@ export interface PostFeedItem {
 
 export async function createPost(
   token: string,
-  data: { gameId: string; textContent: string; mood?: string | null; media?: File[]; mentionedUserIds?: string[] },
+  data: { gameId: string; textContent: string; mood?: string | null; media?: File[]; mentionedUserIds?: string[]; scope?: PostScope },
   onProgress?: (percent: number) => void
 ): Promise<PostFeedItem> {
   const form = new FormData()
   form.append('GameId', data.gameId)
   form.append('TextContent', data.textContent)
   if (data.mood) form.append('Mood', data.mood)
+  if (data.scope) form.append('Scope', data.scope)
   for (const file of data.media ?? []) form.append('Media', file)
   for (const userId of data.mentionedUserIds ?? []) form.append('MentionedUserIds', userId)
 

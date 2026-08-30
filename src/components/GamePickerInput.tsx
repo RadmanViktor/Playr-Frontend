@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ChevronDown, Gamepad2, Loader2, RefreshCw } from 'lucide-react'
 import { createGame, searchExternalGames, type ExternalGameSearchResult, type Game } from '../api/gamesApi'
 import { resolveMediaUrl } from '../api/http'
@@ -17,6 +18,7 @@ interface GamePickerInputProps {
 }
 
 export function GamePickerInput({ games, value, onChange, error, onRetry, disabled, onGameAdded }: GamePickerInputProps) {
+  const { t } = useTranslation('componentsB')
   const { token } = useAuth()
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
@@ -65,7 +67,7 @@ export function GamePickerInput({ games, value, onChange, error, onRetry, disabl
           if (!cancelled) setExternalResults(r)
         })
         .catch(() => {
-          if (!cancelled) setExternalError('Failed to search games.')
+          if (!cancelled) setExternalError(t('gamePickerInput.searchError'))
         })
         .finally(() => {
           if (!cancelled) setExternalSearching(false)
@@ -114,7 +116,7 @@ export function GamePickerInput({ games, value, onChange, error, onRetry, disabl
       onGameAdded?.(game)
       selectGame(game.id)
     } catch {
-      setExternalError('Failed to add game. Please try again.')
+      setExternalError(t('gamePickerInput.addError'))
     } finally {
       setAddingRawgId(null)
     }
@@ -162,7 +164,7 @@ export function GamePickerInput({ games, value, onChange, error, onRetry, disabl
             className="flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-text hover:bg-border cursor-pointer"
           >
             <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
-            Try again
+            {t('gamePickerInput.tryAgain')}
           </button>
         )}
       </div>
@@ -173,7 +175,7 @@ export function GamePickerInput({ games, value, onChange, error, onRetry, disabl
     <div className="relative" ref={containerRef}>
       <button
         type="button"
-        aria-label="Select a game"
+        aria-label={t('gamePickerInput.selectGameAriaLabel')}
         aria-expanded={open}
         disabled={disabled}
         onClick={() => setOpen((o) => !o)}
@@ -185,7 +187,7 @@ export function GamePickerInput({ games, value, onChange, error, onRetry, disabl
         ) : (
           <Gamepad2 className="h-5 w-5 text-muted" aria-hidden="true" />
         )}
-        <span className="flex-1 truncate text-sm">{selectedGame ? selectedGame.name : 'Select a game'}</span>
+        <span className="flex-1 truncate text-sm">{selectedGame ? selectedGame.name : t('gamePickerInput.selectGamePlaceholder')}</span>
         <ChevronDown className="h-4 w-4 text-muted" aria-hidden="true" />
       </button>
 
@@ -196,8 +198,8 @@ export function GamePickerInput({ games, value, onChange, error, onRetry, disabl
             // the results list below and leaves the picker looking empty.
             autoFocus={!isMobile}
             type="text"
-            aria-label="Search games"
-            placeholder="Search games…"
+            aria-label={t('gamePickerInput.searchGamesAriaLabel')}
+            placeholder={t('gamePickerInput.searchGamesPlaceholder')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -205,7 +207,7 @@ export function GamePickerInput({ games, value, onChange, error, onRetry, disabl
           />
           <div className="max-h-56 overflow-y-auto">
             {filteredGames.length === 0 && filteredExternalResults.length === 0 && !externalSearching ? (
-              <p className="px-3 py-2 text-sm text-muted">No games found.</p>
+              <p className="px-3 py-2 text-sm text-muted">{t('gamePickerInput.noGamesFound')}</p>
             ) : (
               <>
                 {filteredGames.map((game, index) => (
@@ -258,7 +260,7 @@ export function GamePickerInput({ games, value, onChange, error, onRetry, disabl
             {externalSearching && (
               <div className="flex items-center gap-2 px-3 py-2 text-sm text-muted">
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                Searching…
+                {t('gamePickerInput.searching')}
               </div>
             )}
 

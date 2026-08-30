@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Gamepad2, Loader2, Plus, Trash2 } from 'lucide-react'
 import {
   addGameToLibrary,
@@ -20,6 +21,7 @@ interface MyGamesLibraryProps {
 }
 
 export function MyGamesLibrary({ username, isOwner }: MyGamesLibraryProps) {
+  const { t } = useTranslation('componentsB')
   const { token } = useAuth()
   const [entries, setEntries] = useState<GameLibraryEntry[] | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -31,7 +33,7 @@ export function MyGamesLibrary({ username, isOwner }: MyGamesLibraryProps) {
     setError(null)
     getGameLibrary(username)
       .then(setEntries)
-      .catch(() => setError('Failed to load games.'))
+      .catch(() => setError(t('myGamesLibrary.loadError')))
   }, [username])
 
   async function handleGameAdded(game: Game) {
@@ -41,7 +43,7 @@ export function MyGamesLibrary({ username, isOwner }: MyGamesLibraryProps) {
       const entry = await addGameToLibrary(token, game.id)
       setEntries((current) => [entry, ...(current ?? [])])
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Failed to add game.')
+      setError(err instanceof ApiError ? err.message : t('myGamesLibrary.addError'))
     }
   }
 
@@ -53,7 +55,7 @@ export function MyGamesLibrary({ username, isOwner }: MyGamesLibraryProps) {
       const updated = await rateGame(token, gameId, rating, reviewText)
       setEntries((current) => current?.map((e) => (e.gameId === gameId ? updated : e)) ?? null)
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Failed to save rating.')
+      setError(err instanceof ApiError ? err.message : t('myGamesLibrary.rateError'))
     } finally {
       setBusyGameId(null)
     }
@@ -67,13 +69,13 @@ export function MyGamesLibrary({ username, isOwner }: MyGamesLibraryProps) {
       await removeGameFromLibrary(token, gameId)
       setEntries((current) => current?.filter((e) => e.gameId !== gameId) ?? null)
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Failed to remove game.')
+      setError(err instanceof ApiError ? err.message : t('myGamesLibrary.removeError'))
     } finally {
       setBusyGameId(null)
     }
   }
 
-  if (entries === null && !error) return <p className="text-muted">Loading…</p>
+  if (entries === null && !error) return <p className="text-muted">{t('myGamesLibrary.loading')}</p>
   if (error && entries === null) return <p className="text-frustrated">{error}</p>
 
   return (
@@ -85,7 +87,7 @@ export function MyGamesLibrary({ username, isOwner }: MyGamesLibraryProps) {
           className="flex w-fit items-center gap-2 rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm font-medium text-primary hover:bg-border cursor-pointer"
         >
           <Plus className="h-4 w-4" aria-hidden="true" />
-          Add a game
+          {t('myGamesLibrary.addGame')}
         </button>
       )}
 
@@ -93,7 +95,7 @@ export function MyGamesLibrary({ username, isOwner }: MyGamesLibraryProps) {
 
       {entries !== null && entries.length === 0 ? (
         <p className="text-muted">
-          {isOwner ? "You haven't added any games yet." : 'No games added yet.'}
+          {isOwner ? t('myGamesLibrary.emptyOwner') : t('myGamesLibrary.emptyOther')}
         </p>
       ) : (
         <ul className="flex flex-col gap-3">
@@ -119,7 +121,7 @@ export function MyGamesLibrary({ username, isOwner }: MyGamesLibraryProps) {
                 {isOwner && (
                   <button
                     type="button"
-                    aria-label={`Remove ${entry.gameName} from library`}
+                    aria-label={t('myGamesLibrary.removeFromLibraryAriaLabel', { gameName: entry.gameName })}
                     disabled={busyGameId === entry.gameId}
                     onClick={() => handleRemove(entry.gameId)}
                     className="rounded-lg p-1.5 text-muted hover:bg-border hover:text-frustrated disabled:opacity-50 cursor-pointer"
@@ -162,6 +164,7 @@ interface RatingEditorProps {
 }
 
 function RatingEditor({ entry, disabled, onSave }: RatingEditorProps) {
+  const { t } = useTranslation('componentsB')
   const [rating, setRating] = useState(entry.rating ?? 0)
   const [reviewText, setReviewText] = useState(entry.reviewText ?? '')
   const isDirty = rating !== (entry.rating ?? 0) || reviewText !== (entry.reviewText ?? '')
@@ -172,7 +175,7 @@ function RatingEditor({ entry, disabled, onSave }: RatingEditorProps) {
       <textarea
         value={reviewText}
         onChange={(e) => setReviewText(e.target.value)}
-        placeholder="Write a review (optional)…"
+        placeholder={t('myGamesLibrary.reviewPlaceholder')}
         rows={2}
         maxLength={1000}
         className="w-full resize-none rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text outline-none focus:border-primary placeholder:text-muted"
@@ -185,7 +188,7 @@ function RatingEditor({ entry, disabled, onSave }: RatingEditorProps) {
           className="flex w-fit items-center gap-2 rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50 cursor-pointer"
         >
           {disabled && <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />}
-          Save rating
+          {t('myGamesLibrary.saveRating')}
         </button>
       )}
     </div>

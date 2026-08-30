@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import type { TFunction } from 'i18next'
 import { X, Upload } from 'lucide-react'
 
 const ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.gif']
@@ -6,20 +8,20 @@ const ALLOWED_VIDEO_EXTENSIONS = ['.mp4', '.webm', '.mov']
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024
 const MAX_VIDEO_BYTES = 100 * 1024 * 1024
 
-export function validateMediaFile(file: File): string | null {
+export function validateMediaFile(file: File, t: TFunction): string | null {
   const extension = file.name.slice(file.name.lastIndexOf('.')).toLowerCase()
 
   if (ALLOWED_IMAGE_EXTENSIONS.includes(extension)) {
-    if (file.size > MAX_IMAGE_BYTES) return 'Images cannot be larger than 10 MB.'
+    if (file.size > MAX_IMAGE_BYTES) return t('mediaUploadInput.errors.imageTooLarge')
     return null
   }
 
   if (ALLOWED_VIDEO_EXTENSIONS.includes(extension)) {
-    if (file.size > MAX_VIDEO_BYTES) return 'Videos cannot be larger than 100 MB.'
+    if (file.size > MAX_VIDEO_BYTES) return t('mediaUploadInput.errors.videoTooLarge')
     return null
   }
 
-  return 'Unsupported file type. Allowed: jpg, jpeg, png, webp, gif, mp4, webm, mov.'
+  return t('mediaUploadInput.errors.unsupportedType')
 }
 
 export function isVideoFile(file: File): boolean {
@@ -48,6 +50,7 @@ export function MediaUploadInput({
   error = null,
   onError,
 }: MediaUploadInputProps) {
+  const { t } = useTranslation('componentsA')
   const inputRef = useRef<HTMLInputElement>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [isDragOver, setIsDragOver] = useState(false)
@@ -67,7 +70,7 @@ export function MediaUploadInput({
       onFileChange(null)
       return
     }
-    const validationError = validateMediaFile(selected)
+    const validationError = validateMediaFile(selected, t)
     if (validationError) {
       onError?.(validationError)
       onFileChange(null)
@@ -92,11 +95,11 @@ export function MediaUploadInput({
           {isVideoFile(file) ? (
             <video src={previewUrl} controls className="max-h-64 rounded-lg" />
           ) : (
-            <img src={previewUrl} alt="Selected media preview" className="max-h-64 rounded-lg" />
+            <img src={previewUrl} alt={t('mediaUploadInput.selectedPreviewAlt')} className="max-h-64 rounded-lg" />
           )}
           <button
             type="button"
-            aria-label="Remove selected file"
+            aria-label={t('mediaUploadInput.removeSelectedFileAriaLabel')}
             onClick={clearFile}
             className="absolute -right-2 -top-2 rounded-full bg-surface p-1 text-text shadow cursor-pointer"
           >
@@ -108,11 +111,11 @@ export function MediaUploadInput({
           {existingMediaType === 'Video' ? (
             <video src={existingMediaUrl!} controls className="max-h-64 rounded-lg" />
           ) : (
-            <img src={existingMediaUrl!} alt="Post media" className="max-h-64 rounded-lg" />
+            <img src={existingMediaUrl!} alt={t('mediaUploadInput.postMediaAlt')} className="max-h-64 rounded-lg" />
           )}
           <button
             type="button"
-            aria-label="Remove media"
+            aria-label={t('mediaUploadInput.removeMediaAriaLabel')}
             onClick={() => onRemoveExistingChange?.(true)}
             className="absolute -right-2 -top-2 rounded-full bg-surface p-1 text-text shadow cursor-pointer"
           >
@@ -137,12 +140,12 @@ export function MediaUploadInput({
           }`}
         >
           <Upload className="h-4 w-4" aria-hidden="true" />
-          Add photo or video, or drag & drop
+          {t('mediaUploadInput.addMediaLabel')}
           <input
             ref={inputRef}
             type="file"
             accept="image/*,video/*"
-            aria-label="Upload photo or video"
+            aria-label={t('mediaUploadInput.uploadAriaLabel')}
             className="hidden"
             onChange={(e) => {
               onRemoveExistingChange?.(false)

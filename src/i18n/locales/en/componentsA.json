@@ -1,0 +1,136 @@
+{
+  "createPostModal": {
+    "title": "Create Post",
+    "titleProfile": "Create Profile Post",
+    "close": "Close",
+    "discardConfirm": "Discard this post? Your text and media will be lost.",
+    "discard": "Discard",
+    "keepEditing": "Keep editing",
+    "gameLabel": "Game",
+    "moodLabel": "Mood (optional)",
+    "textLabel": "What happened?",
+    "postTextAriaLabel": "Post text",
+    "charCount": "{{count}} / {{max}}",
+    "postButton": "Post",
+    "posting": "Posting…",
+    "errors": {
+      "loadGamesFailed": "Failed to load games.",
+      "selectGame": "Please select a game.",
+      "textRequired": "Post text is required.",
+      "textTooLong": "Post text cannot be longer than 1000 characters.",
+      "genericError": "Something went wrong."
+    }
+  },
+  "commentsSection": {
+    "loading": "Loading comments…",
+    "empty": "No comments yet.",
+    "loadMore": "Load more comments",
+    "loadingMore": "Loading…",
+    "writeCommentAriaLabel": "Write a comment",
+    "writeCommentPlaceholder": "Write a comment…",
+    "commentButton": "Comment",
+    "posting": "Posting…",
+    "errors": {
+      "loadFailed": "Failed to load comments.",
+      "postFailed": "Failed to post comment."
+    }
+  },
+  "commentItem": {
+    "editAriaLabel": "Edit comment text",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "optionsAriaLabel": "Comment options",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleting": "Deleting…",
+    "timeAgo": {
+      "minutes": "{{count}}m ago",
+      "hours": "{{count}}h ago",
+      "days": "{{count}}d ago"
+    },
+    "errors": {
+      "reactionFailed": "Failed to update reaction.",
+      "updateFailed": "Failed to update comment.",
+      "deleteFailed": "Failed to delete comment."
+    }
+  },
+  "commentReactions": {
+    "reactAriaLabel": "React to comment",
+    "removeReactionAriaLabel": "Remove {{type}} reaction"
+  },
+  "postCard": {
+    "mood": {
+      "none": "None",
+      "enjoying": "Enjoying",
+      "needHelp": "Need Help",
+      "frustrated": "Frustrated",
+      "completed": "Completed"
+    },
+    "optionsAriaLabel": "Post options",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "deleteConfirm": "Delete this post?",
+    "confirmDeleteAriaLabel": "Confirm delete",
+    "deleting": "Deleting…",
+    "editPostAriaLabel": "Edit post text",
+    "charCount": "{{count}} / {{max}}",
+    "hideCommentsAriaLabel": "Hide comments",
+    "showCommentsAriaLabel": "Show comments",
+    "unlikePostAriaLabel": "Unlike post",
+    "likePostAriaLabel": "Like post",
+    "timeAgo": {
+      "minutes": "{{count}}m ago",
+      "hours": "{{count}}h ago",
+      "days": "{{count}}d ago"
+    },
+    "errors": {
+      "updateFailed": "Failed to update post.",
+      "deleteFailed": "Failed to delete post."
+    }
+  },
+  "postMediaCarousel": {
+    "openMediaAriaLabel": "Open media",
+    "previousImageAriaLabel": "Previous image",
+    "nextImageAriaLabel": "Next image",
+    "postMediaAlt": "Post media",
+    "counter": "{{current}}/{{total}}"
+  },
+  "mediaLightbox": {
+    "close": "Close",
+    "previousImageAriaLabel": "Previous image",
+    "nextImageAriaLabel": "Next image",
+    "postMediaAlt": "Post media"
+  },
+  "mediaUploadInput": {
+    "removeSelectedFileAriaLabel": "Remove selected file",
+    "removeMediaAriaLabel": "Remove media",
+    "selectedPreviewAlt": "Selected media preview",
+    "postMediaAlt": "Post media",
+    "addMediaLabel": "Add photo or video, or drag & drop",
+    "uploadAriaLabel": "Upload photo or video",
+    "errors": {
+      "imageTooLarge": "Images cannot be larger than 10 MB.",
+      "videoTooLarge": "Videos cannot be larger than 100 MB.",
+      "unsupportedType": "Unsupported file type. Allowed: jpg, jpeg, png, webp, gif, mp4, webm, mov."
+    }
+  },
+  "mediaGalleryUploadInput": {
+    "undo": "Undo",
+    "removeMediaAriaLabel": "Remove media",
+    "removeSelectedFileAriaLabel": "Remove selected file",
+    "postMediaAlt": "Post media",
+    "selectedPreviewAlt": "Selected media preview",
+    "addMediaLabel": "Add photos or a video, or drag & drop",
+    "addMoreLabel": "Add more ({{count}} left)",
+    "uploadAriaLabel": "Upload photos or video",
+    "errors": {
+      "singleVideoOnly": "A post can only contain a single video, or up to 5 images.",
+      "singleVideoOnlyNotBoth": "A post can only contain a single video, or up to 5 images, not both.",
+      "maxImages": "You can add up to {{max}} images per post."
+    }
+  }
+}

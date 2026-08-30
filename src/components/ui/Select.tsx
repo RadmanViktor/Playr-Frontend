@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { ChevronDown } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 export interface SelectOption {
   value: string
@@ -22,12 +23,14 @@ export function Select({
   options,
   value,
   onChange,
-  placeholder = 'Select…',
+  placeholder,
   id,
   className = '',
   disabled,
   ...rest
 }: SelectProps) {
+  const { t } = useTranslation('ui')
+  const resolvedPlaceholder = placeholder ?? t('select.placeholder')
   const [open, setOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -57,7 +60,7 @@ export function Select({
         {...rest}
       >
         <span className={`flex-1 truncate ${selected ? '' : 'text-muted'}`}>
-          {selected ? selected.label : placeholder}
+          {selected ? selected.label : resolvedPlaceholder}
         </span>
         <ChevronDown className="h-4 w-4 shrink-0 text-muted" aria-hidden="true" />
       </button>

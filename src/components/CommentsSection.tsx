@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Button } from './ui/Button'
 import { CommentItem } from './CommentItem'
 import { EmojiPickerButton } from './EmojiPickerButton'
@@ -17,6 +18,7 @@ interface CommentsSectionProps {
 }
 
 export function CommentsSection({ postId, currentUserId, onCountChange, highlightCommentId }: CommentsSectionProps) {
+  const { t } = useTranslation('componentsA')
   const [comments, setComments] = useState<CommentItemType[]>([])
   const [hasMore, setHasMore] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
@@ -42,7 +44,7 @@ export function CommentsSection({ postId, currentUserId, onCountChange, highligh
       })
       .catch((err) => {
         if (cancelled) return
-        setLoadError(err instanceof ApiError ? err.message : 'Failed to load comments.')
+        setLoadError(err instanceof ApiError ? err.message : t('commentsSection.errors.loadFailed'))
       })
       .finally(() => {
         if (!cancelled) setIsLoading(false)
@@ -78,7 +80,7 @@ export function CommentsSection({ postId, currentUserId, onCountChange, highligh
       setComments((prev) => [...prev, ...result.items])
       setHasMore(result.hasMore)
     } catch (err) {
-      setLoadError(err instanceof ApiError ? err.message : 'Failed to load comments.')
+      setLoadError(err instanceof ApiError ? err.message : t('commentsSection.errors.loadFailed'))
     } finally {
       setIsLoadingMore(false)
     }
@@ -102,7 +104,7 @@ export function CommentsSection({ postId, currentUserId, onCountChange, highligh
       setNewMentions([])
       onCountChange(1)
     } catch (err) {
-      setPostError(err instanceof ApiError ? err.message : 'Failed to post comment.')
+      setPostError(err instanceof ApiError ? err.message : t('commentsSection.errors.postFailed'))
     } finally {
       setIsPosting(false)
     }
@@ -131,11 +133,11 @@ export function CommentsSection({ postId, currentUserId, onCountChange, highligh
 
   return (
     <div className="flex flex-col gap-3 border-t border-border pt-3">
-      {isLoading && <p className="text-xs text-muted">Loading comments…</p>}
+      {isLoading && <p className="text-xs text-muted">{t('commentsSection.loading')}</p>}
       {loadError && <p className="text-frustrated text-xs">{loadError}</p>}
 
       {!isLoading && comments.length === 0 && !loadError && (
-        <p className="text-xs text-muted">No comments yet.</p>
+        <p className="text-xs text-muted">{t('commentsSection.empty')}</p>
       )}
 
       {comments.map((comment) => (
@@ -162,15 +164,15 @@ export function CommentsSection({ postId, currentUserId, onCountChange, highligh
 
       {hasMore && (
         <Button size="sm" variant="ghost" onClick={loadMore} disabled={isLoadingMore}>
-          {isLoadingMore ? 'Loading…' : 'Load more comments'}
+          {isLoadingMore ? t('commentsSection.loadingMore') : t('commentsSection.loadMore')}
         </Button>
       )}
 
       {currentUserId != null && (
         <form onSubmit={handlePost} className="flex flex-col gap-2">
           <MentionInput
-            ariaLabel="Write a comment"
-            placeholder="Write a comment…"
+            ariaLabel={t('commentsSection.writeCommentAriaLabel')}
+            placeholder={t('commentsSection.writeCommentPlaceholder')}
             className="w-full rounded-lg border border-border bg-surface-raised px-3 py-2 pr-10 text-sm text-text resize-none h-16 outline-none focus:border-primary"
             value={newText}
             mentions={newMentions}
@@ -187,7 +189,7 @@ export function CommentsSection({ postId, currentUserId, onCountChange, highligh
           />
           {postError && <p className="text-frustrated text-xs">{postError}</p>}
           <Button type="submit" size="sm" disabled={isPosting || newText.trim().length === 0} className="self-end mt-1">
-            {isPosting ? 'Posting…' : 'Comment'}
+            {isPosting ? t('commentsSection.posting') : t('commentsSection.commentButton')}
           </Button>
         </form>
       )}

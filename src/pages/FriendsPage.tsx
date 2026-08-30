@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Card } from '../components/ui/Card'
 import { Avatar, type AvatarStatus } from '../components/ui/Avatar'
 import { Button } from '../components/ui/Button'
@@ -24,6 +25,7 @@ const statusAvatarMap: Record<ProfileStatus, AvatarStatus> = {
 }
 
 export default function FriendsPage() {
+  const { t } = useTranslation('pagesA')
   const { token } = useAuth()
   const { openChatWithUser, error: chatError } = useChat()
   const navigate = useNavigate()
@@ -42,7 +44,7 @@ export default function FriendsPage() {
     setError(null)
     getFriends(token)
       .then(setFriends)
-      .catch(() => setError('Failed to load friends.'))
+      .catch(() => setError(t('friends.loadError')))
       .finally(() => setIsLoading(false))
   }
 
@@ -100,7 +102,7 @@ export default function FriendsPage() {
       setIncomingRequests((prev) => prev.filter((r) => r.id !== request.id))
       reloadFriends()
     } catch (err) {
-      setRequestActionError(err instanceof ApiError ? err.message : 'Failed to accept friend request.')
+      setRequestActionError(err instanceof ApiError ? err.message : t('friends.acceptError'))
     } finally {
       setRespondingRequestId(null)
     }
@@ -114,7 +116,7 @@ export default function FriendsPage() {
       await declineFriendRequest(token, request.id)
       setIncomingRequests((prev) => prev.filter((r) => r.id !== request.id))
     } catch (err) {
-      setRequestActionError(err instanceof ApiError ? err.message : 'Failed to decline friend request.')
+      setRequestActionError(err instanceof ApiError ? err.message : t('friends.declineError'))
     } finally {
       setRespondingRequestId(null)
     }
@@ -123,16 +125,16 @@ export default function FriendsPage() {
   return (
     <div className="flex flex-col gap-4">
       <div className="mb-2 border-l-4 border-primary pl-4">
-        <p className="mb-1 text-xs font-semibold uppercase tracking-[0.22em] text-primary">Your crew</p>
-        <h1 className="text-3xl font-bold tracking-tight text-text">Friends</h1>
+        <p className="mb-1 text-xs font-semibold uppercase tracking-[0.22em] text-primary">{t('friends.eyebrow')}</p>
+        <h1 className="text-3xl font-bold tracking-tight text-text">{t('friends.title')}</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-          The players you've connected with. Jump into a chat or check out their profile whenever you're ready to play.
+          {t('friends.subtitle')}
         </p>
       </div>
 
       {!isLoadingRequests && incomingRequests.length > 0 && (
         <div className="flex flex-col gap-2">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">Friend requests</h2>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">{t('friends.friendRequests')}</h2>
           {requestActionError && <p className="text-sm text-frustrated">{requestActionError}</p>}
           {incomingRequests.map((request) => (
             <Card key={request.id} className="flex flex-wrap items-center justify-between gap-4">
@@ -150,14 +152,14 @@ export default function FriendsPage() {
                   onClick={() => handleDeclineRequest(request)}
                   disabled={respondingRequestId === request.id}
                 >
-                  Decline
+                  {t('friends.decline')}
                 </Button>
                 <Button
                   size="sm"
                   onClick={() => handleAcceptRequest(request)}
                   disabled={respondingRequestId === request.id}
                 >
-                  {respondingRequestId === request.id ? 'Working...' : 'Accept'}
+                  {respondingRequestId === request.id ? t('friends.working') : t('friends.accept')}
                 </Button>
               </div>
             </Card>
@@ -166,11 +168,11 @@ export default function FriendsPage() {
       )}
 
       {chatError && <p className="text-sm text-frustrated">{chatError}</p>}
-      {isLoading && <p className="text-muted">Loading friends...</p>}
+      {isLoading && <p className="text-muted">{t('friends.loading')}</p>}
       {error && <p className="text-frustrated">{error}</p>}
       {!isLoading && !error && friends.length === 0 && (
         <Card>
-          <p className="text-muted">No friends yet. Accept an invite or find players to connect with.</p>
+          <p className="text-muted">{t('friends.emptyState')}</p>
         </Card>
       )}
 
@@ -195,7 +197,7 @@ export default function FriendsPage() {
           </button>
           <div className="flex shrink-0 gap-2">
             <Button size="sm" onClick={() => handleOpenChat(friend)}>
-              Chat
+              {t('friends.chat')}
             </Button>
           </div>
         </Card>

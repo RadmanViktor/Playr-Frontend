@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
+import type { TFunction } from 'i18next'
 import { Link } from 'react-router-dom'
 import { Avatar } from './ui/Avatar'
 import { Badge } from './ui/Badge'
@@ -20,23 +22,33 @@ import type { ComponentProps } from 'react'
 type BadgeVariant = ComponentProps<typeof Badge>['variant']
 type CardState = 'read' | 'menu-open' | 'editing' | 'confirming-delete'
 
-function moodBadge(mood: string | null): { label: string; variant: BadgeVariant } | null {
+function moodBadge(mood: string | null, t: TFunction): { label: string; variant: BadgeVariant } | null {
   switch (mood) {
-    case 'Enjoying':   return { label: 'Enjoying',   variant: 'enjoying'   }
-    case 'NeedHelp':   return { label: 'Need Help',  variant: 'need-help'  }
-    case 'Frustrated': return { label: 'Frustrated', variant: 'frustrated' }
-    case 'Completed':  return { label: 'Completed',  variant: 'completed'  }
+    case 'Enjoying':   return { label: t('postCard.mood.enjoying'),   variant: 'enjoying'   }
+    case 'NeedHelp':   return { label: t('postCard.mood.needHelp'),  variant: 'need-help'  }
+    case 'Frustrated': return { label: t('postCard.mood.frustrated'), variant: 'frustrated' }
+    case 'Completed':  return { label: t('postCard.mood.completed'),  variant: 'completed'  }
     default: return null
   }
 }
 
-function formatRelativeTime(createdAt: string): string {
+function moodLabel(mood: string, t: TFunction): string {
+  switch (mood) {
+    case 'Enjoying': return t('postCard.mood.enjoying')
+    case 'Need Help': return t('postCard.mood.needHelp')
+    case 'Frustrated': return t('postCard.mood.frustrated')
+    case 'Completed': return t('postCard.mood.completed')
+    default: return t('postCard.mood.none')
+  }
+}
+
+function formatRelativeTime(createdAt: string, t: TFunction): string {
   const diffMs = Date.now() - new Date(createdAt).getTime()
   const diffMin = Math.floor(diffMs / 60_000)
-  if (diffMin < 60) return `${Math.max(diffMin, 1)}m ago`
+  if (diffMin < 60) return t('postCard.timeAgo.minutes', { count: Math.max(diffMin, 1) })
   const diffH = Math.floor(diffMin / 60)
-  if (diffH < 24) return `${diffH}h ago`
-  return `${Math.floor(diffH / 24)}d ago`
+  if (diffH < 24) return t('postCard.timeAgo.hours', { count: diffH })
+  return t('postCard.timeAgo.days', { count: Math.floor(diffH / 24) })
 }
 
 interface PostCardProps {
@@ -49,6 +61,7 @@ interface PostCardProps {
 }
 
 export function PostCard({ post, currentUserId, onDelete, onUpdate, defaultCommentsOpen = false, highlightCommentId }: PostCardProps) {
+  const { t } = useTranslation('componentsA')
   const { token } = useAuth()
   const [state, setState] = useState<CardState>('read')
   const [editText, setEditText] = useState(post.textContent)
@@ -67,7 +80,7 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate, defaultComme
   const menuRef = useRef<HTMLDivElement>(null)
 
   const isOwner = currentUserId != null && currentUserId === post.authorId
-  const badge = moodBadge(post.mood)
+  const badge = moodBadge(post.mood, t)
 
   // Close menu on outside click
   useEffect(() => {
@@ -98,7 +111,7 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate, defaultComme
       onUpdate?.(updated)
       setState('read')
     } catch (err) {
-      setActionError(err instanceof ApiError ? err.message : 'Failed to update post.')
+      setActionError(err instanceof ApiError ? err.message : t('postCard.errors.updateFailed'))
     } finally {
       setIsSaving(false)
     }
@@ -111,7 +124,7 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate, defaultComme
       await deletePost(token ?? '', post.id)
       onDelete?.(post.id)
     } catch (err) {
-      setActionError(err instanceof ApiError ? err.message : 'Failed to delete post.')
+      setActionError(err instanceof ApiError ? err.message : t('postCard.errors.deleteFailed'))
       setIsDeleting(false)
     }
   }
@@ -169,7 +182,7 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate, defaultComme
           {isOwner && (state === 'read' || state === 'menu-open') && (
             <div className="relative" ref={menuRef}>
               <IconButton
-                aria-label="Post options"
+                aria-label={t('postCard.optionsAriaLabel')}
                 onClick={() => setState(state === 'menu-open' ? 'read' : 'menu-open')}
               >
                 <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
@@ -180,13 +193,13 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate, defaultComme
                     className="w-full px-4 py-2 text-left text-sm text-text hover:bg-border rounded-t-lg cursor-pointer"
                     onClick={openEdit}
                   >
-                    Edit
+                    {t('postCard.edit')}
                   </button>
                   <button
                     className="w-full px-4 py-2 text-left text-sm text-frustrated hover:bg-border rounded-b-lg cursor-pointer"
                     onClick={() => { setActionError(null); setState('confirming-delete') }}
                   >
-                    Delete
+                    {t('postCard.delete')}
                   </button>
                 </div>
               )}
@@ -213,7 +226,7 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate, defaultComme
                   editMood === mood ? 'bg-primary text-white' : 'bg-surface-raised text-muted hover:text-text'
                 }`}
               >
-                {mood}
+                {moodLabel(mood, t)}
               </button>
             ))}
           </div>
@@ -230,7 +243,7 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate, defaultComme
               <EmojiPickerButton onSelect={(emoji) => setEditText((t) => t + emoji)} />
             </div>
           </div>
-          <span className="text-xs text-muted self-end">{editText.length} / 1000</span>
+          <span className="text-xs text-muted self-end">{t('postCard.charCount', { count: editText.length, max: 1000 })}</span>
           <MediaGalleryUploadInput
             files={editMediaFiles}
             onFilesChange={setEditMediaFiles}
@@ -243,29 +256,29 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate, defaultComme
           {actionError && <p className="text-frustrated text-xs">{actionError}</p>}
           <div className="flex gap-2">
             <Button size="sm" onClick={handleSave} disabled={isSaving}>
-              {isSaving ? 'Saving…' : 'Save'}
+              {isSaving ? t('postCard.saving') : t('postCard.save')}
             </Button>
             <Button size="sm" variant="ghost" onClick={() => { setState('read'); setActionError(null) }}>
-              Cancel
+              {t('postCard.cancel')}
             </Button>
           </div>
         </div>
       ) : state === 'confirming-delete' ? (
         <div className="flex flex-col gap-3">
-          <p className="text-sm text-text">Delete this post?</p>
+          <p className="text-sm text-text">{t('postCard.deleteConfirm')}</p>
           {actionError && <p className="text-frustrated text-xs">{actionError}</p>}
           <div className="flex gap-2">
             <Button
               size="sm"
-              aria-label="Confirm delete"
+              aria-label={t('postCard.confirmDeleteAriaLabel')}
               className="bg-frustrated hover:bg-frustrated/80 shadow-none"
               onClick={handleDelete}
               disabled={isDeleting}
             >
-              {isDeleting ? 'Deleting…' : 'Delete'}
+              {isDeleting ? t('postCard.deleting') : t('postCard.delete')}
             </Button>
             <Button size="sm" variant="ghost" onClick={() => { setState('read'); setActionError(null) }}>
-              Cancel
+              {t('postCard.cancel')}
             </Button>
           </div>
         </div>
@@ -278,11 +291,11 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate, defaultComme
 
       {/* Timestamp + likes */}
       <div className="flex items-center justify-between">
-        <p className="text-xs text-muted">{formatRelativeTime(post.createdAt)}</p>
+        <p className="text-xs text-muted">{formatRelativeTime(post.createdAt, t)}</p>
         <div className="flex items-center gap-4">
           <button
             onClick={() => setCommentsOpen((open) => !open)}
-            aria-label={commentsOpen ? 'Hide comments' : 'Show comments'}
+            aria-label={commentsOpen ? t('postCard.hideCommentsAriaLabel') : t('postCard.showCommentsAriaLabel')}
             aria-pressed={commentsOpen}
             className="flex items-center gap-1.5 text-xs font-medium text-muted hover:text-text transition-colors cursor-pointer"
           >
@@ -292,7 +305,7 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate, defaultComme
           <button
             onClick={handleToggleLike}
             disabled={currentUserId == null}
-            aria-label={liked ? 'Unlike post' : 'Like post'}
+            aria-label={liked ? t('postCard.unlikePostAriaLabel') : t('postCard.likePostAriaLabel')}
             aria-pressed={liked}
             className={`flex items-center gap-1.5 text-xs font-medium transition-colors cursor-pointer disabled:cursor-default ${
               liked ? 'text-frustrated' : 'text-muted hover:text-frustrated'

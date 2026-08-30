@@ -30,6 +30,13 @@ vi.mock('../context/ChatContext', () => ({
     error: null,
   }),
 }))
+vi.mock('../context/CreatePostModalContext', () => ({
+  useCreatePostModal: () => ({
+    openCreatePost: vi.fn(),
+    closeCreatePost: vi.fn(),
+    subscribePostCreated: vi.fn(() => () => {}),
+  }),
+}))
 
 const profile: profilesApi.ProfileData = {
   userId: 'u1', username: 'player', displayName: 'Player One', bio: 'My bio',

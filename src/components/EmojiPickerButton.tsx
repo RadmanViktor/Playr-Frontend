@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import EmojiPicker, { type EmojiClickData, Theme } from 'emoji-picker-react'
 import { Smile } from 'lucide-react'
 
@@ -7,6 +8,7 @@ interface EmojiPickerButtonProps {
 }
 
 export function EmojiPickerButton({ onSelect }: EmojiPickerButtonProps) {
+  const { t } = useTranslation('componentsB')
   const [open, setOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -30,7 +32,7 @@ export function EmojiPickerButton({ onSelect }: EmojiPickerButtonProps) {
     <div className="relative hidden sm:block" ref={containerRef}>
       <button
         type="button"
-        aria-label="Add emoji"
+        aria-label={t('emojiPickerButton.addEmojiAriaLabel')}
         onClick={() => setOpen((o) => !o)}
         className="flex items-center justify-center rounded-lg p-1.5 text-muted hover:text-text hover:bg-surface-raised cursor-pointer transition-colors"
       >

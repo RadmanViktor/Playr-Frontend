@@ -2,10 +2,10 @@ import { createContext, useCallback, useContext, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { CreatePostModal } from '../components/CreatePostModal'
 import { Toast } from '../components/ui/Toast'
-import type { PostFeedItem } from '../api/postsApi'
+import type { PostFeedItem, PostScope } from '../api/postsApi'
 
 interface CreatePostModalContextValue {
-  openCreatePost: () => void
+  openCreatePost: (scope?: PostScope) => void
   closeCreatePost: () => void
   subscribePostCreated: (callback: (post: PostFeedItem) => void) => () => void
 }
@@ -14,10 +14,14 @@ const CreatePostModalContext = createContext<CreatePostModalContextValue | null>
 
 export function CreatePostModalProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState(false)
+  const [scope, setScope] = useState<PostScope>('Feed')
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const subscribersRef = useRef(new Set<(post: PostFeedItem) => void>())
 
-  const openCreatePost = useCallback(() => setIsOpen(true), [])
+  const openCreatePost = useCallback((nextScope: PostScope = 'Feed') => {
+    setScope(nextScope)
+    setIsOpen(true)
+  }, [])
   const closeCreatePost = useCallback(() => setIsOpen(false), [])
 
   const subscribePostCreated = useCallback((callback: (post: PostFeedItem) => void) => {
@@ -34,7 +38,7 @@ export function CreatePostModalProvider({ children }: { children: ReactNode }) {
   return (
     <CreatePostModalContext.Provider value={{ openCreatePost, closeCreatePost, subscribePostCreated }}>
       {children}
-      {isOpen && <CreatePostModal onClose={closeCreatePost} onPostCreated={handlePostCreated} />}
+      {isOpen && <CreatePostModal scope={scope} onClose={closeCreatePost} onPostCreated={handlePostCreated} />}
       {toastMessage && <Toast message={toastMessage} onDismiss={() => setToastMessage(null)} />}
     </CreatePostModalContext.Provider>
   )

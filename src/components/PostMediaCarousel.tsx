@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { resolveMediaUrl } from '../api/postsApi'
 import type { PostMediaItem } from '../api/postsApi'
@@ -9,6 +10,7 @@ interface PostMediaCarouselProps {
 }
 
 export function PostMediaCarousel({ media }: PostMediaCarouselProps) {
+  const { t } = useTranslation('componentsA')
   const [activeIndex, setActiveIndex] = useState(0)
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -23,14 +25,14 @@ export function PostMediaCarousel({ media }: PostMediaCarouselProps) {
           type="button"
           onClick={() => setLightboxIndex(0)}
           className="w-full cursor-pointer text-left"
-          aria-label="Open media"
+          aria-label={t('postMediaCarousel.openMediaAriaLabel')}
         >
           {item.mediaType === 'Video' ? (
             <video src={resolveMediaUrl(item.url)!} controls className="max-h-96 w-full rounded-lg object-contain" />
           ) : (
             <img
               src={resolveMediaUrl(item.url)!}
-              alt="Post media"
+              alt={t('postMediaCarousel.postMediaAlt')}
               className="max-h-96 w-full rounded-lg object-contain"
             />
           )}
@@ -70,7 +72,7 @@ export function PostMediaCarousel({ media }: PostMediaCarouselProps) {
             type="button"
             onClick={() => setLightboxIndex(index)}
             className="w-full shrink-0 snap-center cursor-pointer text-left"
-            aria-label="Open media"
+            aria-label={t('postMediaCarousel.openMediaAriaLabel')}
           >
             {item.mediaType === 'Video' ? (
               <video
@@ -81,7 +83,7 @@ export function PostMediaCarousel({ media }: PostMediaCarouselProps) {
             ) : (
               <img
                 src={resolveMediaUrl(item.url)!}
-                alt="Post media"
+                alt={t('postMediaCarousel.postMediaAlt')}
                 className="max-h-96 w-full rounded-lg object-contain"
               />
             )}
@@ -92,7 +94,7 @@ export function PostMediaCarousel({ media }: PostMediaCarouselProps) {
       {activeIndex > 0 && (
         <button
           type="button"
-          aria-label="Previous image"
+          aria-label={t('postMediaCarousel.previousImageAriaLabel')}
           onClick={() => scrollToIndex(activeIndex - 1)}
           className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-1.5 text-white opacity-0 transition-opacity cursor-pointer group-hover:opacity-100"
         >
@@ -102,7 +104,7 @@ export function PostMediaCarousel({ media }: PostMediaCarouselProps) {
       {activeIndex < media.length - 1 && (
         <button
           type="button"
-          aria-label="Next image"
+          aria-label={t('postMediaCarousel.nextImageAriaLabel')}
           onClick={() => scrollToIndex(activeIndex + 1)}
           className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-1.5 text-white opacity-0 transition-opacity cursor-pointer group-hover:opacity-100"
         >
@@ -111,7 +113,7 @@ export function PostMediaCarousel({ media }: PostMediaCarouselProps) {
       )}
 
       <div className="absolute right-2 top-2 rounded-full bg-black/50 px-2 py-0.5 text-xs text-white">
-        {activeIndex + 1}/{media.length}
+        {t('postMediaCarousel.counter', { current: activeIndex + 1, total: media.length })}
       </div>
 
       <div className="absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-1.5">

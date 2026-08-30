@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Gamepad2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Card } from '../components/ui/Card'
 import { Avatar } from '../components/ui/Avatar'
 import { Badge } from '../components/ui/Badge'
@@ -13,6 +14,7 @@ import { cancelInvitation } from '../api/invitationsApi'
 import { ApiError } from '../api/http'
 
 export default function FindPlayersPage() {
+  const { t } = useTranslation('pagesA')
   const { token } = useAuth()
   const navigate = useNavigate()
   const [players, setPlayers] = useState<LookingForGamePlayer[]>([])
@@ -31,7 +33,7 @@ export default function FindPlayersPage() {
       const result = await getLookingForGamePlayers(token)
       setPlayers(result)
     } catch {
-      setError('Failed to load players. Please try again.')
+      setError(t('findPlayers.loadError'))
     } finally {
       setIsLoading(false)
     }
@@ -46,7 +48,7 @@ export default function FindPlayersPage() {
     setPlayers((prev) =>
       prev.map((p) => (p.userId === userId ? { ...p, relationshipStatus: 'InvitePending' } : p)),
     )
-    setSuccessMessage(`Invitation sent${player ? ` to ${player.displayName}` : ''}.`)
+    setSuccessMessage(player ? t('findPlayers.invitationSentTo', { name: player.displayName }) : t('findPlayers.invitationSent'))
   }
 
   async function handleCancelInvite(player: LookingForGamePlayer) {
@@ -60,10 +62,10 @@ export default function FindPlayersPage() {
           p.userId === player.userId ? { ...p, relationshipStatus: 'None', pendingInvitationId: null } : p,
         ),
       )
-      setSuccessMessage(`Invitation to ${player.displayName} cancelled.`)
+      setSuccessMessage(t('findPlayers.invitationCancelled', { name: player.displayName }))
     } catch (err) {
       setSuccessMessage(null)
-      setCancelError(err instanceof ApiError ? err.message : 'Failed to cancel invitation.')
+      setCancelError(err instanceof ApiError ? err.message : t('findPlayers.cancelInviteError'))
     } finally {
       setCancellingUserId(null)
     }
@@ -72,7 +74,7 @@ export default function FindPlayersPage() {
   if (isLoading) {
     return (
       <Card>
-        <p className="text-muted">Loading players...</p>
+        <p className="text-muted">{t('findPlayers.loading')}</p>
       </Card>
     )
   }
@@ -88,10 +90,10 @@ export default function FindPlayersPage() {
   return (
     <div className="flex flex-col gap-4">
       <div className="mb-2 border-l-4 border-primary pl-4">
-        <p className="mb-1 text-xs font-semibold uppercase tracking-[0.22em] text-primary">Discover your squad</p>
-        <h1 className="text-2xl font-bold tracking-tight text-text sm:text-3xl">Find Players</h1>
+        <p className="mb-1 text-xs font-semibold uppercase tracking-[0.22em] text-primary">{t('findPlayers.eyebrow')}</p>
+        <h1 className="text-2xl font-bold tracking-tight text-text sm:text-3xl">{t('findPlayers.title')}</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-          Meet new friends and find players ready to squad up.
+          {t('findPlayers.subtitle')}
         </p>
       </div>
 
@@ -111,7 +113,7 @@ export default function FindPlayersPage() {
 
       {players.length === 0 ? (
         <Card>
-          <p className="text-muted">No one is looking for a game right now.</p>
+          <p className="text-muted">{t('findPlayers.emptyState')}</p>
         </Card>
       ) : (
         <div className="flex flex-col gap-2">
@@ -147,7 +149,7 @@ export default function FindPlayersPage() {
               <div className="flex items-center gap-2 sm:shrink-0">
                 {player.relationshipStatus === 'Friends' && (
                   <>
-                    <Badge variant="completed">Friend</Badge>
+                    <Badge variant="completed">{t('findPlayers.friendBadge')}</Badge>
                     <Button
                       size="sm"
                       className="flex-1 sm:flex-none"
@@ -156,13 +158,13 @@ export default function FindPlayersPage() {
                         setInvitePlayer(player)
                       }}
                     >
-                      Invite
+                      {t('findPlayers.invite')}
                     </Button>
                   </>
                 )}
                 {player.relationshipStatus === 'InvitePending' && (
                   <>
-                    <Badge variant="tag">Invited</Badge>
+                    <Badge variant="tag">{t('findPlayers.invitedBadge')}</Badge>
                     {player.pendingInvitationId && (
                       <Button
                         variant="ghost"
@@ -171,7 +173,7 @@ export default function FindPlayersPage() {
                         onClick={() => handleCancelInvite(player)}
                         disabled={cancellingUserId === player.userId}
                       >
-                        {cancellingUserId === player.userId ? 'Cancelling...' : 'Cancel'}
+                        {cancellingUserId === player.userId ? t('findPlayers.cancelling') : t('findPlayers.cancel')}
                       </Button>
                     )}
                   </>
@@ -185,7 +187,7 @@ export default function FindPlayersPage() {
                       setInvitePlayer(player)
                     }}
                   >
-                    Invite
+                    {t('findPlayers.invite')}
                   </Button>
                 )}
               </div>

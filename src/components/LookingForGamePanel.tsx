@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Card } from './ui/Card'
 import { Badge } from './ui/Badge'
 import { Button } from './ui/Button'
@@ -11,14 +12,15 @@ interface LookingForGamePanelProps {
   onChanged: () => void
 }
 
-const playStyleOptions: { value: PlayStyle; label: string; description: string }[] = [
-  { value: 'Competitive', label: 'Competitive', description: 'Ranked, sweaty, trying to win' },
-  { value: 'Chill', label: 'Chill', description: 'Casual, relaxed, just for fun' },
+const playStyleOptions: { value: PlayStyle; labelKey: string; descriptionKey: string }[] = [
+  { value: 'Competitive', labelKey: 'lookingForGamePanel.playStyleCompetitive', descriptionKey: 'lookingForGamePanel.playStyleCompetitiveDescription' },
+  { value: 'Chill', labelKey: 'lookingForGamePanel.playStyleChill', descriptionKey: 'lookingForGamePanel.playStyleChillDescription' },
 ]
 
 const MAX_NOTE_LENGTH = 200
 
 export function LookingForGamePanel({ onChanged }: LookingForGamePanelProps) {
+  const { t } = useTranslation('componentsB')
   const {
     status,
     lookingForGameName,
@@ -45,7 +47,7 @@ export function LookingForGamePanel({ onChanged }: LookingForGamePanelProps) {
         if (!cancelled) setGames(result)
       })
       .catch(() => {
-        if (!cancelled) setGamesError('Failed to load games.')
+        if (!cancelled) setGamesError(t('lookingForGamePanel.loadGamesError'))
       })
     return () => {
       cancelled = true
@@ -57,7 +59,7 @@ export function LookingForGamePanel({ onChanged }: LookingForGamePanelProps) {
   async function handleStart() {
     setError(null)
     if (!selectedGameId || !selectedPlayStyle) {
-      setError('Choose a game and a play style.')
+      setError(t('lookingForGamePanel.chooseGameAndStyle'))
       return
     }
 
@@ -70,7 +72,7 @@ export function LookingForGamePanel({ onChanged }: LookingForGamePanelProps) {
       setIsExpanded(false)
       onChanged()
     } catch {
-      setError('Failed to make you available. Please try again.')
+      setError(t('lookingForGamePanel.startError'))
     } finally {
       setIsSaving(false)
     }
@@ -83,7 +85,7 @@ export function LookingForGamePanel({ onChanged }: LookingForGamePanelProps) {
       await updateStatus('Online', null, null, null)
       onChanged()
     } catch {
-      setError('Failed to stop showing you. Please try again.')
+      setError(t('lookingForGamePanel.stopError'))
     } finally {
       setIsSaving(false)
     }
@@ -93,7 +95,7 @@ export function LookingForGamePanel({ onChanged }: LookingForGamePanelProps) {
     return (
       <Card className="flex flex-col gap-3">
         <div>
-          <p className="text-sm font-semibold text-text">You're available for a game</p>
+          <p className="text-sm font-semibold text-text">{t('lookingForGamePanel.availableTitle')}</p>
           <div className="mt-2 flex flex-wrap items-center gap-1.5">
             {lookingForGameName && <Badge variant="tag">{lookingForGameName}</Badge>}
             {lookingForPlayStyle && (
@@ -107,7 +109,7 @@ export function LookingForGamePanel({ onChanged }: LookingForGamePanelProps) {
         {error && <p className="text-sm text-frustrated">{error}</p>}
         <div>
           <Button variant="secondary" className="w-full sm:w-auto" onClick={handleStop} disabled={isSaving}>
-            {isSaving ? 'Stopping...' : 'Stop showing me'}
+            {isSaving ? t('lookingForGamePanel.stopping') : t('lookingForGamePanel.stopShowingMe')}
           </Button>
         </div>
       </Card>
@@ -118,7 +120,7 @@ export function LookingForGamePanel({ onChanged }: LookingForGamePanelProps) {
     <Card className="flex flex-col gap-3">
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
         <p className="text-sm font-medium text-text">
-          {isExpanded ? 'Make yourself available' : 'Want other players to find you?'}
+          {isExpanded ? t('lookingForGamePanel.makeAvailableTitle') : t('lookingForGamePanel.wantToBeFoundTitle')}
         </p>
         {isExpanded ? (
           <button
@@ -126,11 +128,11 @@ export function LookingForGamePanel({ onChanged }: LookingForGamePanelProps) {
             onClick={() => setIsExpanded(false)}
             className="self-start text-xs font-medium text-muted hover:text-text cursor-pointer"
           >
-            Cancel
+            {t('lookingForGamePanel.cancel')}
           </button>
         ) : (
           <Button size="sm" className="w-full sm:w-auto" onClick={() => setIsExpanded(true)}>
-            Make me available!
+            {t('lookingForGamePanel.makeMeAvailable')}
           </Button>
         )}
       </div>
@@ -146,7 +148,7 @@ export function LookingForGamePanel({ onChanged }: LookingForGamePanelProps) {
           <div className="flex flex-col gap-3 pt-1">
             <div>
               <label htmlFor="lfg-game" className="mb-1 block text-xs font-medium text-muted">
-                Game
+                {t('lookingForGamePanel.gameLabel')}
               </label>
               <GamePickerInput
                 games={games}
@@ -159,21 +161,21 @@ export function LookingForGamePanel({ onChanged }: LookingForGamePanelProps) {
             </div>
 
             <div>
-              <span className="mb-1 block text-xs font-medium text-muted">Play style</span>
+              <span className="mb-1 block text-xs font-medium text-muted">{t('lookingForGamePanel.playStyleLabel')}</span>
               <div className="flex gap-2">
-                {playStyleOptions.map(({ value, label, description }) => (
+                {playStyleOptions.map(({ value, labelKey, descriptionKey }) => (
                   <button
                     key={value}
                     type="button"
                     onClick={() => setSelectedPlayStyle(value)}
-                    title={description}
+                    title={t(descriptionKey)}
                     className={`flex-1 rounded-lg border p-2 text-center text-sm font-medium transition-colors cursor-pointer ${
                       selectedPlayStyle === value
                         ? 'border-primary bg-surface-raised text-text'
                         : 'border-border text-muted hover:bg-surface-raised'
                     }`}
                   >
-                    {label}
+                    {t(labelKey)}
                   </button>
                 ))}
               </div>
@@ -181,13 +183,13 @@ export function LookingForGamePanel({ onChanged }: LookingForGamePanelProps) {
 
             <div>
               <label htmlFor="lfg-note" className="mb-1 block text-xs font-medium text-muted">
-                Note
+                {t('lookingForGamePanel.noteLabel')}
               </label>
               <input
                 id="lfg-note"
                 value={note}
                 onChange={(event) => setNote(event.target.value.slice(0, MAX_NOTE_LENGTH))}
-                placeholder="Anything specific?"
+                placeholder={t('lookingForGamePanel.notePlaceholder')}
                 className="w-full rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm text-text outline-none placeholder:text-muted focus:border-primary"
               />
               <p className="mt-1 text-right text-xs text-muted">{note.length}/{MAX_NOTE_LENGTH}</p>
@@ -197,7 +199,7 @@ export function LookingForGamePanel({ onChanged }: LookingForGamePanelProps) {
 
             <div>
               <Button className="w-full sm:w-auto" onClick={handleStart} disabled={isSaving}>
-                {isSaving ? 'Saving...' : 'Make me available!'}
+                {isSaving ? t('lookingForGamePanel.saving') : t('lookingForGamePanel.makeMeAvailable')}
               </Button>
             </div>
           </div>

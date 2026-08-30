@@ -1,0 +1,176 @@
+{
+  "addGameModal": {
+    "title": "Add a game",
+    "searchAriaLabel": "Search for a game",
+    "searchPlaceholder": "Search for a game…",
+    "searching": "Searching…",
+    "noGamesFound": "No games found.",
+    "searchError": "Failed to search games.",
+    "addError": "Failed to add game. Please try again."
+  },
+  "gamePickerInput": {
+    "tryAgain": "Try again",
+    "selectGameAriaLabel": "Select a game",
+    "selectGamePlaceholder": "Select a game",
+    "searchGamesAriaLabel": "Search games",
+    "searchGamesPlaceholder": "Search games…",
+    "noGamesFound": "No games found.",
+    "searching": "Searching…",
+    "searchError": "Failed to search games.",
+    "addError": "Failed to add game. Please try again."
+  },
+  "myGamesLibrary": {
+    "loadError": "Failed to load games.",
+    "addError": "Failed to add game.",
+    "rateError": "Failed to save rating.",
+    "removeError": "Failed to remove game.",
+    "loading": "Loading…",
+    "addGame": "Add a game",
+    "emptyOwner": "You haven't added any games yet.",
+    "emptyOther": "No games added yet.",
+    "removeFromLibraryAriaLabel": "Remove {{gameName}} from library",
+    "reviewPlaceholder": "Write a review (optional)…",
+    "saveRating": "Save rating"
+  },
+  "steamGamesList": {
+    "loading": "Loading…",
+    "noGames": "No Steam games to show.",
+    "hoursPlayed_one": "{{count}} h",
+    "hoursPlayed_other": "{{count}} h",
+    "minutesPlayed_one": "{{count}} min",
+    "minutesPlayed_other": "{{count}} min"
+  },
+  "steamAchievementsList": {
+    "loadError": "Failed to load achievements.",
+    "titleWithGame": "{{gameName}} – Achievements",
+    "loading": "Loading…",
+    "noAchievements": "No achievements to show for this game.",
+    "unlockedOn": "Unlocked {{date}}"
+  },
+  "steamAccountSection": {
+    "title": "Steam account",
+    "loadError": "Failed to load Steam status.",
+    "linkError": "Failed to start Steam linking.",
+    "unlinkError": "Failed to unlink Steam account.",
+    "publicLibrary": "Public game library",
+    "privateProfile": "Private profile – games cannot be fetched",
+    "unlink": "Unlink",
+    "connectDescription": "Connect your Steam account to show your game library on your profile.",
+    "connect": "Connect Steam"
+  },
+  "lookingForGamePanel": {
+    "playStyleCompetitive": "Competitive",
+    "playStyleCompetitiveDescription": "Ranked, sweaty, trying to win",
+    "playStyleChill": "Chill",
+    "playStyleChillDescription": "Casual, relaxed, just for fun",
+    "loadGamesError": "Failed to load games.",
+    "chooseGameAndStyle": "Choose a game and a play style.",
+    "startError": "Failed to make you available. Please try again.",
+    "stopError": "Failed to stop showing you. Please try again.",
+    "availableTitle": "You're available for a game",
+    "stopping": "Stopping...",
+    "stopShowingMe": "Stop showing me",
+    "makeAvailableTitle": "Make yourself available",
+    "wantToBeFoundTitle": "Want other players to find you?",
+    "cancel": "Cancel",
+    "makeMeAvailable": "Make me available!",
+    "gameLabel": "Game",
+    "playStyleLabel": "Play style",
+    "noteLabel": "Note",
+    "notePlaceholder": "Anything specific?",
+    "saving": "Saving..."
+  },
+  "profileHeader": {
+    "settings": "Settings",
+    "signOut": "Sign out",
+    "message": "Message",
+    "friend": "Friend",
+    "requestSent": "Request sent",
+    "cancelling": "Cancelling...",
+    "cancelRequest": "Cancel request",
+    "addFriend": "Add friend",
+    "posts_one": "post",
+    "posts_other": "posts",
+    "joined": "Joined {{date}}"
+  },
+  "editProfileForm": {
+    "saveError": "Something went wrong.",
+    "title": "Edit Profile",
+    "displayNameLabel": "Display name",
+    "bioLabel": "Bio",
+    "bioCounter": "{{count}} / {{max}}",
+    "avatarLabel": "Avatar",
+    "regionLabel": "Region",
+    "regionPlaceholder": "e.g. EU, NA, AS",
+    "platformsLabel": "Platforms",
+    "externalLinksLabel": "External links",
+    "linkNamePlaceholder": "Name",
+    "linkValuePlaceholder": "URL or username",
+    "removeLink": "✕",
+    "addLink": "+ Add link",
+    "saving": "Saving…",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "avatarUploadInput": {
+    "unsupportedFileType": "Unsupported file type. Allowed: jpg, jpeg, png, webp, gif.",
+    "fileTooLarge": "Images cannot be larger than 10 MB.",
+    "uploadAvatarAriaLabel": "Upload avatar"
+  },
+  "passwordStrengthMeter": {
+    "requirementLength": "at least 8 characters",
+    "requirementLowercase": "a lowercase letter",
+    "requirementUppercase": "an uppercase letter",
+    "requirementNumber": "a number",
+    "requirementSymbol": "a symbol (optional, adds strength)",
+    "strengthWeak": "weak",
+    "strengthFair": "fair",
+    "strengthGood": "good",
+    "strengthStrong": "strong",
+    "strengthLabel": "Password strength: {{label}}",
+    "chooseStrongerPassword": " - please choose a stronger password"
+  },
+  "notificationSettingsSection": {
+    "title": "Notifications",
+    "description": "Control how you're notified when a friend sends you a chat message.",
+    "soundTitle": "Notification sound",
+    "soundDescription": "Play a sound when you receive a new chat message.",
+    "browserTitle": "Browser notifications",
+    "browserDescription": "Show a desktop notification for new messages, even if the tab isn't focused.",
+    "browserBlocked": "Notifications are blocked in your browser settings."
+  },
+  "settingsSectionHeader": {
+    "backToSettingsAriaLabel": "Back to settings"
+  },
+  "emojiPickerButton": {
+    "addEmojiAriaLabel": "Add emoji"
+  },
+  "conversationsList": {
+    "minutesAgo_one": "{{count}}m ago",
+    "minutesAgo_other": "{{count}}m ago",
+    "hoursAgo_one": "{{count}}h ago",
+    "hoursAgo_other": "{{count}}h ago",
+    "daysAgo_one": "{{count}}d ago",
+    "daysAgo_other": "{{count}}d ago",
+    "loadError": "Failed to load chats.",
+    "loading": "Loading chats...",
+    "emptyState": "No conversations yet. Start a chat with a friend to see it here.",
+    "noMessagesYet": "No messages yet",
+    "unreadAriaLabel": "Unread"
+  },
+  "chatWindow": {
+    "loadError": "Failed to load messages.",
+    "sendError": "Failed to send message.",
+    "expandChatAriaLabel": "Expand chat",
+    "minimizeChatAriaLabel": "Minimize chat",
+    "closeChatAriaLabel": "Close chat",
+    "loadingMessages": "Loading messages...",
+    "emptyState": "Say hi and plan your next game together.",
+    "attachedMediaAlt": "Attached media",
+    "selectedMediaPreviewAlt": "Selected media preview",
+    "removeSelectedFileAriaLabel": "Remove selected file",
+    "attachPhotoOrVideoAriaLabel": "Attach photo or video",
+    "messagePlaceholder": "Write a message...",
+    "send": "Send"
+  }
+}

@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom'
+import './i18n/config'
 
 // jsdom does not implement PointerEvent at all; MouseEvent carries everything
 // the overlay dismissal logic reads (target/currentTarget/bubbles).

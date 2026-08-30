@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { SmilePlus } from 'lucide-react'
 import type { CommentReactions as CommentReactionsType, ReactionType } from '../api/commentsApi'
 
@@ -28,6 +29,7 @@ interface CommentReactionsProps {
 }
 
 export function CommentReactions({ reactions, canReact, onReact, onRemoveReaction }: CommentReactionsProps) {
+  const { t } = useTranslation('componentsA')
   const [open, setOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -61,7 +63,7 @@ export function CommentReactions({ reactions, canReact, onReact, onRemoveReactio
         <div className="relative" ref={containerRef}>
           <button
             type="button"
-            aria-label="React to comment"
+            aria-label={t('commentReactions.reactAriaLabel')}
             aria-pressed={reactions.currentUserReaction != null}
             onClick={() => setOpen((o) => !o)}
             className={`flex items-center justify-center rounded-lg p-1 transition-colors cursor-pointer ${
@@ -98,7 +100,7 @@ export function CommentReactions({ reactions, canReact, onReact, onRemoveReactio
             type="button"
             disabled={!canReact}
             aria-pressed={isMine}
-            aria-label={isMine ? `Remove ${type} reaction` : undefined}
+            aria-label={isMine ? t('commentReactions.removeReactionAriaLabel', { type }) : undefined}
             onClick={() => isMine && onRemoveReaction()}
             className={`flex items-center gap-1 rounded-full px-1.5 py-0.5 text-xs transition-colors ${
               isMine ? 'bg-surface-raised text-primary cursor-pointer hover:bg-surface' : 'text-muted'

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Gamepad2, Loader2 } from 'lucide-react'
 import { Modal } from './ui/Modal'
 import { useAuth } from '../context/AuthContext'
@@ -16,6 +17,7 @@ interface AddGameModalProps {
 }
 
 export function AddGameModal({ onClose, onGameAdded }: AddGameModalProps) {
+  const { t } = useTranslation('componentsB')
   const { token } = useAuth()
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<ExternalGameSearchResult[]>([])
@@ -41,7 +43,7 @@ export function AddGameModal({ onClose, onGameAdded }: AddGameModalProps) {
           if (!cancelled) setResults(r)
         })
         .catch(() => {
-          if (!cancelled) setSearchError('Failed to search games.')
+          if (!cancelled) setSearchError(t('addGameModal.searchError'))
         })
         .finally(() => {
           if (!cancelled) setSearching(false)
@@ -61,20 +63,20 @@ export function AddGameModal({ onClose, onGameAdded }: AddGameModalProps) {
       const game = await createGame(token!, result)
       onGameAdded(game)
     } catch {
-      setAddError('Failed to add game. Please try again.')
+      setAddError(t('addGameModal.addError'))
     } finally {
       setAddingRawgId(null)
     }
   }
 
   return (
-    <Modal title="Add a game" onClose={onClose}>
+    <Modal title={t('addGameModal.title')} onClose={onClose}>
       <div className="flex flex-col gap-3">
         <input
           autoFocus
           type="text"
-          aria-label="Search for a game"
-          placeholder="Search for a game…"
+          aria-label={t('addGameModal.searchAriaLabel')}
+          placeholder={t('addGameModal.searchPlaceholder')}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="w-full rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm text-text outline-none focus:border-primary placeholder:text-muted"
@@ -86,14 +88,14 @@ export function AddGameModal({ onClose, onGameAdded }: AddGameModalProps) {
           {searching && (
             <div className="flex items-center gap-2 px-1 py-2 text-sm text-muted">
               <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-              Searching…
+              {t('addGameModal.searching')}
             </div>
           )}
 
           {!searching && searchError && <p className="px-1 py-2 text-sm text-frustrated">{searchError}</p>}
 
           {!searching && !searchError && query.trim() && results.length === 0 && (
-            <p className="px-1 py-2 text-sm text-muted">No games found.</p>
+            <p className="px-1 py-2 text-sm text-muted">{t('addGameModal.noGamesFound')}</p>
           )}
 
           {!searching &&

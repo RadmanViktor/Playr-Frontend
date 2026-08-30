@@ -1,0 +1,30 @@
+{
+  "actions": {
+    "save": "Spara",
+    "cancel": "Avbryt",
+    "delete": "Ta bort",
+    "edit": "Redigera",
+    "close": "Stäng",
+    "confirm": "Bekräfta",
+    "back": "Tillbaka",
+    "next": "Nästa",
+    "loading": "Laddar...",
+    "retry": "Försök igen",
+    "send": "Skicka",
+    "remove": "Ta bort",
+    "add": "Lägg till",
+    "search": "Sök"
+  },
+  "errors": {
+    "generic": "Något gick fel. Försök igen.",
+    "network": "Nätverksfel. Kontrollera din anslutning och försök igen."
+  },
+  "settings": {
+    "language": {
+      "label": "Språk",
+      "description": "Välj vilket språk som används i appen.",
+      "english": "Engelska",
+      "swedish": "Svenska"
+    }
+  }
+}

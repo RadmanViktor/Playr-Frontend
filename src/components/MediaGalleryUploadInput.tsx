@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { X, Upload } from 'lucide-react'
 import { validateMediaFile, isVideoFile } from './MediaUploadInput'
 import type { PostMediaItem } from '../api/postsApi'
@@ -29,6 +30,7 @@ export function MediaGalleryUploadInput({
   error = null,
   onError,
 }: MediaGalleryUploadInputProps) {
+  const { t } = useTranslation('componentsA')
   const inputRef = useRef<HTMLInputElement>(null)
   const [previewUrls, setPreviewUrls] = useState<string[]>([])
   const [isDragOver, setIsDragOver] = useState(false)
@@ -55,18 +57,18 @@ export function MediaGalleryUploadInput({
     if (incoming.length === 0) return
 
     if (hasVideo || files.some(isVideoFile)) {
-      onError?.('A post can only contain a single video, or up to 5 images.')
+      onError?.(t('mediaGalleryUploadInput.errors.singleVideoOnly'))
       return
     }
 
     const incomingHasVideo = incoming.some(isVideoFile)
     if (incomingHasVideo && (incoming.length > 1 || totalCount > 0)) {
-      onError?.('A post can only contain a single video, or up to 5 images, not both.')
+      onError?.(t('mediaGalleryUploadInput.errors.singleVideoOnlyNotBoth'))
       return
     }
 
     for (const file of incoming) {
-      const validationError = validateMediaFile(file)
+      const validationError = validateMediaFile(file, t)
       if (validationError) {
         onError?.(validationError)
         return
@@ -74,7 +76,7 @@ export function MediaGalleryUploadInput({
     }
 
     if (totalCount + incoming.length > MAX_MEDIA_COUNT) {
-      onError?.(`You can add up to ${MAX_MEDIA_COUNT} images per post.`)
+      onError?.(t('mediaGalleryUploadInput.errors.maxImages', { max: MAX_MEDIA_COUNT }))
       return
     }
 
@@ -110,7 +112,7 @@ export function MediaGalleryUploadInput({
                     onClick={() => undoRemoveExisting(media.id)}
                     className="text-xs text-muted hover:text-text cursor-pointer underline"
                   >
-                    Undo
+                    {t('mediaGalleryUploadInput.undo')}
                   </button>
                 </div>
               ) : (
@@ -120,13 +122,13 @@ export function MediaGalleryUploadInput({
                   ) : (
                     <img
                       src={resolveMediaUrl(media.url)!}
-                      alt="Post media"
+                      alt={t('mediaGalleryUploadInput.postMediaAlt')}
                       className="h-full w-full rounded-lg object-cover"
                     />
                   )}
                   <button
                     type="button"
-                    aria-label="Remove media"
+                    aria-label={t('mediaGalleryUploadInput.removeMediaAriaLabel')}
                     onClick={() => removeExisting(media.id)}
                     className="absolute -right-2 -top-2 rounded-full bg-surface p-1 text-text shadow cursor-pointer"
                   >
@@ -143,13 +145,13 @@ export function MediaGalleryUploadInput({
               ) : (
                 <img
                   src={previewUrls[index]}
-                  alt="Selected media preview"
+                  alt={t('mediaGalleryUploadInput.selectedPreviewAlt')}
                   className="h-full w-full rounded-lg object-cover"
                 />
               )}
               <button
                 type="button"
-                aria-label="Remove selected file"
+                aria-label={t('mediaGalleryUploadInput.removeSelectedFileAriaLabel')}
                 onClick={() => removeNewFile(index)}
                 className="absolute -right-2 -top-2 rounded-full bg-surface p-1 text-text shadow cursor-pointer"
               >
@@ -177,13 +179,13 @@ export function MediaGalleryUploadInput({
           }`}
         >
           <Upload className="h-4 w-4" aria-hidden="true" />
-          {totalCount === 0 ? 'Add photos or a video, or drag & drop' : `Add more (${remainingSlots} left)`}
+          {totalCount === 0 ? t('mediaGalleryUploadInput.addMediaLabel') : t('mediaGalleryUploadInput.addMoreLabel', { count: remainingSlots })}
           <input
             ref={inputRef}
             type="file"
             multiple
             accept="image/*,video/*"
-            aria-label="Upload photos or video"
+            aria-label={t('mediaGalleryUploadInput.uploadAriaLabel')}
             className="hidden"
             onChange={(e) => {
               addFiles(e.target.files)

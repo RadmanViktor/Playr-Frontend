@@ -1,0 +1,73 @@
+{
+  "home": {
+    "createPost": "Create Post",
+    "loading": "Loading…",
+    "loadError": "Failed to load your posts.",
+    "emptyState": "You haven't posted anything yet — share your first moment!"
+  },
+  "feed": {
+    "eyebrow": "What's happening",
+    "title": "Feed",
+    "subtitle": "See what your fellow players are up to — highlights, updates, and moments worth sharing.",
+    "filterByGame": "Filter by game",
+    "allGames": "All games",
+    "loading": "Loading…",
+    "loadError": "Failed to load feed.",
+    "emptyStateNoPosts": "No posts yet — be the first to share!",
+    "emptyStateNoGamePosts": "No posts for this game.",
+    "createPost": "Create post"
+  },
+  "profile": {
+    "loading": "Loading…",
+    "notFound": "Profile not found.",
+    "loadError": "Failed to load profile.",
+    "friendRequestSent": "Friend request sent.",
+    "friendRequestSendError": "Failed to send friend request.",
+    "friendRequestCancelled": "Friend request cancelled.",
+    "friendRequestCancelError": "Failed to cancel friend request.",
+    "tabs": {
+      "posts": "Posts",
+      "steam": "Steam",
+      "games": "Games"
+    },
+    "noPosts": "No posts yet.",
+    "createPost": "Create Post"
+  },
+  "postDetail": {
+    "loading": "Loading…",
+    "notFound": "This post no longer exists.",
+    "loadError": "Failed to load post."
+  },
+  "friends": {
+    "eyebrow": "Your crew",
+    "title": "Friends",
+    "subtitle": "The players you've connected with. Jump into a chat or check out their profile whenever you're ready to play.",
+    "friendRequests": "Friend requests",
+    "acceptError": "Failed to accept friend request.",
+    "declineError": "Failed to decline friend request.",
+    "decline": "Decline",
+    "accept": "Accept",
+    "working": "Working...",
+    "loading": "Loading friends...",
+    "loadError": "Failed to load friends.",
+    "emptyState": "No friends yet. Accept an invite or find players to connect with.",
+    "chat": "Chat"
+  },
+  "findPlayers": {
+    "eyebrow": "Discover your squad",
+    "title": "Find Players",
+    "subtitle": "Meet new friends and find players ready to squad up.",
+    "loading": "Loading players...",
+    "loadError": "Failed to load players. Please try again.",
+    "invitationSent": "Invitation sent",
+    "invitationSentTo": "Invitation sent to {{name}}.",
+    "invitationCancelled": "Invitation to {{name}} cancelled.",
+    "cancelInviteError": "Failed to cancel invitation.",
+    "emptyState": "No one is looking for a game right now.",
+    "friendBadge": "Friend",
+    "invitedBadge": "Invited",
+    "invite": "Invite",
+    "cancel": "Cancel",
+    "cancelling": "Cancelling..."
+  }
+}

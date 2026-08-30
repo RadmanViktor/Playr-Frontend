@@ -1,0 +1,67 @@
+{
+  "sidebar": {
+    "nav": {
+      "feed": "Flöde",
+      "findPlayers": "Hitta spelare",
+      "chats": "Chattar",
+      "friends": "Vänner"
+    },
+    "status": {
+      "online": "Online",
+      "lookingForGame": "Letar efter spel",
+      "busy": "Upptagen",
+      "inactive": "Inaktiv",
+      "offline": "Offline"
+    },
+    "lookingForGameName": "Letar efter {{game}}",
+    "unreadMessages": "Olästa meddelanden",
+    "createPost": "Skapa inlägg"
+  },
+  "topBar": {
+    "openMenu": "Öppna meny",
+    "searchAriaLabel": "Sök PLAYR",
+    "searchPlaceholder": "Sök PLAYR",
+    "loading": "Laddar...",
+    "myProfile": "Min profil",
+    "search": {
+      "noRecentSearches": "Inga senaste sökningar",
+      "recentSearches": "Senaste sökningar",
+      "clearAll": "Rensa alla",
+      "removeRecent": "Ta bort {{name}} från senaste sökningar",
+      "noUsersFound": "Inga användare hittades"
+    },
+    "notifications": {
+      "ariaLabel": "Aviseringar",
+      "title": "Aviseringar",
+      "markAllRead": "Markera alla som lästa",
+      "empty": "Inga aviseringar än",
+      "taggedInComment": "taggade dig i en kommentar",
+      "taggedInPost": "taggade dig i ett inlägg",
+      "loadMore": "Ladda fler",
+      "timeMinutes_one": "{{count}} min sedan",
+      "timeMinutes_other": "{{count}} min sedan",
+      "timeHours_one": "{{count}} tim sedan",
+      "timeHours_other": "{{count}} tim sedan",
+      "timeDays_one": "{{count}} dag sedan",
+      "timeDays_other": "{{count}} dagar sedan"
+    },
+    "invitations": {
+      "ariaLabel": "Meddelanden",
+      "title": "Inbjudningar",
+      "incoming": "Inkommande",
+      "sent": "Skickade",
+      "noIncoming": "Inga inkommande inbjudningar",
+      "noSent": "Inga skickade inbjudningar",
+      "gameInvite": "Spelinbjudan",
+      "friendRequest": "Vänförfrågan",
+      "accept": "Acceptera",
+      "decline": "Avböj",
+      "cancel": "Avbryt",
+      "loadError": "Det gick inte att läsa in inbjudningar.",
+      "acceptError": "Det gick inte att acceptera inbjudan.",
+      "declineError": "Det gick inte att avböja inbjudan.",
+      "cancelError": "Det gick inte att avbryta inbjudan.",
+      "acceptedChatMessage": "Du chattar nu med {{name}}. Ha kul med spelandet! :D"
+    }
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "sidebar": {
+    "nav": {
+      "feed": "Feed",
+      "findPlayers": "Find Players",
+      "chats": "Chats",
+      "friends": "Friends"
+    },
+    "status": {
+      "online": "Online",
+      "lookingForGame": "Looking for game",
+      "busy": "Busy",
+      "inactive": "Inactive",
+      "offline": "Offline"
+    },
+    "lookingForGameName": "Looking for {{game}}",
+    "unreadMessages": "Unread messages",
+    "createPost": "Create Post"
+  },
+  "topBar": {
+    "openMenu": "Open menu",
+    "searchAriaLabel": "Search PLAYR",
+    "searchPlaceholder": "Search PLAYR",
+    "loading": "Loading...",
+    "myProfile": "My profile",
+    "search": {
+      "noRecentSearches": "No recent searches",
+      "recentSearches": "Recent searches",
+      "clearAll": "Clear all",
+      "removeRecent": "Remove {{name}} from recent searches",
+      "noUsersFound": "No users found"
+    },
+    "notifications": {
+      "ariaLabel": "Notifications",
+      "title": "Notifications",
+      "markAllRead": "Mark all as read",
+      "empty": "No notifications yet",
+      "taggedInComment": "tagged you in a comment",
+      "taggedInPost": "tagged you in a post",
+      "loadMore": "Load more",
+      "timeMinutes_one": "{{count}}m ago",
+      "timeMinutes_other": "{{count}}m ago",
+      "timeHours_one": "{{count}}h ago",
+      "timeHours_other": "{{count}}h ago",
+      "timeDays_one": "{{count}}d ago",
+      "timeDays_other": "{{count}}d ago"
+    },
+    "invitations": {
+      "ariaLabel": "Messages",
+      "title": "Invitations",
+      "incoming": "Incoming",
+      "sent": "Sent",
+      "noIncoming": "No incoming invitations",
+      "noSent": "No sent invitations",
+      "gameInvite": "Game invite",
+      "friendRequest": "Friend request",
+      "accept": "Accept",
+      "decline": "Decline",
+      "cancel": "Cancel",
+      "loadError": "Failed to load invitations.",
+      "acceptError": "Failed to accept invitation.",
+      "declineError": "Failed to decline invitation.",
+      "cancelError": "Failed to cancel invitation.",
+      "acceptedChatMessage": "You're now chatting with {{name}}. Happy gaming! :D"
+    }
+  }
+}

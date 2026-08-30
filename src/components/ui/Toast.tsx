@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { CheckCircle2, X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 interface ToastProps {
   message: string
@@ -8,6 +9,7 @@ interface ToastProps {
 }
 
 export function Toast({ message, onDismiss, durationMs = 3000 }: ToastProps) {
+  const { t } = useTranslation('ui')
   useEffect(() => {
     const timer = setTimeout(onDismiss, durationMs)
     return () => clearTimeout(timer)
@@ -20,7 +22,7 @@ export function Toast({ message, onDismiss, durationMs = 3000 }: ToastProps) {
         <p className="text-sm text-text">{message}</p>
         <button
           type="button"
-          aria-label="Dismiss"
+          aria-label={t('toast.dismiss')}
           onClick={onDismiss}
           className="ml-2 rounded-md p-0.5 text-muted hover:text-text cursor-pointer"
         >

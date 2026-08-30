@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { X } from 'lucide-react'
 import { Button } from './ui/Button'
 import { MediaGalleryUploadInput } from './MediaGalleryUploadInput'
@@ -8,19 +9,31 @@ import { GamePickerInput } from './GamePickerInput'
 import { MentionInput, type MentionDraft } from './MentionInput'
 import { useAuth } from '../context/AuthContext'
 import { getGames, type Game } from '../api/gamesApi'
-import { createPost, type PostFeedItem } from '../api/postsApi'
+import { createPost, type PostFeedItem, type PostScope } from '../api/postsApi'
 import { ApiError } from '../api/http'
 import { MOOD_OPTIONS, moodOptionToApi, type MoodOption } from '../lib/mood'
 import { addRecentGameId } from '../lib/recentGames'
 import { useBodyScrollLock } from '../lib/useBodyScrollLock'
 import { useOverlayDismiss } from '../lib/useOverlayDismiss'
 
+function moodLabel(mood: string, t: (key: string) => string): string {
+  switch (mood) {
+    case 'Enjoying': return t('postCard.mood.enjoying')
+    case 'Need Help': return t('postCard.mood.needHelp')
+    case 'Frustrated': return t('postCard.mood.frustrated')
+    case 'Completed': return t('postCard.mood.completed')
+    default: return t('postCard.mood.none')
+  }
+}
+
 interface CreatePostModalProps {
+  scope?: PostScope
   onClose: () => void
   onPostCreated: (post: PostFeedItem) => void
 }
 
-export function CreatePostModal({ onClose, onPostCreated }: CreatePostModalProps) {
+export function CreatePostModal({ scope = 'Feed', onClose, onPostCreated }: CreatePostModalProps) {
+  const { t } = useTranslation('componentsA')
   const { token } = useAuth()
 
   const [games, setGames] = useState<Game[]>([])
@@ -45,7 +58,7 @@ export function CreatePostModal({ onClose, onPostCreated }: CreatePostModalProps
         setGames(g)
         if (g.length > 0) setSelectedGameId((current) => current || g[0].id)
       })
-      .catch(() => setGamesError('Failed to load games.'))
+      .catch(() => setGamesError(t('createPostModal.errors.loadGamesFailed')))
   }, [gamesLoadKey])
 
   useEffect(() => {
@@ -56,7 +69,7 @@ export function CreatePostModal({ onClose, onPostCreated }: CreatePostModalProps
         if (item.type.startsWith('image/')) {
           const file = item.getAsFile()
           if (!file) continue
-          const validationError = validateMediaFile(file)
+          const validationError = validateMediaFile(file, t)
           if (validationError) {
             setMediaError(validationError)
           } else {
@@ -90,9 +103,9 @@ export function CreatePostModal({ onClose, onPostCreated }: CreatePostModalProps
     setSubmitError(null)
 
     const trimmed = text.trim()
-    if (!selectedGameId) { setSubmitError('Please select a game.'); return }
-    if (!trimmed) { setTextError('Post text is required.'); return }
-    if (trimmed.length > 1000) { setTextError('Post text cannot be longer than 1000 characters.'); return }
+    if (!selectedGameId) { setSubmitError(t('createPostModal.errors.selectGame')); return }
+    if (!trimmed) { setTextError(t('createPostModal.errors.textRequired')); return }
+    if (trimmed.length > 1000) { setTextError(t('createPostModal.errors.textTooLong')); return }
 
     setIsSubmitting(true)
     setUploadProgress(mediaFiles.length > 0 ? 0 : null)
@@ -105,13 +118,14 @@ export function CreatePostModal({ onClose, onPostCreated }: CreatePostModalProps
           mood: moodOptionToApi(selectedMood),
           media: mediaFiles,
           mentionedUserIds: mentions.map((m) => m.userId),
+          scope,
         },
         mediaFiles.length > 0 ? setUploadProgress : undefined
       )
       addRecentGameId(selectedGameId)
       onPostCreated(post)
     } catch (err) {
-      setSubmitError(err instanceof ApiError ? err.message : 'Something went wrong.')
+      setSubmitError(err instanceof ApiError ? err.message : t('createPostModal.errors.genericError'))
     } finally {
       setIsSubmitting(false)
       setUploadProgress(null)
@@ -125,11 +139,11 @@ export function CreatePostModal({ onClose, onPostCreated }: CreatePostModalProps
     >
       <div className="my-auto flex max-h-[90svh] w-full max-w-xl cursor-default flex-col overflow-y-auto overscroll-contain rounded-xl border border-border bg-surface p-5">
         <div className="sticky top-0 z-10 -mx-5 -mt-5 mb-4 flex items-center justify-between bg-surface px-5 pb-3 pt-5">
-          <h2 className="text-lg font-semibold text-text">Create Post</h2>
+          <h2 className="text-lg font-semibold text-text">{t(scope === 'Profile' ? 'createPostModal.titleProfile' : 'createPostModal.title')}</h2>
           <button
             type="button"
             onClick={requestClose}
-            aria-label="Close"
+            aria-label={t('createPostModal.close')}
             className="rounded-lg p-1 text-muted hover:bg-surface-raised hover:text-text cursor-pointer"
           >
             <X className="h-5 w-5" aria-hidden="true" />
@@ -138,20 +152,20 @@ export function CreatePostModal({ onClose, onPostCreated }: CreatePostModalProps
 
         {confirmingDiscard ? (
           <div className="flex flex-col gap-3">
-            <p className="text-sm text-text">Discard this post? Your text and media will be lost.</p>
+            <p className="text-sm text-text">{t('createPostModal.discardConfirm')}</p>
             <div className="flex gap-2">
               <Button size="sm" className="bg-frustrated hover:bg-frustrated/80 shadow-none" onClick={onClose}>
-                Discard
+                {t('createPostModal.discard')}
               </Button>
               <Button size="sm" variant="ghost" onClick={() => setConfirmingDiscard(false)}>
-                Keep editing
+                {t('createPostModal.keepEditing')}
               </Button>
             </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
             <label className="flex flex-col gap-1 text-sm text-muted">
-              Game
+              {t('createPostModal.gameLabel')}
               <GamePickerInput
                 games={games}
                 value={selectedGameId}
@@ -163,7 +177,7 @@ export function CreatePostModal({ onClose, onPostCreated }: CreatePostModalProps
             </label>
 
             <div className="flex flex-col gap-2">
-              <span className="text-sm text-muted">Mood (optional)</span>
+              <span className="text-sm text-muted">{t('createPostModal.moodLabel')}</span>
               <div className="flex flex-wrap gap-2">
                 {MOOD_OPTIONS.map((mood) => (
                   <button
@@ -177,16 +191,16 @@ export function CreatePostModal({ onClose, onPostCreated }: CreatePostModalProps
                         : 'bg-surface-raised text-muted hover:text-text'
                     }`}
                   >
-                    {mood}
+                    {moodLabel(mood, t)}
                   </button>
                 ))}
               </div>
             </div>
 
             <label className="flex flex-col gap-1 text-sm text-muted">
-              What happened?
+              {t('createPostModal.textLabel')}
               <MentionInput
-                ariaLabel="Post text"
+                ariaLabel={t('createPostModal.postTextAriaLabel')}
                 className="w-full rounded-lg border border-border bg-surface-raised px-3 py-2 pr-10 text-text resize-none min-h-24 max-h-40 outline-none focus:border-primary"
                 value={text}
                 mentions={mentions}
@@ -201,7 +215,7 @@ export function CreatePostModal({ onClose, onPostCreated }: CreatePostModalProps
                   </div>
                 }
               />
-              <span className="text-xs text-muted self-end">{text.length} / 1000</span>
+              <span className="text-xs text-muted self-end">{t('createPostModal.charCount', { count: text.length, max: 1000 })}</span>
             </label>
 
             {textError && <p className="text-frustrated text-sm">{textError}</p>}
@@ -226,7 +240,7 @@ export function CreatePostModal({ onClose, onPostCreated }: CreatePostModalProps
 
             <div className="sticky bottom-0 -mx-5 -mb-5 bg-surface px-5 pb-5 pt-3">
               <Button type="submit" disabled={isSubmitting} className="w-full">
-                {isSubmitting ? 'Posting…' : 'Post'}
+                {isSubmitting ? t('createPostModal.posting') : t('createPostModal.postButton')}
               </Button>
             </div>
           </form>

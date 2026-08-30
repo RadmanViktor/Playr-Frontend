@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
+import type { TFunction } from 'i18next'
 import { Link } from 'react-router-dom'
 import { Avatar } from './ui/Avatar'
 import { Button } from './ui/Button'
@@ -9,13 +11,13 @@ import { CommentReactions } from './CommentReactions'
 import { linkify } from '../lib/linkify'
 import type { CommentItem as CommentItemType, ReactionType } from '../api/commentsApi'
 
-function formatRelativeTime(createdAt: string): string {
+function formatRelativeTime(createdAt: string, t: TFunction): string {
   const diffMs = Date.now() - new Date(createdAt).getTime()
   const diffMin = Math.floor(diffMs / 60_000)
-  if (diffMin < 60) return `${Math.max(diffMin, 1)}m ago`
+  if (diffMin < 60) return t('commentItem.timeAgo.minutes', { count: Math.max(diffMin, 1) })
   const diffH = Math.floor(diffMin / 60)
-  if (diffH < 24) return `${diffH}h ago`
-  return `${Math.floor(diffH / 24)}d ago`
+  if (diffH < 24) return t('commentItem.timeAgo.hours', { count: diffH })
+  return t('commentItem.timeAgo.days', { count: Math.floor(diffH / 24) })
 }
 
 interface CommentItemProps {
@@ -28,6 +30,7 @@ interface CommentItemProps {
 }
 
 export function CommentItem({ comment, currentUserId, onSave, onDelete, onReact, onRemoveReaction }: CommentItemProps) {
+  const { t } = useTranslation('componentsA')
   const [isEditing, setIsEditing] = useState(false)
   const [text, setText] = useState(comment.textContent)
   const [isSaving, setIsSaving] = useState(false)
@@ -55,7 +58,7 @@ export function CommentItem({ comment, currentUserId, onSave, onDelete, onReact,
     try {
       await onReact(comment.id, type)
     } catch (err) {
-      setReactionError(err instanceof Error ? err.message : 'Failed to update reaction.')
+      setReactionError(err instanceof Error ? err.message : t('commentItem.errors.reactionFailed'))
     }
   }
 
@@ -64,7 +67,7 @@ export function CommentItem({ comment, currentUserId, onSave, onDelete, onReact,
     try {
       await onRemoveReaction(comment.id)
     } catch (err) {
-      setReactionError(err instanceof Error ? err.message : 'Failed to update reaction.')
+      setReactionError(err instanceof Error ? err.message : t('commentItem.errors.reactionFailed'))
     }
   }
 
@@ -77,7 +80,7 @@ export function CommentItem({ comment, currentUserId, onSave, onDelete, onReact,
       await onSave(comment.id, trimmed)
       setIsEditing(false)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update comment.')
+      setError(err instanceof Error ? err.message : t('commentItem.errors.updateFailed'))
     } finally {
       setIsSaving(false)
     }
@@ -89,7 +92,7 @@ export function CommentItem({ comment, currentUserId, onSave, onDelete, onReact,
     try {
       await onDelete(comment.id)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete comment.')
+      setError(err instanceof Error ? err.message : t('commentItem.errors.deleteFailed'))
       setIsDeleting(false)
     }
   }
@@ -105,7 +108,7 @@ export function CommentItem({ comment, currentUserId, onSave, onDelete, onReact,
           <div className="mt-1 flex flex-col gap-2">
             <div className="relative">
               <textarea
-                aria-label="Edit comment text"
+                aria-label={t('commentItem.editAriaLabel')}
                 className="w-full rounded-lg border border-border bg-surface px-2 py-1 pr-10 text-sm text-text resize-none h-16 outline-none focus:border-primary"
                 value={text}
                 maxLength={500}
@@ -118,10 +121,10 @@ export function CommentItem({ comment, currentUserId, onSave, onDelete, onReact,
             {error && <p className="text-frustrated text-xs">{error}</p>}
             <div className="flex gap-2">
               <Button size="sm" onClick={handleSave} disabled={isSaving}>
-                {isSaving ? 'Saving…' : 'Save'}
+                {isSaving ? t('commentItem.saving') : t('commentItem.save')}
               </Button>
               <Button size="sm" variant="ghost" onClick={() => { setIsEditing(false); setText(comment.textContent); setError(null) }}>
-                Cancel
+                {t('commentItem.cancel')}
               </Button>
             </div>
           </div>
@@ -131,7 +134,7 @@ export function CommentItem({ comment, currentUserId, onSave, onDelete, onReact,
       </div>
       {!isEditing && (
         <div className="mt-1 flex items-center gap-3 px-1 text-xs text-muted">
-          <span>{formatRelativeTime(comment.createdAt)}</span>
+          <span>{formatRelativeTime(comment.createdAt, t)}</span>
           <CommentReactions
             reactions={comment.reactions}
             canReact={currentUserId != null}
@@ -141,7 +144,7 @@ export function CommentItem({ comment, currentUserId, onSave, onDelete, onReact,
           {isOwner && (
             <div className="relative" ref={menuRef}>
               <IconButton
-                aria-label="Comment options"
+                aria-label={t('commentItem.optionsAriaLabel')}
                 onClick={() => setMenuOpen((open) => !open)}
               >
                 <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
@@ -152,14 +155,14 @@ export function CommentItem({ comment, currentUserId, onSave, onDelete, onReact,
                     className="w-full px-4 py-2 text-left text-sm text-text hover:bg-border rounded-t-lg cursor-pointer"
                     onClick={() => { setIsEditing(true); setMenuOpen(false) }}
                   >
-                    Edit
+                    {t('commentItem.edit')}
                   </button>
                   <button
                     className="w-full px-4 py-2 text-left text-sm text-frustrated hover:bg-border rounded-b-lg cursor-pointer disabled:opacity-60"
                     onClick={handleDelete}
                     disabled={isDeleting}
                   >
-                    {isDeleting ? 'Deleting…' : 'Delete'}
+                    {isDeleting ? t('commentItem.deleting') : t('commentItem.delete')}
                   </button>
                 </div>
               )}

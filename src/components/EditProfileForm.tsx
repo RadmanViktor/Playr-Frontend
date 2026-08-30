@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Button } from './ui/Button'
 import { AvatarUploadInput } from './AvatarUploadInput'
 import { updateProfile, uploadAvatar, type ProfileData } from '../api/profilesApi'
@@ -16,6 +17,7 @@ interface EditProfileFormProps {
 interface LinkRow { key: string; value: string }
 
 export function EditProfileForm({ profile, token, onSave, onCancel }: EditProfileFormProps) {
+  const { t } = useTranslation('componentsB')
   const [displayName, setDisplayName] = useState(profile.displayName)
   const [bio, setBio] = useState(profile.bio ?? '')
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
@@ -70,7 +72,7 @@ export function EditProfileForm({ profile, token, onSave, onCancel }: EditProfil
       })
       onSave(updated)
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Something went wrong.')
+      setError(err instanceof ApiError ? err.message : t('editProfileForm.saveError'))
     } finally {
       setIsSaving(false)
     }
@@ -80,26 +82,26 @@ export function EditProfileForm({ profile, token, onSave, onCancel }: EditProfil
 
   return (
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4 rounded-xl border border-border bg-surface p-6">
-      <h2 className="text-base font-semibold text-text">Edit Profile</h2>
+      <h2 className="text-base font-semibold text-text">{t('editProfileForm.title')}</h2>
 
       <label className="flex flex-col gap-1 text-sm text-muted">
-        Display name
+        {t('editProfileForm.displayNameLabel')}
         <input className={inputClass} value={displayName} onChange={(e) => setDisplayName(e.target.value)} required />
       </label>
 
       <label className="flex flex-col gap-1 text-sm text-muted">
-        Bio
+        {t('editProfileForm.bioLabel')}
         <textarea
           className={`${inputClass} resize-none h-24`}
           value={bio}
           maxLength={500}
           onChange={(e) => setBio(e.target.value)}
         />
-        <span className="text-xs self-end">{bio.length} / 500</span>
+        <span className="text-xs self-end">{t('editProfileForm.bioCounter', { count: bio.length, max: 500 })}</span>
       </label>
 
       <label className="flex flex-col gap-1 text-sm text-muted">
-        Avatar
+        {t('editProfileForm.avatarLabel')}
         <AvatarUploadInput
           currentAvatarUrl={profile.avatarUrl}
           displayName={profile.displayName}
@@ -111,12 +113,12 @@ export function EditProfileForm({ profile, token, onSave, onCancel }: EditProfil
       </label>
 
       <label className="flex flex-col gap-1 text-sm text-muted">
-        Region
-        <input className={inputClass} value={region} onChange={(e) => setRegion(e.target.value)} placeholder="e.g. EU, NA, AS" />
+        {t('editProfileForm.regionLabel')}
+        <input className={inputClass} value={region} onChange={(e) => setRegion(e.target.value)} placeholder={t('editProfileForm.regionPlaceholder')} />
       </label>
 
       <div className="flex flex-col gap-2">
-        <span className="text-sm text-muted">Platforms</span>
+        <span className="text-sm text-muted">{t('editProfileForm.platformsLabel')}</span>
         <div className="flex flex-wrap gap-2">
           {PLATFORMS.map((platform) => (
             <button
@@ -135,27 +137,27 @@ export function EditProfileForm({ profile, token, onSave, onCancel }: EditProfil
       </div>
 
       <div className="flex flex-col gap-2">
-        <span className="text-sm text-muted">External links</span>
+        <span className="text-sm text-muted">{t('editProfileForm.externalLinksLabel')}</span>
         {links.map((row, i) => (
           <div key={i} className="flex gap-2 items-center">
             <input
               className="rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm text-text outline-none focus:border-primary w-32"
-              placeholder="Name"
+              placeholder={t('editProfileForm.linkNamePlaceholder')}
               value={row.key}
               onChange={(e) => updateLink(i, 'key', e.target.value)}
             />
             <input
               className="rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm text-text outline-none focus:border-primary flex-1"
-              placeholder="URL or username"
+              placeholder={t('editProfileForm.linkValuePlaceholder')}
               value={row.value}
               onChange={(e) => updateLink(i, 'value', e.target.value)}
             />
-            <Button type="button" variant="ghost" size="sm" onClick={() => removeLink(i)}>✕</Button>
+            <Button type="button" variant="ghost" size="sm" onClick={() => removeLink(i)}>{t('editProfileForm.removeLink')}</Button>
           </div>
         ))}
         {links.length < 10 && (
           <Button type="button" variant="ghost" size="sm" onClick={addLink} className="self-start">
-            + Add link
+            {t('editProfileForm.addLink')}
           </Button>
         )}
       </div>
@@ -163,8 +165,8 @@ export function EditProfileForm({ profile, token, onSave, onCancel }: EditProfil
       {error && <p className="text-frustrated text-sm">{error}</p>}
 
       <div className="flex gap-2">
-        <Button type="submit" disabled={isSaving}>{isSaving ? 'Saving…' : 'Save'}</Button>
-        <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>
+        <Button type="submit" disabled={isSaving}>{isSaving ? t('editProfileForm.saving') : t('editProfileForm.save')}</Button>
+        <Button type="button" variant="ghost" onClick={onCancel}>{t('editProfileForm.cancel')}</Button>
       </div>
     </form>
   )

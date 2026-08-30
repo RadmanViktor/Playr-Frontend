@@ -1,0 +1,73 @@
+{
+  "home": {
+    "createPost": "Skapa inlägg",
+    "loading": "Laddar…",
+    "loadError": "Det gick inte att ladda dina inlägg.",
+    "emptyState": "Du har inte postat något än — dela ditt första ögonblick!"
+  },
+  "feed": {
+    "eyebrow": "Vad som händer",
+    "title": "Flöde",
+    "subtitle": "Se vad dina medspelare gör — höjdpunkter, uppdateringar och ögonblick värda att dela.",
+    "filterByGame": "Filtrera efter spel",
+    "allGames": "Alla spel",
+    "loading": "Laddar…",
+    "loadError": "Det gick inte att ladda flödet.",
+    "emptyStateNoPosts": "Inga inlägg än — bli den första att dela!",
+    "emptyStateNoGamePosts": "Inga inlägg för det här spelet.",
+    "createPost": "Skapa inlägg"
+  },
+  "profile": {
+    "loading": "Laddar…",
+    "notFound": "Profilen hittades inte.",
+    "loadError": "Det gick inte att ladda profilen.",
+    "friendRequestSent": "Vänförfrågan skickad.",
+    "friendRequestSendError": "Det gick inte att skicka vänförfrågan.",
+    "friendRequestCancelled": "Vänförfrågan avbruten.",
+    "friendRequestCancelError": "Det gick inte att avbryta vänförfrågan.",
+    "tabs": {
+      "posts": "Inlägg",
+      "steam": "Steam",
+      "games": "Spel"
+    },
+    "noPosts": "Inga inlägg än.",
+    "createPost": "Skapa inlägg"
+  },
+  "postDetail": {
+    "loading": "Laddar…",
+    "notFound": "Det här inlägget finns inte längre.",
+    "loadError": "Det gick inte att ladda inlägget."
+  },
+  "friends": {
+    "eyebrow": "Ditt gäng",
+    "title": "Vänner",
+    "subtitle": "Spelarna du kopplat ihop dig med. Hoppa in i en chatt eller kolla in deras profil när du är redo att spela.",
+    "friendRequests": "Vänförfrågningar",
+    "acceptError": "Det gick inte att acceptera vänförfrågan.",
+    "declineError": "Det gick inte att avböja vänförfrågan.",
+    "decline": "Avböj",
+    "accept": "Acceptera",
+    "working": "Arbetar...",
+    "loading": "Laddar vänner...",
+    "loadError": "Det gick inte att ladda vänner.",
+    "emptyState": "Inga vänner än. Acceptera en inbjudan eller hitta spelare att koppla ihop dig med.",
+    "chat": "Chatta"
+  },
+  "findPlayers": {
+    "eyebrow": "Upptäck ditt gäng",
+    "title": "Hitta spelare",
+    "subtitle": "Träffa nya vänner och hitta spelare redo att köra ihop.",
+    "loading": "Laddar spelare...",
+    "loadError": "Det gick inte att ladda spelare. Försök igen.",
+    "invitationSent": "Inbjudan skickad",
+    "invitationSentTo": "Inbjudan skickad till {{name}}.",
+    "invitationCancelled": "Inbjudan till {{name}} avbruten.",
+    "cancelInviteError": "Det gick inte att avbryta inbjudan.",
+    "emptyState": "Ingen letar efter ett spel just nu.",
+    "friendBadge": "Vän",
+    "invitedBadge": "Inbjuden",
+    "invite": "Bjud in",
+    "cancel": "Avbryt",
+    "cancelling": "Avbryter..."
+  }
+}

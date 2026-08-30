@@ -1,4 +1,5 @@
 import { Star } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 interface StarRatingProps {
   value: number
@@ -7,16 +8,17 @@ interface StarRatingProps {
 }
 
 export function StarRating({ value, onChange, size = 18 }: StarRatingProps) {
+  const { t } = useTranslation('ui')
   const interactive = !!onChange
 
   return (
-    <div className="flex items-center gap-0.5" role={interactive ? 'radiogroup' : undefined} aria-label="Rating">
+    <div className="flex items-center gap-0.5" role={interactive ? 'radiogroup' : undefined} aria-label={t('starRating.ariaLabel')}>
       {[1, 2, 3, 4, 5].map((star) => (
         <button
           key={star}
           type="button"
           disabled={!interactive}
-          aria-label={`${star} star${star > 1 ? 's' : ''}`}
+          aria-label={t('starRating.starLabel', { count: star })}
           aria-pressed={interactive ? star <= value : undefined}
           onClick={() => onChange?.(star)}
           className={interactive ? 'cursor-pointer' : 'cursor-default'}

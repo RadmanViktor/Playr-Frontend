@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { getSteamAchievements, type SteamAchievement } from '../api/steamApi'
 
 interface SteamAchievementsListProps {
@@ -9,6 +10,7 @@ interface SteamAchievementsListProps {
 }
 
 export function SteamAchievementsList({ userId, appId, gameName, onClose }: SteamAchievementsListProps) {
+  const { t } = useTranslation('componentsB')
   const [achievements, setAchievements] = useState<SteamAchievement[] | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -18,7 +20,7 @@ export function SteamAchievementsList({ userId, appId, gameName, onClose }: Stea
     setError(null)
     getSteamAchievements(userId, appId)
       .then(setAchievements)
-      .catch(() => setError('Failed to load achievements.'))
+      .catch(() => setError(t('steamAchievementsList.loadError')))
       .finally(() => setIsLoading(false))
   }, [userId, appId])
 
@@ -29,18 +31,18 @@ export function SteamAchievementsList({ userId, appId, gameName, onClose }: Stea
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-text">{gameName} – Achievements</h3>
+          <h3 className="text-lg font-semibold text-text">{t('steamAchievementsList.titleWithGame', { gameName })}</h3>
           <button className="text-muted hover:text-text" onClick={onClose}>
             ✕
           </button>
         </div>
 
         {isLoading ? (
-          <p className="text-muted">Loading…</p>
+          <p className="text-muted">{t('steamAchievementsList.loading')}</p>
         ) : error ? (
           <p className="text-frustrated">{error}</p>
         ) : !achievements || achievements.length === 0 ? (
-          <p className="text-muted">No achievements to show for this game.</p>
+          <p className="text-muted">{t('steamAchievementsList.noAchievements')}</p>
         ) : (
           <ul className="flex flex-col gap-2">
             {achievements.map((achievement) => (
@@ -61,7 +63,7 @@ export function SteamAchievementsList({ userId, appId, gameName, onClose }: Stea
                   <p className="text-text text-sm">{achievement.displayName ?? achievement.apiName}</p>
                   {achievement.achieved && achievement.unlockedAt && (
                     <p className="text-muted text-xs">
-                      Unlocked {new Date(achievement.unlockedAt).toLocaleDateString()}
+                      {t('steamAchievementsList.unlockedOn', { date: new Date(achievement.unlockedAt).toLocaleDateString() })}
                     </p>
                   )}
                 </div>

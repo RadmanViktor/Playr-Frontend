@@ -1,0 +1,17 @@
+﻿{
+  "title": "Inställningar",
+  "items": {
+    "notifications": {
+      "label": "Aviseringar",
+      "description": "Inställningar för ljud- och webbläsaraviseringar."
+    },
+    "steam": {
+      "label": "Kontolänkning",
+      "description": "Anslut eller koppla bort ditt Steam-konto."
+    },
+    "profile": {
+      "label": "Redigera profil",
+      "description": "Visningsnamn, bio, avatar, plattformar och länkar."
+    }
+  }
+}

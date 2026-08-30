@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { getSteamGames, type SteamGame } from '../api/steamApi'
 import { SteamAchievementsList } from './SteamAchievementsList'
 
@@ -6,12 +7,13 @@ interface SteamGamesListProps {
   userId: string
 }
 
-function formatPlaytime(minutes: number): string {
+function formatPlaytime(minutes: number, t: (key: string, opts?: Record<string, unknown>) => string): string {
   const hours = Math.round(minutes / 60)
-  return hours > 0 ? `${hours} h` : `${minutes} min`
+  return hours > 0 ? t('steamGamesList.hoursPlayed', { count: hours }) : t('steamGamesList.minutesPlayed', { count: minutes })
 }
 
 export function SteamGamesList({ userId }: SteamGamesListProps) {
+  const { t } = useTranslation('componentsB')
   const [games, setGames] = useState<SteamGame[] | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [selectedGame, setSelectedGame] = useState<SteamGame | null>(null)
@@ -24,9 +26,9 @@ export function SteamGamesList({ userId }: SteamGamesListProps) {
       .finally(() => setIsLoading(false))
   }, [userId])
 
-  if (isLoading) return <p className="text-muted">Loading…</p>
+  if (isLoading) return <p className="text-muted">{t('steamGamesList.loading')}</p>
   if (!games || games.length === 0) {
-    return <p className="text-muted">No Steam games to show.</p>
+    return <p className="text-muted">{t('steamGamesList.noGames')}</p>
   }
 
   return (
@@ -40,7 +42,7 @@ export function SteamGamesList({ userId }: SteamGamesListProps) {
           >
             {game.iconUrl && <img src={game.iconUrl} alt="" className="h-8 w-8 rounded" />}
             <span className="flex-1 text-text">{game.name}</span>
-            <span className="text-muted text-sm">{formatPlaytime(game.playtimeForeverMinutes)}</span>
+            <span className="text-muted text-sm">{formatPlaytime(game.playtimeForeverMinutes, t)}</span>
           </li>
         ))}
       </ul>

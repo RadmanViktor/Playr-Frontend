@@ -1,0 +1,80 @@
+﻿{
+  "chats": {
+    "eyebrow": "Stay connected",
+    "title": "Chats",
+    "subtitle": "Keep the conversation going with the players you've teamed up with — plan sessions, trade tips, and stay in sync."
+  },
+  "login": {
+    "title": "Log in to PLAYR",
+    "usernameOrEmailLabel": "Username or email",
+    "usernameOrEmailAriaLabel": "username or email",
+    "passwordLabel": "Password",
+    "passwordAriaLabel": "password",
+    "confirmationEmailSent": "Confirmation email sent. Check your inbox.",
+    "resendConfirmationEmail": "Resend confirmation email",
+    "enterEmailToResend": "Enter your email above to resend",
+    "submit": "Log In",
+    "registerInstead": "Register instead",
+    "errors": {
+      "usernameOrEmailRequired": "username or email is required",
+      "passwordRequired": "password is required",
+      "generic": "Something went wrong.",
+      "resendFailed": "Could not send the confirmation email. Please try again."
+    }
+  },
+  "register": {
+    "title": "Create your PLAYR account",
+    "emailLabel": "Email",
+    "emailAriaLabel": "email",
+    "usernameLabel": "Username",
+    "usernameAriaLabel": "username",
+    "passwordLabel": "Password",
+    "passwordAriaLabel": "password",
+    "confirmPasswordLabel": "Confirm password",
+    "confirmPasswordAriaLabel": "confirm password",
+    "showPassword": "show password",
+    "hidePassword": "hide password",
+    "submit": "Register",
+    "loginInstead": "Login instead",
+    "checkYourEmail": {
+      "title": "Check your email",
+      "sentTo": "We sent a confirmation link to",
+      "instructions": ". Click it to activate your account, then log in.",
+      "checkSpam": "Nothing in your inbox? Check your spam folder first.",
+      "emailSent": "Confirmation email sent.",
+      "resendEmail": "Resend email",
+      "resendEmailCooldown": "Resend email ({{seconds}}s)",
+      "goToLogin": "Go to login"
+    },
+    "errors": {
+      "passwordTooWeak": "password is too weak",
+      "generic": "Something went wrong.",
+      "resendFailed": "Could not send the confirmation email. Please try again."
+    }
+  },
+  "confirmEmail": {
+    "title": "Confirm your email",
+    "confirming": "Confirming your email address...",
+    "confirmed": "Your email address is confirmed. You can now log in.",
+    "goToLogin": "Go to login",
+    "resendSent": "If that address belongs to an unconfirmed account, a new link is on its way.",
+    "enterEmailLabel": "Enter your email to get a new link",
+    "emailAriaLabel": "email",
+    "sendNewLink": "Send new link",
+    "errors": {
+      "incompleteLink": "This confirmation link is incomplete.",
+      "invalidOrExpired": "This confirmation link is invalid or has expired.",
+      "resendFailed": "Could not send the confirmation email. Please try again."
+    }
+  },
+  "steamAccountSettings": {
+    "title": "Account linking"
+  },
+  "profileSettings": {
+    "title": "Edit profile",
+    "loading": "Loading…"
+  },
+  "notificationSettings": {
+    "title": "Notifications"
+  }
+}

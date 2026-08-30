@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import { Plus } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { PostCard } from '../components/PostCard'
 import { getFeed, type PostFeedItem } from '../api/postsApi'
 import { getGames, type Game } from '../api/gamesApi'
@@ -8,6 +9,7 @@ import { useCreatePostModal } from '../context/CreatePostModalContext'
 import { Select } from '../components/ui/Select'
 
 export default function FeedPage() {
+  const { t } = useTranslation('pagesA')
   const { user, token } = useAuth()
   const { openCreatePost, subscribePostCreated } = useCreatePostModal()
   const [posts, setPosts] = useState<PostFeedItem[]>([])
@@ -19,13 +21,15 @@ export default function FeedPage() {
   useEffect(() => {
     Promise.all([getFeed(token), getGames()])
       .then(([p, g]) => { setPosts(p); setGames(g) })
-      .catch(() => setError('Failed to load feed.'))
+      .catch(() => setError(t('feed.loadError')))
       .finally(() => setIsLoading(false))
   }, [])
 
   useEffect(() => {
     return subscribePostCreated((post) => {
-      setPosts((prev) => [post, ...prev])
+      if (post.scope === 'Feed') {
+        setPosts((prev) => [post, ...prev])
+      }
     })
   }, [subscribePostCreated])
 
@@ -50,33 +54,33 @@ export default function FeedPage() {
   return (
     <div className="flex flex-col gap-4 pb-20 md:pb-0">
       <div className="mb-2 border-l-4 border-primary pl-4">
-        <p className="mb-1 text-xs font-semibold uppercase tracking-[0.22em] text-primary">What's happening</p>
-        <h1 className="text-3xl font-bold tracking-tight text-text">Feed</h1>
+        <p className="mb-1 text-xs font-semibold uppercase tracking-[0.22em] text-primary">{t('feed.eyebrow')}</p>
+        <h1 className="text-3xl font-bold tracking-tight text-text">{t('feed.title')}</h1>
         <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-          See what your fellow players are up to — highlights, updates, and moments worth sharing.
+          {t('feed.subtitle')}
         </p>
       </div>
 
       {gamesInFeed.length > 0 && (
         <div className="flex items-center justify-end">
           <Select
-            aria-label="Filter by game"
+            aria-label={t('feed.filterByGame')}
             value={selectedGameId}
             onChange={setSelectedGameId}
             className="w-auto"
             options={[
-              { value: 'all', label: 'All games' },
+              { value: 'all', label: t('feed.allGames') },
               ...gamesInFeed.map((g) => ({ value: g.id, label: g.name })),
             ]}
           />
         </div>
       )}
 
-      {isLoading && <p className="text-muted">Loading…</p>}
+      {isLoading && <p className="text-muted">{t('feed.loading')}</p>}
       {error && <p className="text-frustrated">{error}</p>}
       {!isLoading && !error && filteredPosts.length === 0 && (
         <p className="text-muted">
-          {posts.length === 0 ? 'No posts yet — be the first to share!' : 'No posts for this game.'}
+          {posts.length === 0 ? t('feed.emptyStateNoPosts') : t('feed.emptyStateNoGamePosts')}
         </p>
       )}
       {filteredPosts.map((post) => (
@@ -91,8 +95,8 @@ export default function FeedPage() {
 
       <button
         type="button"
-        aria-label="Create post"
-        onClick={openCreatePost}
+        aria-label={t('feed.createPost')}
+        onClick={() => openCreatePost('Feed')}
         className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg transition-transform hover:scale-105 active:scale-95 md:hidden"
       >
         <Plus className="h-6 w-6" aria-hidden="true" />

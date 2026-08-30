@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Button } from './Button'
 import { Modal } from './Modal'
 import { Avatar } from './Avatar'
@@ -27,27 +28,34 @@ export function InviteModal({
   recipientAvatarUrl,
   onClose,
   onSent,
-  title = 'Send invitation',
-  promptText = 'Invite',
-  promptSuffix = ' to play',
-  placeholderText = "Say hi and tell them why you'd like to play together...",
-  actionLabel = 'Send invitation',
+  title,
+  promptText,
+  promptSuffix,
+  placeholderText,
+  actionLabel,
 }: InviteModalProps) {
+  const { t } = useTranslation('ui')
   const { token } = useAuth()
   const [message, setMessage] = useState('')
   const [isSending, setIsSending] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const resolvedTitle = title ?? t('inviteModal.title')
+  const resolvedPromptText = promptText ?? t('inviteModal.promptText')
+  const resolvedPromptSuffix = promptSuffix ?? t('inviteModal.promptSuffix')
+  const resolvedPlaceholderText = placeholderText ?? t('inviteModal.placeholderText')
+  const resolvedActionLabel = actionLabel ?? t('inviteModal.actionLabel')
+
   async function handleSend() {
     setError(null)
     const trimmed = message.trim()
     if (trimmed.length === 0) {
-      setError('Write a short presentation of yourself.')
+      setError(t('inviteModal.errorEmptyMessage'))
       return
     }
 
     if (!token) {
-      setError('You must be logged in to send invitations.')
+      setError(t('inviteModal.errorNotLoggedIn'))
       return
     }
 
@@ -57,29 +65,29 @@ export function InviteModal({
       onSent()
       onClose()
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Failed to send invitation. Please try again.')
+      setError(err instanceof ApiError ? err.message : t('inviteModal.errorGeneric'))
     } finally {
       setIsSending(false)
     }
   }
 
   return (
-    <Modal title={title} onClose={onClose}>
+    <Modal title={resolvedTitle} onClose={onClose}>
         <div className="mb-4 flex items-center gap-3">
           <Avatar src={recipientAvatarUrl ?? undefined} alt={recipientDisplayName} size="md" />
           <p className="text-sm text-text">
-            {promptText} <span className="font-medium">{recipientDisplayName}</span>{promptSuffix}
+            {resolvedPromptText} <span className="font-medium">{recipientDisplayName}</span>{resolvedPromptSuffix}
           </p>
         </div>
 
         <label htmlFor="invite-message" className="mb-1 block text-xs font-medium text-muted">
-          Presentation
+          {t('inviteModal.presentationLabel')}
         </label>
         <textarea
           id="invite-message"
           value={message}
           onChange={(event) => setMessage(event.target.value.slice(0, MAX_MESSAGE_LENGTH))}
-          placeholder={placeholderText}
+          placeholder={resolvedPlaceholderText}
           rows={4}
           className="w-full resize-none rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm text-text outline-none placeholder:text-muted focus:border-primary"
         />
@@ -91,10 +99,10 @@ export function InviteModal({
 
         <div className="mt-4 flex justify-end gap-2">
           <Button variant="secondary" onClick={onClose} disabled={isSending}>
-            Cancel
+            {t('inviteModal.cancel')}
           </Button>
           <Button onClick={handleSend} disabled={isSending}>
-            {isSending ? 'Sending...' : actionLabel}
+            {isSending ? t('inviteModal.sending') : resolvedActionLabel}
           </Button>
         </div>
     </Modal>

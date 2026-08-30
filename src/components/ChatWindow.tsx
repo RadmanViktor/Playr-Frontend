@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ChevronDown, ChevronUp, Paperclip, X } from 'lucide-react'
 import { Avatar, type AvatarStatus } from './ui/Avatar'
 import { Button } from './ui/Button'
@@ -49,6 +50,8 @@ export function ChatWindow({
   onClose,
   style,
 }: ChatWindowProps) {
+  const { t } = useTranslation('componentsB')
+  const { t: tMedia } = useTranslation('componentsA')
   const { user, token } = useAuth()
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [body, setBody] = useState('')
@@ -111,7 +114,7 @@ export function ChatWindow({
           hasLoadedOnce = true
         }
       } catch {
-        if (!cancelled) setError('Failed to load messages.')
+        if (!cancelled) setError(t('chatWindow.loadError'))
       } finally {
         if (!cancelled) setIsLoading(false)
       }
@@ -147,7 +150,7 @@ export function ChatWindow({
       setMediaFile(null)
       return
     }
-    const validationError = validateMediaFile(selected)
+    const validationError = validateMediaFile(selected, tMedia)
     if (validationError) {
       setError(validationError)
       setMediaFile(null)
@@ -174,7 +177,7 @@ export function ChatWindow({
       setBody('')
       clearMediaFile()
     } catch {
-      setError('Failed to send message.')
+      setError(t('chatWindow.sendError'))
     } finally {
       setIsSending(false)
     }
@@ -220,7 +223,7 @@ export function ChatWindow({
             event.stopPropagation()
             onToggleMinimize()
           }}
-          aria-label={isMinimized ? 'Expand chat' : 'Minimize chat'}
+          aria-label={isMinimized ? t('chatWindow.expandChatAriaLabel') : t('chatWindow.minimizeChatAriaLabel')}
           className="rounded-lg p-1 text-muted hover:bg-surface hover:text-text cursor-pointer"
         >
           {isMinimized ? (
@@ -235,7 +238,7 @@ export function ChatWindow({
             event.stopPropagation()
             onClose()
           }}
-          aria-label="Close chat"
+          aria-label={t('chatWindow.closeChatAriaLabel')}
           className="rounded-lg p-1 text-muted hover:bg-surface hover:text-text cursor-pointer"
         >
           <X className="h-5 w-5" aria-hidden="true" />
@@ -252,9 +255,9 @@ export function ChatWindow({
 
           <div className="flex-1 overflow-y-auto px-4 py-3">
             {isLoading ? (
-              <p className="text-sm text-muted">Loading messages...</p>
+              <p className="text-sm text-muted">{t('chatWindow.loadingMessages')}</p>
             ) : messages.length === 0 ? (
-              <p className="text-sm text-muted">Say hi and plan your next game together.</p>
+              <p className="text-sm text-muted">{t('chatWindow.emptyState')}</p>
             ) : (
               <div className="flex flex-col gap-2">
                 {messages.map((message) => {
@@ -277,7 +280,7 @@ export function ChatWindow({
                             ) : (
                               <img
                                 src={resolveMediaUrl(message.mediaUrl)!}
-                                alt="Attached media"
+                                alt={t('chatWindow.attachedMediaAlt')}
                                 className="max-h-64 max-w-full rounded-lg"
                               />
                             )}
@@ -304,11 +307,11 @@ export function ChatWindow({
                 {isVideoFile(mediaFile) ? (
                   <video src={mediaPreviewUrl} controls className="max-h-32 rounded-lg" />
                 ) : (
-                  <img src={mediaPreviewUrl} alt="Selected media preview" className="max-h-32 rounded-lg" />
+                  <img src={mediaPreviewUrl} alt={t('chatWindow.selectedMediaPreviewAlt')} className="max-h-32 rounded-lg" />
                 )}
                 <button
                   type="button"
-                  aria-label="Remove selected file"
+                  aria-label={t('chatWindow.removeSelectedFileAriaLabel')}
                   onClick={clearMediaFile}
                   className="absolute -right-2 -top-2 rounded-full bg-surface p-1 text-text shadow cursor-pointer"
                 >
@@ -323,14 +326,14 @@ export function ChatWindow({
               ref={fileInputRef}
               type="file"
               accept="image/*,video/*"
-              aria-label="Attach photo or video"
+              aria-label={t('chatWindow.attachPhotoOrVideoAriaLabel')}
               className="hidden"
               onChange={(event) => handleFileSelected(event.target.files?.[0] ?? null)}
             />
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              aria-label="Attach photo or video"
+              aria-label={t('chatWindow.attachPhotoOrVideoAriaLabel')}
               className="rounded-lg p-2 text-muted hover:bg-surface-raised hover:text-text cursor-pointer"
             >
               <Paperclip className="h-5 w-5" aria-hidden="true" />
@@ -344,12 +347,12 @@ export function ChatWindow({
                   handleSend()
                 }
               }}
-              placeholder="Write a message..."
+              placeholder={t('chatWindow.messagePlaceholder')}
               className="min-w-0 flex-1 rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm text-text outline-none placeholder:text-muted focus:border-primary"
             />
             <EmojiPickerButton onSelect={(emoji) => setBody((prev) => (prev + emoji).slice(0, 1000))} />
             <Button size="sm" onClick={handleSend} disabled={isSending || (body.trim().length === 0 && !mediaFile)}>
-              Send
+              {t('chatWindow.send')}
             </Button>
           </div>
         </>

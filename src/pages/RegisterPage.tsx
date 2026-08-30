@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { Eye, EyeOff } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { AuthPanel } from '../components/AuthPanel'
 import { PasswordStrengthMeter } from '../components/PasswordStrengthMeter'
 import { Button } from '../components/ui/Button'
@@ -29,6 +30,7 @@ const inputClass =
 const RESEND_COOLDOWN_SECONDS = 30
 
 export default function RegisterPage() {
+  const { t } = useTranslation('pagesB')
   const { register } = useAuth()
   const [email, setEmail] = useState('')
   const [username, setUsername] = useState('')
@@ -55,7 +57,7 @@ export default function RegisterPage() {
     if (passwordError) {
       errors.password = passwordError
     } else if (getPasswordStrength(password).score < MINIMUM_PASSWORD_SCORE) {
-      errors.password = 'password is too weak'
+      errors.password = t('register.errors.passwordTooWeak')
     }
 
     if (confirmError) errors.confirmPassword = confirmError
@@ -87,7 +89,7 @@ export default function RegisterPage() {
       await register(email, username, password)
       setRegisteredEmail(email)
     } catch (err) {
-      const message = err instanceof ApiError ? err.message : 'Something went wrong.'
+      const message = err instanceof ApiError ? err.message : t('register.errors.generic')
       setGeneralError(message)
     } finally {
       setIsSubmitting(false)
@@ -113,25 +115,25 @@ export default function RegisterPage() {
       }, 1000)
     } catch {
       setResendState('idle')
-      setGeneralError('Could not send the confirmation email. Please try again.')
+      setGeneralError(t('register.errors.resendFailed'))
     }
   }
 
   if (registeredEmail) {
     return (
       <div className="flex min-h-dvh items-center justify-center bg-bg px-4">
-        <AuthPanel title="Check your email">
+        <AuthPanel title={t('register.checkYourEmail.title')}>
           <p className="text-sm text-muted">
-            We sent a confirmation link to{' '}
-            <span className="text-text">{registeredEmail}</span>. Click it to activate your
-            account, then log in.
+            {t('register.checkYourEmail.sentTo')}{' '}
+            <span className="text-text">{registeredEmail}</span>
+            {t('register.checkYourEmail.instructions')}
           </p>
           <p className="mt-4 text-sm text-muted">
-            Nothing in your inbox? Check your spam folder first.
+            {t('register.checkYourEmail.checkSpam')}
           </p>
           {resendState === 'sent' && (
             <p className="mt-4 text-sm text-enjoying" role="status">
-              Confirmation email sent.
+              {t('register.checkYourEmail.emailSent')}
             </p>
           )}
           {generalError && <p className="mt-4 text-frustrated">{generalError}</p>}
@@ -142,11 +144,11 @@ export default function RegisterPage() {
             disabled={resendState === 'sending' || resendCooldown > 0}
             className="mt-4 w-full"
           >
-            {resendCooldown > 0 ? `Resend email (${resendCooldown}s)` : 'Resend email'}
+            {resendCooldown > 0 ? t('register.checkYourEmail.resendEmailCooldown', { seconds: resendCooldown }) : t('register.checkYourEmail.resendEmail')}
           </Button>
           <p className="mt-6 text-sm text-muted">
             <Link to="/login" className="text-primary hover:underline">
-              Go to login
+              {t('register.checkYourEmail.goToLogin')}
             </Link>
           </p>
         </AuthPanel>
@@ -156,13 +158,13 @@ export default function RegisterPage() {
 
   return (
     <div className="flex min-h-dvh items-center justify-center bg-bg px-4">
-      <AuthPanel title="Create your PLAYR account">
+      <AuthPanel title={t('register.title')}>
         <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
           <label className="flex flex-col gap-1 text-sm text-muted">
-            Email
+            {t('register.emailLabel')}
             <input
               id="email"
-              aria-label="email"
+              aria-label={t('register.emailAriaLabel')}
               type="email"
               autoComplete="email"
               className={inputClass}
@@ -180,10 +182,10 @@ export default function RegisterPage() {
           </label>
 
           <label className="flex flex-col gap-1 text-sm text-muted">
-            Username
+            {t('register.usernameLabel')}
             <input
               id="username"
-              aria-label="username"
+              aria-label={t('register.usernameAriaLabel')}
               autoComplete="username"
               className={inputClass}
               value={username}
@@ -202,11 +204,11 @@ export default function RegisterPage() {
           </label>
 
           <label className="flex flex-col gap-1 text-sm text-muted">
-            Password
+            {t('register.passwordLabel')}
             <div className="relative">
               <input
                 id="password"
-                aria-label="password"
+                aria-label={t('register.passwordAriaLabel')}
                 type={showPassword ? 'text' : 'password'}
                 autoComplete="new-password"
                 className={`${inputClass} w-full pr-10`}
@@ -219,7 +221,7 @@ export default function RegisterPage() {
               />
               <button
                 type="button"
-                aria-label={showPassword ? 'hide password' : 'show password'}
+                aria-label={showPassword ? t('register.hidePassword') : t('register.showPassword')}
                 onClick={() => setShowPassword((visible) => !visible)}
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-muted hover:text-text"
               >
@@ -233,10 +235,10 @@ export default function RegisterPage() {
           </label>
 
           <label className="flex flex-col gap-1 text-sm text-muted">
-            Confirm password
+            {t('register.confirmPasswordLabel')}
             <input
               id="confirmPassword"
-              aria-label="confirm password"
+              aria-label={t('register.confirmPasswordAriaLabel')}
               type={showPassword ? 'text' : 'password'}
               autoComplete="new-password"
               className={inputClass}
@@ -259,12 +261,12 @@ export default function RegisterPage() {
 
           {generalError && <p className="text-frustrated">{generalError}</p>}
           <Button type="submit" disabled={isSubmitting} className="mt-2 w-full">
-            Register
+            {t('register.submit')}
           </Button>
         </form>
         <p className="mt-6 text-sm text-muted">
           <Link to="/login" className="text-primary hover:underline">
-            Login instead
+            {t('register.loginInstead')}
           </Link>
         </p>
       </AuthPanel>

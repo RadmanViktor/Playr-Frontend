@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { resolveMediaUrl } from '../api/postsApi'
 import type { PostMediaItem } from '../api/postsApi'
@@ -12,6 +13,7 @@ interface MediaLightboxProps {
 }
 
 export function MediaLightbox({ media, initialIndex, onClose }: MediaLightboxProps) {
+  const { t } = useTranslation('componentsA')
   const [index, setIndex] = useState(initialIndex)
 
   useBodyScrollLock()
@@ -36,7 +38,7 @@ export function MediaLightbox({ media, initialIndex, onClose }: MediaLightboxPro
     >
       <button
         type="button"
-        aria-label="Close"
+        aria-label={t('mediaLightbox.close')}
         onClick={onClose}
         className="absolute right-4 top-[max(1rem,env(safe-area-inset-top))] rounded-full bg-surface/80 p-2 text-text cursor-pointer"
       >
@@ -46,7 +48,7 @@ export function MediaLightbox({ media, initialIndex, onClose }: MediaLightboxPro
       {index > 0 && (
         <button
           type="button"
-          aria-label="Previous image"
+          aria-label={t('mediaLightbox.previousImageAriaLabel')}
           onClick={(e) => {
             e.stopPropagation()
             setIndex((i) => Math.max(0, i - 1))
@@ -59,7 +61,7 @@ export function MediaLightbox({ media, initialIndex, onClose }: MediaLightboxPro
       {index < media.length - 1 && (
         <button
           type="button"
-          aria-label="Next image"
+          aria-label={t('mediaLightbox.nextImageAriaLabel')}
           onClick={(e) => {
             e.stopPropagation()
             setIndex((i) => Math.min(media.length - 1, i + 1))
@@ -81,7 +83,7 @@ export function MediaLightbox({ media, initialIndex, onClose }: MediaLightboxPro
         ) : (
           <img
             src={resolveMediaUrl(current.url)!}
-            alt="Post media"
+            alt={t('mediaLightbox.postMediaAlt')}
             className="max-h-[85dvh] max-w-[90vw] rounded-lg object-contain"
           />
         )}

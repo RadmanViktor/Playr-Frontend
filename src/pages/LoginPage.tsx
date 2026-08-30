@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { AuthPanel } from '../components/AuthPanel'
 import { Button } from '../components/ui/Button'
 import { useAuth } from '../context/AuthContext'
@@ -15,6 +16,7 @@ const inputClass =
   'rounded-lg border border-border bg-surface-raised px-3 py-2 text-text outline-none focus:border-primary'
 
 export default function LoginPage() {
+  const { t } = useTranslation('pagesB')
   const { login } = useAuth()
   const navigate = useNavigate()
   const [usernameOrEmail, setUsernameOrEmail] = useState('')
@@ -28,10 +30,10 @@ export default function LoginPage() {
   function validate(): FieldErrors {
     const errors: FieldErrors = {}
     if (!usernameOrEmail.trim()) {
-      errors.usernameOrEmail = 'username or email is required'
+      errors.usernameOrEmail = t('login.errors.usernameOrEmailRequired')
     }
     if (!password) {
-      errors.password = 'password is required'
+      errors.password = t('login.errors.passwordRequired')
     }
     return errors
   }
@@ -57,7 +59,7 @@ export default function LoginPage() {
         setNeedsConfirmation(true)
         setGeneralError(err.message)
       } else {
-        const message = err instanceof ApiError ? err.message : 'Something went wrong.'
+        const message = err instanceof ApiError ? err.message : t('login.errors.generic')
         setGeneralError(message)
       }
     } finally {
@@ -72,19 +74,19 @@ export default function LoginPage() {
       setResendState('sent')
     } catch {
       setResendState('idle')
-      setGeneralError('Could not send the confirmation email. Please try again.')
+      setGeneralError(t('login.errors.resendFailed'))
     }
   }
 
   return (
     <div className="flex min-h-dvh items-center justify-center bg-bg px-4">
-      <AuthPanel title="Log in to PLAYR">
+      <AuthPanel title={t('login.title')}>
         <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
           <label className="flex flex-col gap-1 text-sm text-muted">
-            Username or email
+            {t('login.usernameOrEmailLabel')}
             <input
               id="usernameOrEmail"
-              aria-label="username or email"
+              aria-label={t('login.usernameOrEmailAriaLabel')}
               className={inputClass}
               value={usernameOrEmail}
               onChange={(e) => setUsernameOrEmail(e.target.value)}
@@ -94,10 +96,10 @@ export default function LoginPage() {
             )}
           </label>
           <label className="flex flex-col gap-1 text-sm text-muted">
-            Password
+            {t('login.passwordLabel')}
             <input
               id="password"
-              aria-label="password"
+              aria-label={t('login.passwordAriaLabel')}
               type="password"
               className={inputClass}
               value={password}
@@ -111,7 +113,7 @@ export default function LoginPage() {
           {needsConfirmation &&
             (resendState === 'sent' ? (
               <p className="text-sm text-enjoying" role="status">
-                Confirmation email sent. Check your inbox.
+                {t('login.confirmationEmailSent')}
               </p>
             ) : (
               <Button
@@ -122,17 +124,17 @@ export default function LoginPage() {
                 className="w-full"
               >
                 {usernameOrEmail.includes('@')
-                  ? 'Resend confirmation email'
-                  : 'Enter your email above to resend'}
+                  ? t('login.resendConfirmationEmail')
+                  : t('login.enterEmailToResend')}
               </Button>
             ))}
           <Button type="submit" disabled={isSubmitting} className="mt-2 w-full">
-            Log In
+            {t('login.submit')}
           </Button>
         </form>
         <p className="mt-6 text-sm text-muted">
           <Link to="/register" className="text-primary hover:underline">
-            Register instead
+            {t('login.registerInstead')}
           </Link>
         </p>
       </AuthPanel>

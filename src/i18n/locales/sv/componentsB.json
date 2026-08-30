@@ -1,0 +1,176 @@
+{
+  "addGameModal": {
+    "title": "Lägg till ett spel",
+    "searchAriaLabel": "Sök efter ett spel",
+    "searchPlaceholder": "Sök efter ett spel…",
+    "searching": "Söker…",
+    "noGamesFound": "Inga spel hittades.",
+    "searchError": "Det gick inte att söka efter spel.",
+    "addError": "Det gick inte att lägga till spelet. Försök igen."
+  },
+  "gamePickerInput": {
+    "tryAgain": "Försök igen",
+    "selectGameAriaLabel": "Välj ett spel",
+    "selectGamePlaceholder": "Välj ett spel",
+    "searchGamesAriaLabel": "Sök spel",
+    "searchGamesPlaceholder": "Sök spel…",
+    "noGamesFound": "Inga spel hittades.",
+    "searching": "Söker…",
+    "searchError": "Det gick inte att söka efter spel.",
+    "addError": "Det gick inte att lägga till spelet. Försök igen."
+  },
+  "myGamesLibrary": {
+    "loadError": "Det gick inte att läsa in spel.",
+    "addError": "Det gick inte att lägga till spelet.",
+    "rateError": "Det gick inte att spara betyget.",
+    "removeError": "Det gick inte att ta bort spelet.",
+    "loading": "Läser in…",
+    "addGame": "Lägg till ett spel",
+    "emptyOwner": "Du har inte lagt till några spel än.",
+    "emptyOther": "Inga spel har lagts till än.",
+    "removeFromLibraryAriaLabel": "Ta bort {{gameName}} från biblioteket",
+    "reviewPlaceholder": "Skriv en recension (valfritt)…",
+    "saveRating": "Spara betyg"
+  },
+  "steamGamesList": {
+    "loading": "Läser in…",
+    "noGames": "Inga Steam-spel att visa.",
+    "hoursPlayed_one": "{{count}} h",
+    "hoursPlayed_other": "{{count}} h",
+    "minutesPlayed_one": "{{count}} min",
+    "minutesPlayed_other": "{{count}} min"
+  },
+  "steamAchievementsList": {
+    "loadError": "Det gick inte att läsa in prestationer.",
+    "titleWithGame": "{{gameName}} – Prestationer",
+    "loading": "Läser in…",
+    "noAchievements": "Inga prestationer att visa för det här spelet.",
+    "unlockedOn": "Upplåst {{date}}"
+  },
+  "steamAccountSection": {
+    "title": "Steam-konto",
+    "loadError": "Det gick inte att läsa in Steam-status.",
+    "linkError": "Det gick inte att starta Steam-länkningen.",
+    "unlinkError": "Det gick inte att koppla bort Steam-kontot.",
+    "publicLibrary": "Publikt spelbibliotek",
+    "privateProfile": "Privat profil – spel kan inte hämtas",
+    "unlink": "Koppla bort",
+    "connectDescription": "Anslut ditt Steam-konto för att visa ditt spelbibliotek på din profil.",
+    "connect": "Anslut Steam"
+  },
+  "lookingForGamePanel": {
+    "playStyleCompetitive": "Tävlingsinriktad",
+    "playStyleCompetitiveDescription": "Rankad, intensiv, vill vinna",
+    "playStyleChill": "Avslappnad",
+    "playStyleChillDescription": "Avslappnad, för skojs skull",
+    "loadGamesError": "Det gick inte att läsa in spel.",
+    "chooseGameAndStyle": "Välj ett spel och en spelstil.",
+    "startError": "Det gick inte att göra dig tillgänglig. Försök igen.",
+    "stopError": "Det gick inte att sluta visa dig. Försök igen.",
+    "availableTitle": "Du är tillgänglig för ett spel",
+    "stopping": "Stänger av...",
+    "stopShowingMe": "Sluta visa mig",
+    "makeAvailableTitle": "Gör dig tillgänglig",
+    "wantToBeFoundTitle": "Vill du att andra spelare ska hitta dig?",
+    "cancel": "Avbryt",
+    "makeMeAvailable": "Gör mig tillgänglig!",
+    "gameLabel": "Spel",
+    "playStyleLabel": "Spelstil",
+    "noteLabel": "Anteckning",
+    "notePlaceholder": "Något specifikt?",
+    "saving": "Sparar..."
+  },
+  "profileHeader": {
+    "settings": "Inställningar",
+    "signOut": "Logga ut",
+    "message": "Meddelande",
+    "friend": "Vän",
+    "requestSent": "Förfrågan skickad",
+    "cancelling": "Avbryter...",
+    "cancelRequest": "Avbryt förfrågan",
+    "addFriend": "Lägg till vän",
+    "posts_one": "inlägg",
+    "posts_other": "inlägg",
+    "joined": "Gick med {{date}}"
+  },
+  "editProfileForm": {
+    "saveError": "Något gick fel.",
+    "title": "Redigera profil",
+    "displayNameLabel": "Visningsnamn",
+    "bioLabel": "Bio",
+    "bioCounter": "{{count}} / {{max}}",
+    "avatarLabel": "Avatar",
+    "regionLabel": "Region",
+    "regionPlaceholder": "t.ex. EU, NA, AS",
+    "platformsLabel": "Plattformar",
+    "externalLinksLabel": "Externa länkar",
+    "linkNamePlaceholder": "Namn",
+    "linkValuePlaceholder": "URL eller användarnamn",
+    "removeLink": "✕",
+    "addLink": "+ Lägg till länk",
+    "saving": "Sparar…",
+    "save": "Spara",
+    "cancel": "Avbryt"
+  },
+  "avatarUploadInput": {
+    "unsupportedFileType": "Filtypen stöds inte. Tillåtna: jpg, jpeg, png, webp, gif.",
+    "fileTooLarge": "Bilder får inte vara större än 10 MB.",
+    "uploadAvatarAriaLabel": "Ladda upp avatar"
+  },
+  "passwordStrengthMeter": {
+    "requirementLength": "minst 8 tecken",
+    "requirementLowercase": "en gemen bokstav",
+    "requirementUppercase": "en versal bokstav",
+    "requirementNumber": "en siffra",
+    "requirementSymbol": "ett specialtecken (valfritt, ökar styrkan)",
+    "strengthWeak": "svagt",
+    "strengthFair": "okej",
+    "strengthGood": "bra",
+    "strengthStrong": "starkt",
+    "strengthLabel": "Lösenordsstyrka: {{label}}",
+    "chooseStrongerPassword": " - välj ett starkare lösenord"
+  },
+  "notificationSettingsSection": {
+    "title": "Notiser",
+    "description": "Bestäm hur du blir notifierad när en vän skickar ett chattmeddelande till dig.",
+    "soundTitle": "Notisljud",
+    "soundDescription": "Spela upp ett ljud när du får ett nytt chattmeddelande.",
+    "browserTitle": "Webbläsarnotiser",
+    "browserDescription": "Visa en skrivbordsnotis för nya meddelanden, även om fliken inte är aktiv.",
+    "browserBlocked": "Notiser är blockerade i dina webbläsarinställningar."
+  },
+  "settingsSectionHeader": {
+    "backToSettingsAriaLabel": "Tillbaka till inställningar"
+  },
+  "emojiPickerButton": {
+    "addEmojiAriaLabel": "Lägg till emoji"
+  },
+  "conversationsList": {
+    "minutesAgo_one": "{{count}} min sedan",
+    "minutesAgo_other": "{{count}} min sedan",
+    "hoursAgo_one": "{{count}} tim sedan",
+    "hoursAgo_other": "{{count}} tim sedan",
+    "daysAgo_one": "{{count}} dag sedan",
+    "daysAgo_other": "{{count}} dagar sedan",
+    "loadError": "Det gick inte att läsa in chattar.",
+    "loading": "Läser in chattar...",
+    "emptyState": "Inga konversationer än. Starta en chatt med en vän för att se den här.",
+    "noMessagesYet": "Inga meddelanden än",
+    "unreadAriaLabel": "Oläst"
+  },
+  "chatWindow": {
+    "loadError": "Det gick inte att läsa in meddelanden.",
+    "sendError": "Det gick inte att skicka meddelandet.",
+    "expandChatAriaLabel": "Utöka chatt",
+    "minimizeChatAriaLabel": "Minimera chatt",
+    "closeChatAriaLabel": "Stäng chatt",
+    "loadingMessages": "Läser in meddelanden...",
+    "emptyState": "Säg hej och planera ditt nästa spel tillsammans.",
+    "attachedMediaAlt": "Bifogad media",
+    "selectedMediaPreviewAlt": "Förhandsvisning av vald media",
+    "removeSelectedFileAriaLabel": "Ta bort vald fil",
+    "attachPhotoOrVideoAriaLabel": "Bifoga foto eller video",
+    "messagePlaceholder": "Skriv ett meddelande...",
+    "send": "Skicka"
+  }
+}

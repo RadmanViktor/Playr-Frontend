@@ -1,0 +1,136 @@
+{
+  "createPostModal": {
+    "title": "Skapa inlägg",
+    "titleProfile": "Skapa profilinlägg",
+    "close": "Stäng",
+    "discardConfirm": "Vill du kasta det här inlägget? Din text och media försvinner.",
+    "discard": "Kasta",
+    "keepEditing": "Fortsätt redigera",
+    "gameLabel": "Spel",
+    "moodLabel": "Humör (valfritt)",
+    "textLabel": "Vad hände?",
+    "postTextAriaLabel": "Inläggstext",
+    "charCount": "{{count}} / {{max}}",
+    "postButton": "Publicera",
+    "posting": "Publicerar…",
+    "errors": {
+      "loadGamesFailed": "Det gick inte att ladda spel.",
+      "selectGame": "Välj ett spel.",
+      "textRequired": "Inläggstext krävs.",
+      "textTooLong": "Inläggstext får inte vara längre än 1000 tecken.",
+      "genericError": "Något gick fel."
+    }
+  },
+  "commentsSection": {
+    "loading": "Laddar kommentarer…",
+    "empty": "Inga kommentarer än.",
+    "loadMore": "Ladda fler kommentarer",
+    "loadingMore": "Laddar…",
+    "writeCommentAriaLabel": "Skriv en kommentar",
+    "writeCommentPlaceholder": "Skriv en kommentar…",
+    "commentButton": "Kommentera",
+    "posting": "Publicerar…",
+    "errors": {
+      "loadFailed": "Det gick inte att ladda kommentarer.",
+      "postFailed": "Det gick inte att publicera kommentaren."
+    }
+  },
+  "commentItem": {
+    "editAriaLabel": "Redigera kommentartext",
+    "save": "Spara",
+    "saving": "Sparar…",
+    "cancel": "Avbryt",
+    "optionsAriaLabel": "Kommentaralternativ",
+    "edit": "Redigera",
+    "delete": "Ta bort",
+    "deleting": "Tar bort…",
+    "timeAgo": {
+      "minutes": "{{count}} min sedan",
+      "hours": "{{count}} tim sedan",
+      "days": "{{count}} dag sedan"
+    },
+    "errors": {
+      "reactionFailed": "Det gick inte att uppdatera reaktionen.",
+      "updateFailed": "Det gick inte att uppdatera kommentaren.",
+      "deleteFailed": "Det gick inte att ta bort kommentaren."
+    }
+  },
+  "commentReactions": {
+    "reactAriaLabel": "Reagera på kommentar",
+    "removeReactionAriaLabel": "Ta bort {{type}}-reaktion"
+  },
+  "postCard": {
+    "mood": {
+      "none": "Ingen",
+      "enjoying": "Njuter",
+      "needHelp": "Behöver hjälp",
+      "frustrated": "Frustrerad",
+      "completed": "Klar"
+    },
+    "optionsAriaLabel": "Inläggsalternativ",
+    "edit": "Redigera",
+    "delete": "Ta bort",
+    "save": "Spara",
+    "saving": "Sparar…",
+    "cancel": "Avbryt",
+    "deleteConfirm": "Vill du ta bort det här inlägget?",
+    "confirmDeleteAriaLabel": "Bekräfta borttagning",
+    "deleting": "Tar bort…",
+    "editPostAriaLabel": "Redigera inläggstext",
+    "charCount": "{{count}} / {{max}}",
+    "hideCommentsAriaLabel": "Dölj kommentarer",
+    "showCommentsAriaLabel": "Visa kommentarer",
+    "unlikePostAriaLabel": "Sluta gilla inlägget",
+    "likePostAriaLabel": "Gilla inlägget",
+    "timeAgo": {
+      "minutes": "{{count}} min sedan",
+      "hours": "{{count}} tim sedan",
+      "days": "{{count}} dag sedan"
+    },
+    "errors": {
+      "updateFailed": "Det gick inte att uppdatera inlägget.",
+      "deleteFailed": "Det gick inte att ta bort inlägget."
+    }
+  },
+  "postMediaCarousel": {
+    "openMediaAriaLabel": "Öppna media",
+    "previousImageAriaLabel": "Föregående bild",
+    "nextImageAriaLabel": "Nästa bild",
+    "postMediaAlt": "Inläggsmedia",
+    "counter": "{{current}}/{{total}}"
+  },
+  "mediaLightbox": {
+    "close": "Stäng",
+    "previousImageAriaLabel": "Föregående bild",
+    "nextImageAriaLabel": "Nästa bild",
+    "postMediaAlt": "Inläggsmedia"
+  },
+  "mediaUploadInput": {
+    "removeSelectedFileAriaLabel": "Ta bort vald fil",
+    "removeMediaAriaLabel": "Ta bort media",
+    "selectedPreviewAlt": "Förhandsvisning av vald media",
+    "postMediaAlt": "Inläggsmedia",
+    "addMediaLabel": "Lägg till foto eller video, eller dra & släpp",
+    "uploadAriaLabel": "Ladda upp foto eller video",
+    "errors": {
+      "imageTooLarge": "Bilder får inte vara större än 10 MB.",
+      "videoTooLarge": "Videor får inte vara större än 100 MB.",
+      "unsupportedType": "Filtypen stöds inte. Tillåtna: jpg, jpeg, png, webp, gif, mp4, webm, mov."
+    }
+  },
+  "mediaGalleryUploadInput": {
+    "undo": "Ångra",
+    "removeMediaAriaLabel": "Ta bort media",
+    "removeSelectedFileAriaLabel": "Ta bort vald fil",
+    "postMediaAlt": "Inläggsmedia",
+    "selectedPreviewAlt": "Förhandsvisning av vald media",
+    "addMediaLabel": "Lägg till foton eller en video, eller dra & släpp",
+    "addMoreLabel": "Lägg till fler ({{count}} kvar)",
+    "uploadAriaLabel": "Ladda upp foton eller video",
+    "errors": {
+      "singleVideoOnly": "Ett inlägg kan bara innehålla en enda video, eller upp till 5 bilder.",
+      "singleVideoOnlyNotBoth": "Ett inlägg kan bara innehålla en enda video, eller upp till 5 bilder, inte båda.",
+      "maxImages": "Du kan lägga till upp till {{max}} bilder per inlägg."
+    }
+  }
+}

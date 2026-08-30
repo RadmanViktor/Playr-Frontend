@@ -1,0 +1,17 @@
+﻿{
+  "title": "Settings",
+  "items": {
+    "notifications": {
+      "label": "Notifications",
+      "description": "Sound and browser notification preferences."
+    },
+    "steam": {
+      "label": "Account linking",
+      "description": "Connect or disconnect your Steam account."
+    },
+    "profile": {
+      "label": "Edit profile",
+      "description": "Display name, bio, avatar, platforms and links."
+    }
+  }
+}

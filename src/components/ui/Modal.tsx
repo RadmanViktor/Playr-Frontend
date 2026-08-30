@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { useBodyScrollLock } from '../../lib/useBodyScrollLock'
 import { useOverlayDismiss } from '../../lib/useOverlayDismiss'
 
@@ -12,6 +13,7 @@ interface ModalProps {
 }
 
 export function Modal({ title, onClose, children, maxWidthClassName = 'max-w-md' }: ModalProps) {
+  const { t } = useTranslation('ui')
   useBodyScrollLock()
   const { backdropProps } = useOverlayDismiss({ onDismiss: onClose })
 
@@ -30,7 +32,7 @@ export function Modal({ title, onClose, children, maxWidthClassName = 'max-w-md'
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close"
+            aria-label={t('modal.close')}
             className="rounded-lg p-1 text-muted hover:bg-surface-raised hover:text-text cursor-pointer"
           >
             <X className="h-5 w-5" aria-hidden="true" />
