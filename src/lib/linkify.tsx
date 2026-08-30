@@ -64,3 +64,34 @@ export function linkify(text: string, mentions: MentionItem[] = []): ReactNode[]
 
   return nodes
 }
+
+/**
+ * Renders chat message text with @username mentions visually highlighted -
+ * but only when the username belongs to one of the conversation's
+ * participants, so a literal "@word" that isn't a real participant stays
+ * plain text. Unlike `linkify`, this isn't turned into a profile link since
+ * chat messages don't carry an authoritative `mentions` list from the
+ * backend, and it uses a different highlight color when the message bubble
+ * is the current user's own (bg-primary), so the tag doesn't blend into the
+ * plain white message text.
+ */
+export function linkifyChatMessage(text: string, validUsernames: Iterable<string>, isMine: boolean): ReactNode[] {
+  const usernames = new Set(Array.from(validUsernames, (username) => username.toLowerCase()))
+  const nodes: ReactNode[] = []
+  let key = 0
+  const mentionClassName = isMine ? 'font-semibold text-yellow-300' : 'font-semibold text-primary'
+
+  for (const mentionPart of text.split(MENTION_SPLIT_PATTERN)) {
+    if (MENTION_TEST_PATTERN.test(mentionPart) && usernames.has(mentionPart.slice(1).toLowerCase())) {
+      nodes.push(
+        <span key={key++} className={mentionClassName}>
+          {mentionPart}
+        </span>,
+      )
+      continue
+    }
+    if (mentionPart) nodes.push(<span key={key++}>{mentionPart}</span>)
+  }
+
+  return nodes
+}

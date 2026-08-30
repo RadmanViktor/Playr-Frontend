@@ -8,6 +8,7 @@ import { getMessages, sendMessage, type ChatMessage, type Conversation } from '.
 import { resolveMediaUrl } from '../api/http'
 import { getProfile, type ProfileStatus } from '../api/profilesApi'
 import { useAuth } from '../context/AuthContext'
+import { linkifyChatMessage } from '../lib/linkify'
 import { useIsMobile } from '../lib/useIsMobile'
 import { useVisualViewportHeight } from '../lib/useVisualViewportHeight'
 
@@ -59,6 +60,9 @@ export function ChatWindow({
   const [otherStatus, setOtherStatus] = useState<ProfileStatus | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const chatUsernames = [conversation.otherParticipant.username, user?.username].filter(
+    (username): username is string => Boolean(username),
+  )
 
   const isMobile = useIsMobile()
   // Only relevant for the fullscreen mobile layout; the docked desktop window
@@ -279,7 +283,7 @@ export function ChatWindow({
                             )}
                           </div>
                         )}
-                        {message.body && <p>{message.body}</p>}
+                        {message.body && <p>{linkifyChatMessage(message.body, chatUsernames, isMine)}</p>}
                         <p className={`mt-1 text-[10px] ${isMine ? 'text-white/70' : 'text-muted'}`}>
                           {formatMessageTime(message.createdAt)}
                         </p>
