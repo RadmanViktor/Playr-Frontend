@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
+import { Plus } from 'lucide-react'
 import { PostCard } from '../components/PostCard'
 import { getFeed, type PostFeedItem } from '../api/postsApi'
 import { getGames, type Game } from '../api/gamesApi'
@@ -8,7 +9,7 @@ import { Select } from '../components/ui/Select'
 
 export default function FeedPage() {
   const { user, token } = useAuth()
-  const { subscribePostCreated } = useCreatePostModal()
+  const { openCreatePost, subscribePostCreated } = useCreatePostModal()
   const [posts, setPosts] = useState<PostFeedItem[]>([])
   const [games, setGames] = useState<Game[]>([])
   const [selectedGameId, setSelectedGameId] = useState<string>('all')
@@ -87,6 +88,15 @@ export default function FeedPage() {
           onUpdate={handleUpdate}
         />
       ))}
+
+      <button
+        type="button"
+        aria-label="Create post"
+        onClick={openCreatePost}
+        className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg transition-transform hover:scale-105 active:scale-95 md:hidden"
+      >
+        <Plus className="h-6 w-6" aria-hidden="true" />
+      </button>
     </div>
   )
 }
