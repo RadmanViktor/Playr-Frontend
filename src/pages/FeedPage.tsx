@@ -48,7 +48,7 @@ export default function FeedPage() {
   }, [posts, selectedGameId])
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 pb-20 md:pb-0">
       <div className="mb-2 border-l-4 border-primary pl-4">
         <p className="mb-1 text-xs font-semibold uppercase tracking-[0.22em] text-primary">What's happening</p>
         <h1 className="text-3xl font-bold tracking-tight text-text">Feed</h1>
