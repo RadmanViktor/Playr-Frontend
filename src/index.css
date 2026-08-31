@@ -38,6 +38,41 @@
   animation: tab-content-in 0.15s ease-out;
 }
 
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(105vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.animate-confetti-fall {
+  animation: confetti-fall linear infinite;
+}
+
+@keyframes celebration-pop {
+  0% {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.03);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-celebration-pop {
+  animation: celebration-pop 0.35s ease-out;
+}
+
+
 /* Avatar badge rings (see components/ui/Avatar.tsx). Wraps the avatar in a
    padded, rounded span whose background shows through as a ring. */
 .badge-ring {
@@ -98,6 +133,82 @@
   .badge-ring-creator {
     animation: none;
     box-shadow: 0 0 10px 2px rgba(255, 46, 196, 0.6);
+  }
+}
+
+/* "Founding Member" (first 100 registered users) badge: a warm gold/white
+   rotating ring with a sparkling glitter glow, visually distinct from both
+   the plain tiered rings and the Creator neon ring. */
+.badge-ring-founder {
+  position: relative;
+  background: conic-gradient(
+    from var(--badge-angle),
+    #fff6d8,
+    #ffd700,
+    #fff6d8,
+    #b8860b,
+    #ffd700,
+    #fff6d8
+  );
+  animation:
+    badge-ring-rotate 4s linear infinite,
+    badge-ring-founder-pulse 2.4s ease-in-out infinite;
+}
+
+.badge-ring-founder::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 9999px;
+  pointer-events: none;
+  background-image:
+    radial-gradient(circle, #fffdf2 0 1px, transparent 1.5px),
+    radial-gradient(circle, #fffdf2 0 1px, transparent 1.5px),
+    radial-gradient(circle, #fffdf2 0 1px, transparent 1.5px),
+    radial-gradient(circle, #fffdf2 0 1px, transparent 1.5px);
+  background-size: 45% 45%;
+  background-repeat: no-repeat;
+  background-position:
+    10% 15%,
+    85% 25%,
+    20% 80%,
+    75% 85%;
+  animation: badge-ring-founder-glitter 1.6s ease-in-out infinite;
+}
+
+@keyframes badge-ring-founder-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 6px 1px rgba(255, 215, 0, 0.55),
+      0 0 14px 2px rgba(255, 246, 216, 0.35);
+  }
+  50% {
+    box-shadow:
+      0 0 12px 3px rgba(255, 215, 0, 0.85),
+      0 0 26px 6px rgba(255, 246, 216, 0.6);
+  }
+}
+
+@keyframes badge-ring-founder-glitter {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .badge-ring-founder {
+    animation: none;
+    box-shadow: 0 0 10px 2px rgba(255, 215, 0, 0.6);
+  }
+
+  .badge-ring-founder::after {
+    animation: none;
+    opacity: 0.5;
   }
 }
 

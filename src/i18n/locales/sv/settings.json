@@ -12,6 +12,10 @@
     "profile": {
       "label": "Redigera profil",
       "description": "Visningsnamn, bio, avatar, plattformar och länkar."
+    },
+    "badges": {
+      "label": "Märken",
+      "description": "Se dina intjänade märken och välj vilket du vill visa."
     }
   }
 }

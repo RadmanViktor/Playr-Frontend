@@ -12,6 +12,10 @@
     "profile": {
       "label": "Edit profile",
       "description": "Display name, bio, avatar, platforms and links."
+    },
+    "badges": {
+      "label": "Badges",
+      "description": "View your earned badges and choose which one to display."
     }
   }
 }

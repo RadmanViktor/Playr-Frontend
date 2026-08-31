@@ -13,6 +13,7 @@ import SettingsPage from './pages/SettingsPage'
 import NotificationSettingsPage from './pages/settings/NotificationSettingsPage'
 import SteamAccountSettingsPage from './pages/settings/SteamAccountSettingsPage'
 import ProfileSettingsPage from './pages/settings/ProfileSettingsPage'
+import BadgesSettingsPage from './pages/settings/BadgesSettingsPage'
 import OnboardingPage from './pages/OnboardingPage'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { AppShell } from './components/layout/AppShell'
@@ -55,6 +56,7 @@ function App() {
         <Route path="/settings/notifications" element={<NotificationSettingsPage />} />
         <Route path="/settings/steam" element={<SteamAccountSettingsPage />} />
         <Route path="/settings/profile" element={<ProfileSettingsPage />} />
+        <Route path="/settings/badges" element={<BadgesSettingsPage />} />
       </Route>
     </Routes>
   )

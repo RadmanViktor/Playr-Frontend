@@ -187,5 +187,29 @@
     "attachPhotoOrVideoAriaLabel": "Bifoga foto eller video",
     "messagePlaceholder": "Skriv ett meddelande...",
     "send": "Skicka"
+  },
+  "badgeSection": {
+    "title": "Dina märken",
+    "description": "Välj ett märke att visa som en ring runt din avatar. Välj det igen för att dölja det.",
+    "empty": "Du har inte låst upp några märken än. Fortsätt posta, kommentera och bjud in vänner för att tjäna några!",
+    "loadError": "Det gick inte att läsa in dina märken.",
+    "updateError": "Det gick inte att uppdatera ditt visade märke.",
+    "active": "Visas",
+    "select": "Välj",
+    "creatorLevel": "Specialmärke",
+    "founderLevel": "Grundarmärke",
+    "types": {
+      "FirstHundredUsers": "Grundare",
+      "Poster": "Posterare",
+      "GameCritic": "Spelkritiker",
+      "Commentator": "Kommentator",
+      "Inviter": "Inbjudare",
+      "Creator": "Skapare"
+    },
+    "levels": {
+      "Bronze": "Brons",
+      "Silver": "Silver",
+      "Gold": "Guld"
+    }
   }
 }

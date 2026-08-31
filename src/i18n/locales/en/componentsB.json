@@ -189,5 +189,29 @@
     "attachPhotoOrVideoAriaLabel": "Attach photo or video",
     "messagePlaceholder": "Write a message...",
     "send": "Send"
+  },
+  "badgeSection": {
+    "title": "Your badges",
+    "description": "Select a badge to display as a ring around your avatar. Select it again to hide it.",
+    "empty": "You haven't unlocked any badges yet. Keep posting, commenting and inviting friends to earn some!",
+    "loadError": "Failed to load your badges.",
+    "updateError": "Failed to update your active badge.",
+    "active": "Displayed",
+    "select": "Select",
+    "creatorLevel": "Special badge",
+    "founderLevel": "Founding member badge",
+    "types": {
+      "FirstHundredUsers": "Founding Member",
+      "Poster": "Poster",
+      "GameCritic": "Game Critic",
+      "Commentator": "Commentator",
+      "Inviter": "Inviter",
+      "Creator": "Creator"
+    },
+    "levels": {
+      "Bronze": "Bronze",
+      "Silver": "Silver",
+      "Gold": "Gold"
+    }
   }
 }

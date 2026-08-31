@@ -74,4 +74,12 @@ describe('Avatar', () => {
     expect(ring.className).toContain('badge-ring-gold')
     expect(ring).not.toHaveClass('badge-ring-creator')
   })
+
+  it('renders the animated gold/white glitter ring for the FirstHundredUsers badge', () => {
+    render(<Avatar alt="Ada" badgeType="FirstHundredUsers" badgeLevel="Gold" />)
+
+    const ring = screen.getByTestId('avatar-badge-ring')
+    expect(ring.className).toContain('badge-ring-founder')
+    expect(ring).not.toHaveClass('badge-ring-gold')
+  })
 })

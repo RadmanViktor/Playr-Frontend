@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { Bell, Gamepad2, UserCog, ChevronRight } from 'lucide-react'
+import { Bell, Gamepad2, UserCog, Award, ChevronRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import LanguageSwitcher from '../components/LanguageSwitcher'
 
@@ -24,6 +24,12 @@ export default function SettingsPage() {
       label: t('items.profile.label'),
       description: t('items.profile.description'),
       icon: UserCog,
+    },
+    {
+      to: '/settings/badges',
+      label: t('items.badges.label'),
+      description: t('items.badges.description'),
+      icon: Award,
     },
   ]
 

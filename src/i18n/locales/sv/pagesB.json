@@ -123,5 +123,8 @@
   },
   "notificationSettings": {
     "title": "Aviseringar"
+  },
+  "badgesSettings": {
+    "title": "Märken"
   }
 }

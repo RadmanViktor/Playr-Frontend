@@ -123,5 +123,8 @@
   },
   "notificationSettings": {
     "title": "Notifications"
+  },
+  "badgesSettings": {
+    "title": "Badges"
   }
 }
