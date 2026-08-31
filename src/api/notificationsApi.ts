@@ -39,7 +39,7 @@ export async function updateNotificationPreferences(
   return response.json()
 }
 
-export type NotificationType = 'PostMention' | 'CommentMention'
+export type NotificationType = 'PostMention' | 'CommentMention' | 'NewFollower'
 
 export interface NotificationActor {
   userId: string
@@ -54,7 +54,7 @@ export interface NotificationItem {
   isRead: boolean
   createdAt: string
   actor: NotificationActor
-  postId: string
+  postId: string | null
   commentId: string | null
 }
 

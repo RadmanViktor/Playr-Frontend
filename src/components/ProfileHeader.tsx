@@ -1,4 +1,4 @@
-import { Globe, Link as LinkIcon, FileText, Calendar } from 'lucide-react'
+import { Globe, Link as LinkIcon, FileText, Calendar, UserPlus, UserCheck, UserRoundPlus, MessageCircle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Avatar, type AvatarStatus } from './ui/Avatar'
 import { Badge } from './ui/Badge'
@@ -16,6 +16,14 @@ interface ProfileHeaderProps {
   isCancellingFriendRequest?: boolean
   onMessageClick?: () => void
   isFriendRequestPending?: boolean
+  isFollowing?: boolean
+  isFollowLoading?: boolean
+  onFollowClick?: () => void
+  onUnfollowClick?: () => void
+  followersCount?: number
+  followingCount?: number
+  onFollowersClick?: () => void
+  onFollowingClick?: () => void
 }
 
 const statusAvatarMap: Record<ProfileData['status'], AvatarStatus> = {
@@ -41,6 +49,14 @@ export function ProfileHeader({
   isCancellingFriendRequest = false,
   onMessageClick,
   isFriendRequestPending = false,
+  isFollowing = false,
+  isFollowLoading = false,
+  onFollowClick,
+  onUnfollowClick,
+  followersCount = 0,
+  followingCount = 0,
+  onFollowersClick,
+  onFollowingClick,
 }: ProfileHeaderProps) {
   const { t } = useTranslation('componentsB')
   return (
@@ -58,7 +74,7 @@ export function ProfileHeader({
       </div>
 
       <div className="flex flex-col gap-4 px-6 pb-6 pt-16">
-        <div className="flex flex-col items-start justify-between gap-4 sm:flex-row">
+        <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
           <div>
             <h1 className="text-xl font-bold text-text">
               {profile.displayName.toLowerCase() === profile.username.toLowerCase()
@@ -70,7 +86,7 @@ export function ProfileHeader({
             )}
           </div>
           {isOwner && (
-            <div className="flex flex-col items-start gap-2 sm:items-end">
+            <div className="flex flex-wrap items-center gap-2">
               <Button variant="secondary" size="sm" onClick={onEditClick}>
                 {t('profileHeader.settings')}
               </Button>
@@ -82,9 +98,29 @@ export function ProfileHeader({
             </div>
           )}
           {!isOwner && (
-            <div className="flex flex-col items-start gap-2 sm:items-end">
+            <div className="flex flex-wrap items-center gap-2">
+              {(onFollowClick || onUnfollowClick) && (
+                <Button
+                  variant={isFollowing ? 'secondary' : 'primary'}
+                  size="sm"
+                  onClick={isFollowing ? onUnfollowClick : onFollowClick}
+                  disabled={isFollowLoading}
+                >
+                  {isFollowing ? (
+                    <UserCheck className="h-4 w-4" aria-hidden="true" />
+                  ) : (
+                    <UserPlus className="h-4 w-4" aria-hidden="true" />
+                  )}
+                  {isFollowLoading
+                    ? t('profileHeader.followLoading')
+                    : isFollowing
+                      ? t('profileHeader.following')
+                      : t('profileHeader.follow')}
+                </Button>
+              )}
               {onMessageClick && (
                 <Button variant="secondary" size="sm" onClick={onMessageClick}>
+                  <MessageCircle className="h-4 w-4" aria-hidden="true" />
                   {t('profileHeader.message')}
                 </Button>
               )}
@@ -106,6 +142,7 @@ export function ProfileHeader({
               )}
               {profile.relationshipStatus !== 'Friends' && !isFriendRequestPending && onAddFriendClick && (
                 <Button size="sm" onClick={onAddFriendClick}>
+                  <UserRoundPlus className="h-4 w-4" aria-hidden="true" />
                   {t('profileHeader.addFriend')}
                 </Button>
               )}
@@ -119,6 +156,32 @@ export function ProfileHeader({
             <FileText className="h-4 w-4" aria-hidden="true" />
             <span className="font-semibold text-text">{postCount}</span> {t('profileHeader.posts', { count: postCount })}
           </span>
+          {onFollowersClick ? (
+            <button
+              type="button"
+              onClick={onFollowersClick}
+              className="flex items-center gap-1.5 cursor-pointer hover:text-text hover:underline"
+            >
+              <span className="font-semibold text-text">{followersCount}</span> {t('profileHeader.followers', { count: followersCount })}
+            </button>
+          ) : (
+            <span className="flex items-center gap-1.5">
+              <span className="font-semibold text-text">{followersCount}</span> {t('profileHeader.followers', { count: followersCount })}
+            </span>
+          )}
+          {onFollowingClick ? (
+            <button
+              type="button"
+              onClick={onFollowingClick}
+              className="flex items-center gap-1.5 cursor-pointer hover:text-text hover:underline"
+            >
+              <span className="font-semibold text-text">{followingCount}</span> {t('profileHeader.followingCount', { count: followingCount })}
+            </button>
+          ) : (
+            <span className="flex items-center gap-1.5">
+              <span className="font-semibold text-text">{followingCount}</span> {t('profileHeader.followingCount', { count: followingCount })}
+            </span>
+          )}
           {profile.region && (
             <span className="flex items-center gap-1.5">
               <Globe className="h-4 w-4" aria-hidden="true" />

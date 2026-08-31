@@ -30,6 +30,13 @@
     "errorNotLoggedIn": "You must be logged in to send invitations.",
     "errorGeneric": "Failed to send invitation. Please try again."
   },
+  "followListModal": {
+    "followersTitle": "Followers",
+    "followingTitle": "Following",
+    "loading": "Loading...",
+    "empty": "No users to show.",
+    "loadError": "Failed to load. Please try again."
+  },
   "statusModal": {
     "title": "Set your status",
     "lookingForGameNotice": "You're looking for a game. Manage that on Find Players.",

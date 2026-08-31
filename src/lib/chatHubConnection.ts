@@ -5,10 +5,23 @@ import type { Invitation } from '../api/invitationsApi'
 import type { FriendRequest } from '../api/friendRequestsApi'
 import type { NotificationItem } from '../api/notificationsApi'
 
+export interface FollowEvent {
+  followerUserId: string
+  followerUsername: string
+  followerDisplayName: string
+  followerAvatarUrl: string | null
+  followingUserId: string
+  followingUsername: string
+  followingDisplayName: string
+  followingAvatarUrl: string | null
+  createdAt: string
+}
+
 type MessageListener = (message: ChatMessage) => void
 type InvitationListener = (invitation: Invitation) => void
 type FriendRequestListener = (friendRequest: FriendRequest) => void
 type NotificationListener = (notification: NotificationItem) => void
+type FollowListener = (followEvent: FollowEvent) => void
 
 let connection: HubConnection | null = null
 let currentToken: string | null = null
@@ -18,6 +31,8 @@ const invitationUpdatedListeners = new Set<InvitationListener>()
 const friendRequestReceivedListeners = new Set<FriendRequestListener>()
 const friendRequestUpdatedListeners = new Set<FriendRequestListener>()
 const notificationReceivedListeners = new Set<NotificationListener>()
+const followReceivedListeners = new Set<FollowListener>()
+const followRemovedListeners = new Set<FollowListener>()
 
 function buildConnection(token: string): HubConnection {
   return new HubConnectionBuilder()
@@ -56,6 +71,12 @@ export async function connectChatHub(token: string): Promise<void> {
   })
   hub.on('NotificationReceived', (notification: NotificationItem) => {
     notificationReceivedListeners.forEach((listener) => listener(notification))
+  })
+  hub.on('FollowReceived', (followEvent: FollowEvent) => {
+    followReceivedListeners.forEach((listener) => listener(followEvent))
+  })
+  hub.on('FollowRemoved', (followEvent: FollowEvent) => {
+    followRemovedListeners.forEach((listener) => listener(followEvent))
   })
 
   try {
@@ -112,4 +133,16 @@ export function onFriendRequestUpdated(listener: FriendRequestListener): () => v
 export function onNotificationReceived(listener: NotificationListener): () => void {
   notificationReceivedListeners.add(listener)
   return () => notificationReceivedListeners.delete(listener)
+}
+
+/** Subscribe to being followed by another user, pushed in real time. */
+export function onFollowReceived(listener: FollowListener): () => void {
+  followReceivedListeners.add(listener)
+  return () => followReceivedListeners.delete(listener)
+}
+
+/** Subscribe to being unfollowed by another user, pushed in real time. */
+export function onFollowRemoved(listener: FollowListener): () => void {
+  followRemovedListeners.add(listener)
+  return () => followRemovedListeners.delete(listener)
 }

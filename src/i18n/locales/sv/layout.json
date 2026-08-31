@@ -37,6 +37,7 @@
       "empty": "Inga aviseringar än",
       "taggedInComment": "taggade dig i en kommentar",
       "taggedInPost": "taggade dig i ett inlägg",
+      "newFollower": "började följa dig",
       "loadMore": "Ladda fler",
       "timeMinutes_one": "{{count}} min sedan",
       "timeMinutes_other": "{{count}} min sedan",

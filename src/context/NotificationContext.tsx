@@ -12,14 +12,12 @@ import { useNotificationPreferences } from './NotificationPreferencesContext'
 import { playNotificationSound } from '../lib/sound'
 import { showBrowserNotification } from '../lib/browserNotifications'
 
-const PAGE_SIZE = 20
+const MAX_NOTIFICATIONS = 10
 
 interface NotificationContextValue {
   notifications: NotificationItem[]
   unreadCount: number
-  hasMore: boolean
   isLoading: boolean
-  loadMore: () => Promise<void>
   markRead: (notificationId: string) => Promise<void>
   markAllRead: () => Promise<void>
 }
@@ -31,24 +29,21 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
   const { preferences } = useNotificationPreferences()
   const [notifications, setNotifications] = useState<NotificationItem[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
-  const [hasMore, setHasMore] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
     if (!token) {
       setNotifications([])
       setUnreadCount(0)
-      setHasMore(false)
       return
     }
     let cancelled = false
     setIsLoading(true)
-    getNotifications(token, 0, PAGE_SIZE)
+    getNotifications(token, 0, MAX_NOTIFICATIONS)
       .then((feed) => {
         if (cancelled) return
-        setNotifications(feed.items)
+        setNotifications(feed.items.slice(0, MAX_NOTIFICATIONS))
         setUnreadCount(feed.unreadCount)
-        setHasMore(feed.hasMore)
       })
       .catch(() => {
         /* keep empty state; the dropdown can be retried by reopening */
@@ -66,13 +61,22 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
     return onNotificationReceived((notification) => {
       setNotifications((prev) =>
-        prev.some((n) => n.id === notification.id) ? prev : [notification, ...prev],
+        prev.some((n) => n.id === notification.id)
+          ? prev
+          : [notification, ...prev].slice(0, MAX_NOTIFICATIONS),
       )
       setUnreadCount((count) => count + 1)
 
-      const title = `${notification.actor.displayName} tagged you`
+      const title =
+        notification.type === 'NewFollower'
+          ? `${notification.actor.displayName} started following you`
+          : `${notification.actor.displayName} tagged you`
       const body =
-        notification.type === 'CommentMention' ? 'in a comment' : 'in a post'
+        notification.type === 'NewFollower'
+          ? ''
+          : notification.type === 'CommentMention'
+            ? 'in a comment'
+            : 'in a post'
 
       if (preferences.chatSoundEnabled) {
         playNotificationSound()
@@ -82,18 +86,6 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       }
     })
   }, [user, preferences])
-
-  const loadMore = useCallback(async () => {
-    if (!token || isLoading) return
-    setIsLoading(true)
-    try {
-      const feed = await getNotifications(token, notifications.length, PAGE_SIZE)
-      setNotifications((prev) => [...prev, ...feed.items])
-      setHasMore(feed.hasMore)
-    } finally {
-      setIsLoading(false)
-    }
-  }, [token, notifications.length, isLoading])
 
   const markRead = useCallback(
     async (notificationId: string) => {
@@ -124,7 +116,7 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
 
   return (
     <NotificationContext.Provider
-      value={{ notifications, unreadCount, hasMore, isLoading, loadMore, markRead, markAllRead }}
+      value={{ notifications, unreadCount, isLoading, markRead, markAllRead }}
     >
       {children}
     </NotificationContext.Provider>

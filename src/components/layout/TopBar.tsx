@@ -7,6 +7,7 @@ import { Avatar } from '../ui/Avatar'
 import { useAuth } from '../../context/AuthContext'
 import { useStatus } from '../../context/StatusContext'
 import { useNotifications } from '../../context/NotificationContext'
+import type { NotificationItem } from '../../api/notificationsApi'
 import { searchProfiles, type ProfileSearchResult } from '../../api/profilesApi'
 import {
   getRecentSearches,
@@ -54,7 +55,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
   const { user, token } = useAuth()
   const { status, avatarUrl } = useStatus()
   const { openChatWithUser } = useChat()
-  const { notifications, unreadCount, hasMore, isLoading: notificationsLoading, loadMore: loadMoreNotifications, markRead, markAllRead } = useNotifications()
+  const { notifications, unreadCount, isLoading: notificationsLoading, markRead, markAllRead } = useNotifications()
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<ProfileSearchResult[]>([])
@@ -308,10 +309,18 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
     return () => document.removeEventListener('mousedown', handleMouseDown)
   }, [isNotificationsOpen])
 
-  async function handleNotificationClick(notificationId: string, postId: string, commentId: string | null) {
+  async function handleNotificationClick(notification: NotificationItem) {
     setIsNotificationsOpen(false)
-    await markRead(notificationId)
-    navigate(commentId ? `/posts/${postId}?commentId=${commentId}` : `/posts/${postId}`)
+    await markRead(notification.id)
+    if (notification.type === 'NewFollower') {
+      navigate(`/profile/${notification.actor.username}`)
+    } else if (notification.postId) {
+      navigate(
+        notification.commentId
+          ? `/posts/${notification.postId}?commentId=${notification.commentId}`
+          : `/posts/${notification.postId}`,
+      )
+    }
   }
 
   function formatNotificationTime(createdAt: string): string {
@@ -502,7 +511,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
                     <button
                       key={notification.id}
                       type="button"
-                      onClick={() => handleNotificationClick(notification.id, notification.postId, notification.commentId)}
+                      onClick={() => handleNotificationClick(notification)}
                       className={`flex w-full items-start gap-3 border-b border-border px-4 py-3 text-left last:border-b-0 hover:bg-surface-raised cursor-pointer ${
                         notification.isRead ? '' : 'bg-surface-raised/60'
                       }`}
@@ -515,24 +524,16 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
                       <div className="min-w-0 flex-1">
                         <p className="text-sm text-text">
                           <span className="font-medium">{notification.actor.displayName}</span>{' '}
-                          {notification.type === 'CommentMention'
-                            ? t('topBar.notifications.taggedInComment')
-                            : t('topBar.notifications.taggedInPost')}
+                          {notification.type === 'NewFollower'
+                            ? t('topBar.notifications.newFollower')
+                            : notification.type === 'CommentMention'
+                              ? t('topBar.notifications.taggedInComment')
+                              : t('topBar.notifications.taggedInPost')}
                         </p>
                         <p className="mt-0.5 text-xs text-muted">{formatNotificationTime(notification.createdAt)}</p>
                       </div>
                     </button>
                   ))}
-                  {hasMore && (
-                    <button
-                      type="button"
-                      onClick={loadMoreNotifications}
-                      disabled={notificationsLoading}
-                      className="w-full px-4 py-2 text-center text-xs font-medium text-muted hover:text-text disabled:opacity-50 cursor-pointer"
-                    >
-                      {notificationsLoading ? t('topBar.loading') : t('topBar.notifications.loadMore')}
-                    </button>
-                  )}
                 </div>
               )}
             </div>

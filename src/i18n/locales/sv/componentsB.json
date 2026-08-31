@@ -89,6 +89,13 @@
     "cancelling": "Avbryter...",
     "cancelRequest": "Avbryt förfrågan",
     "addFriend": "Lägg till vän",
+    "follow": "Följ",
+    "following": "Följer",
+    "followLoading": "Laddar...",
+    "followers_one": "Följare",
+    "followers_other": "Följare",
+    "followingCount_one": "Följer",
+    "followingCount_other": "Följer",
     "posts_one": "inlägg",
     "posts_other": "inlägg",
     "joined": "Gick med {{date}}"

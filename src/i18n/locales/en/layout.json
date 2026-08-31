@@ -37,6 +37,7 @@
       "empty": "No notifications yet",
       "taggedInComment": "tagged you in a comment",
       "taggedInPost": "tagged you in a post",
+      "newFollower": "started following you",
       "loadMore": "Load more",
       "timeMinutes_one": "{{count}}m ago",
       "timeMinutes_other": "{{count}}m ago",

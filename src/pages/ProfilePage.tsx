@@ -7,17 +7,25 @@ import { PostCard } from '../components/PostCard'
 import { SteamGamesList } from '../components/SteamGamesList'
 import { MyGamesLibrary } from '../components/MyGamesLibrary'
 import { Button } from '../components/ui/Button'
+import { FollowListModal } from '../components/ui/FollowListModal'
 import { getProfile, getProfilePosts, type ProfileData } from '../api/profilesApi'
 import {
   sendFriendRequest,
   cancelFriendRequest,
   getSentFriendRequests,
 } from '../api/friendRequestsApi'
+import {
+  followUser,
+  unfollowUser,
+  getFollowStatus,
+  getFollowCounts,
+} from '../api/followApi'
 import { type PostFeedItem } from '../api/postsApi'
 import { ApiError } from '../api/http'
 import { useAuth } from '../context/AuthContext'
 import { useChat } from '../context/ChatContext'
 import { useCreatePostModal } from '../context/CreatePostModalContext'
+import { onFollowReceived, onFollowRemoved } from '../lib/chatHubConnection'
 
 export default function ProfilePage() {
   const { t } = useTranslation('pagesA')
@@ -38,6 +46,12 @@ export default function ProfilePage() {
   const [isSendingFriendRequest, setIsSendingFriendRequest] = useState(false)
   const [isCancellingFriendRequest, setIsCancellingFriendRequest] = useState(false)
   const [friendRequestError, setFriendRequestError] = useState<string | null>(null)
+  const [isFollowing, setIsFollowing] = useState(false)
+  const [isFollowLoading, setIsFollowLoading] = useState(false)
+  const [followersCount, setFollowersCount] = useState(0)
+  const [followingCount, setFollowingCount] = useState(0)
+  const [followError, setFollowError] = useState<string | null>(null)
+  const [followListModal, setFollowListModal] = useState<'followers' | 'following' | null>(null)
 
   useEffect(() => {
     if (!username) return
@@ -79,6 +93,36 @@ export default function ProfilePage() {
   const isOwner = !!user && !!profile && user.id === profile.userId
 
   useEffect(() => {
+    if (!token || !profile) return
+    let cancelled = false
+    getFollowCounts(token, profile.userId)
+      .then((counts) => {
+        if (cancelled) return
+        setFollowersCount(counts.followersCount)
+        setFollowingCount(counts.followingCount)
+      })
+      .catch(() => {
+        /* ignore - non-critical */
+      })
+    if (!user || user.id === profile.userId) {
+      setIsFollowing(false)
+      return () => {
+        cancelled = true
+      }
+    }
+    getFollowStatus(token, profile.userId)
+      .then((status) => {
+        if (!cancelled) setIsFollowing(status.isFollowing)
+      })
+      .catch(() => {
+        /* ignore - non-critical */
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [token, profile, user])
+
+  useEffect(() => {
     if (!profile) return
     return subscribePostCreated((post) => {
       if (post.scope === 'Profile' && post.authorId === profile.userId) {
@@ -86,6 +130,27 @@ export default function ProfilePage() {
       }
     })
   }, [subscribePostCreated, profile])
+
+  useEffect(() => {
+    if (!profile) return
+    const unsubscribeReceived = onFollowReceived((event) => {
+      if (event.followingUserId === profile.userId) {
+        setFollowersCount((prev) => prev + 1)
+      }
+      if (user && event.followerUserId === profile.userId && event.followingUserId === user.id) {
+        setIsFollowing(true)
+      }
+    })
+    const unsubscribeRemoved = onFollowRemoved((event) => {
+      if (event.followingUserId === profile.userId) {
+        setFollowersCount((prev) => Math.max(0, prev - 1))
+      }
+    })
+    return () => {
+      unsubscribeReceived()
+      unsubscribeRemoved()
+    }
+  }, [profile, user])
 
   function handleSignOut() {
     logout()
@@ -127,6 +192,36 @@ export default function ProfilePage() {
     await openChatWithUser(profile.userId)
   }
 
+  async function handleFollow() {
+    if (!token || !profile) return
+    setIsFollowLoading(true)
+    setFollowError(null)
+    try {
+      await followUser(token, profile.userId)
+      setIsFollowing(true)
+      setFollowersCount((prev) => prev + 1)
+    } catch (err) {
+      setFollowError(err instanceof ApiError ? err.message : t('profile.followError'))
+    } finally {
+      setIsFollowLoading(false)
+    }
+  }
+
+  async function handleUnfollow() {
+    if (!token || !profile) return
+    setIsFollowLoading(true)
+    setFollowError(null)
+    try {
+      await unfollowUser(token, profile.userId)
+      setIsFollowing(false)
+      setFollowersCount((prev) => Math.max(0, prev - 1))
+    } catch (err) {
+      setFollowError(err instanceof ApiError ? err.message : t('profile.unfollowError'))
+    } finally {
+      setIsFollowLoading(false)
+    }
+  }
+
   useEffect(() => {
     if (!successMessage) return
     const timeoutId = setTimeout(() => setSuccessMessage(null), 5000)
@@ -164,7 +259,23 @@ export default function ProfilePage() {
         isCancellingFriendRequest={isCancellingFriendRequest}
         isFriendRequestPending={!!pendingFriendRequestId || isSendingFriendRequest}
         onMessageClick={handleMessageClick}
+        isFollowing={isFollowing}
+        isFollowLoading={isFollowLoading}
+        onFollowClick={handleFollow}
+        onUnfollowClick={handleUnfollow}
+        followersCount={followersCount}
+        followingCount={followingCount}
+        onFollowersClick={() => setFollowListModal('followers')}
+        onFollowingClick={() => setFollowListModal('following')}
       />
+
+      {followListModal && (
+        <FollowListModal
+          userId={profile.userId}
+          mode={followListModal}
+          onClose={() => setFollowListModal(null)}
+        />
+      )}
 
       {successMessage && (
         <div className="rounded-xl border border-enjoying/40 bg-enjoying/10 px-4 py-3 text-sm text-enjoying">
@@ -175,6 +286,12 @@ export default function ProfilePage() {
       {friendRequestError && (
         <div className="rounded-xl border border-frustrated/40 bg-frustrated/10 px-4 py-3 text-sm text-frustrated">
           {friendRequestError}
+        </div>
+      )}
+
+      {followError && (
+        <div className="rounded-xl border border-frustrated/40 bg-frustrated/10 px-4 py-3 text-sm text-frustrated">
+          {followError}
         </div>
       )}
 

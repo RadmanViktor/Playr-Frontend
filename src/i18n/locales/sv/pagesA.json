@@ -25,6 +25,8 @@
     "friendRequestSendError": "Det gick inte att skicka vänförfrågan.",
     "friendRequestCancelled": "Vänförfrågan avbruten.",
     "friendRequestCancelError": "Det gick inte att avbryta vänförfrågan.",
+    "followError": "Det gick inte att följa spelaren.",
+    "unfollowError": "Det gick inte att sluta följa spelaren.",
     "tabs": {
       "posts": "Inlägg",
       "steam": "Steam",

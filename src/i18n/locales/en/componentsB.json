@@ -89,6 +89,13 @@
     "cancelling": "Cancelling...",
     "cancelRequest": "Cancel request",
     "addFriend": "Add friend",
+    "follow": "Follow",
+    "following": "Following",
+    "followLoading": "Loading...",
+    "followers_one": "Follower",
+    "followers_other": "Followers",
+    "followingCount_one": "Following",
+    "followingCount_other": "Following",
     "posts_one": "post",
     "posts_other": "posts",
     "joined": "Joined {{date}}"

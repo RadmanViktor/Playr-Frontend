@@ -25,6 +25,8 @@
     "friendRequestSendError": "Failed to send friend request.",
     "friendRequestCancelled": "Friend request cancelled.",
     "friendRequestCancelError": "Failed to cancel friend request.",
+    "followError": "Failed to follow player.",
+    "unfollowError": "Failed to unfollow player.",
     "tabs": {
       "posts": "Posts",
       "steam": "Steam",
