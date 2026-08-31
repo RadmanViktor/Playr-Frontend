@@ -6,6 +6,7 @@ import { updateProfile, uploadAvatar, type ProfileData } from '../api/profilesAp
 import { ApiError } from '../api/http'
 
 const PLATFORMS = ['PC', 'Xbox', 'PlayStation', 'Switch']
+const GENRES = ['FPS', 'RPG', 'Survival', 'MMO', 'Strategy', 'Horror', 'Racing', 'Sports', 'Co-op', 'Indie']
 
 interface EditProfileFormProps {
   profile: ProfileData
@@ -24,6 +25,7 @@ export function EditProfileForm({ profile, token, onSave, onCancel }: EditProfil
   const [avatarError, setAvatarError] = useState<string | null>(null)
   const [region, setRegion] = useState(profile.region ?? '')
   const [platforms, setPlatforms] = useState<string[]>(profile.platforms)
+  const [genres, setGenres] = useState<string[]>(profile.genres)
   const [links, setLinks] = useState<LinkRow[]>(
     Object.entries(profile.externalLinks).map(([key, value]) => ({ key, value }))
   )
@@ -33,6 +35,12 @@ export function EditProfileForm({ profile, token, onSave, onCancel }: EditProfil
   function togglePlatform(platform: string) {
     setPlatforms((prev) =>
       prev.includes(platform) ? prev.filter((p) => p !== platform) : [...prev, platform]
+    )
+  }
+
+  function toggleGenre(genre: string) {
+    setGenres((prev) =>
+      prev.includes(genre) ? prev.filter((g) => g !== genre) : [...prev, genre]
     )
   }
 
@@ -67,8 +75,8 @@ export function EditProfileForm({ profile, token, onSave, onCancel }: EditProfil
         region: region.trim() || null,
         languages: profile.languages,
         platforms,
+        genres,
         externalLinks,
-        currentlyPlayingGames: profile.currentlyPlayingGames,
       })
       onSave(updated)
     } catch (err) {
@@ -131,6 +139,25 @@ export function EditProfileForm({ profile, token, onSave, onCancel }: EditProfil
               }`}
             >
               {platform}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <span className="text-sm text-muted">{t('editProfileForm.genresLabel')}</span>
+        <div className="flex flex-wrap gap-2">
+          {GENRES.map((genre) => (
+            <button
+              key={genre}
+              type="button"
+              aria-pressed={genres.includes(genre)}
+              onClick={() => toggleGenre(genre)}
+              className={`rounded-full px-3 py-1 text-xs font-medium transition-colors cursor-pointer ${
+                genres.includes(genre) ? 'bg-primary text-white' : 'bg-surface-raised text-muted hover:text-text'
+              }`}
+            >
+              {genre}
             </button>
           ))}
         </div>

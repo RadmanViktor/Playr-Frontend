@@ -110,6 +110,7 @@
     "regionLabel": "Region",
     "regionPlaceholder": "e.g. EU, NA, AS",
     "platformsLabel": "Platforms",
+    "genresLabel": "Genres",
     "externalLinksLabel": "External links",
     "linkNamePlaceholder": "Name",
     "linkValuePlaceholder": "URL or username",

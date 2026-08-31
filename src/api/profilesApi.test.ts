@@ -9,9 +9,10 @@ beforeEach(() => { mockFetch.mockReset() })
 
 const sampleProfile = {
   userId: 'u1', username: 'player', displayName: 'Player One', bio: 'Hi',
-  avatarUrl: null, region: 'EU', languages: ['English'], platforms: ['PC'],
-  externalLinks: { Steam: 'https://steam.com/player' }, currentlyPlayingGames: [],
+  avatarUrl: null, coverImageUrl: null, region: 'EU', languages: ['English'], platforms: ['PC'],
+  genres: [], externalLinks: { Steam: 'https://steam.com/player' },
   lookingForGameId: null, lookingForGameName: null, lookingForPlayStyle: null,
+  playstylePreference: null, usuallyPlayingWith: null, typicalPlayTimes: [], hasCompletedOnboarding: true,
   status: 'Online', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
 }
 
@@ -65,7 +66,7 @@ describe('getProfilePosts', () => {
 describe('updateProfile', () => {
   it('sends PUT with bearer token and returns updated profile', async () => {
     mockFetch.mockResolvedValueOnce({ ok: true, json: async () => sampleProfile })
-    const data = { displayName: 'New Name', languages: [], platforms: ['PC'], externalLinks: {}, currentlyPlayingGames: [] }
+    const data = { displayName: 'New Name', languages: [], platforms: ['PC'], genres: [], externalLinks: {} }
     const result = await updateProfile('my-token', data)
     expect(result.displayName).toBe('Player One')
     expect(mockFetch).toHaveBeenCalledWith(
@@ -76,6 +77,6 @@ describe('updateProfile', () => {
 
   it('throws ApiError on 400', async () => {
     mockFetch.mockResolvedValueOnce({ ok: false, status: 400, json: async () => ({ error: 'Display name is required.' }) })
-    await expect(updateProfile('tok', { displayName: '', languages: [], platforms: [], externalLinks: {}, currentlyPlayingGames: [] })).rejects.toBeInstanceOf(ApiError)
+    await expect(updateProfile('tok', { displayName: '', languages: [], platforms: [], genres: [], externalLinks: {} })).rejects.toBeInstanceOf(ApiError)
   })
 })

@@ -13,6 +13,7 @@ import SettingsPage from './pages/SettingsPage'
 import NotificationSettingsPage from './pages/settings/NotificationSettingsPage'
 import SteamAccountSettingsPage from './pages/settings/SteamAccountSettingsPage'
 import ProfileSettingsPage from './pages/settings/ProfileSettingsPage'
+import OnboardingPage from './pages/OnboardingPage'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { AppShell } from './components/layout/AppShell'
 
@@ -22,6 +23,14 @@ function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/confirm-email" element={<ConfirmEmailPage />} />
+      <Route
+        path="/onboarding"
+        element={
+          <ProtectedRoute allowIncompleteOnboarding>
+            <OnboardingPage />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Public routes inside AppShell (no auth required) */}
       <Route element={<AppShell />}>

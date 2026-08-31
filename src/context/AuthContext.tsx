@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { getMe, login as apiLogin, register as apiRegister, type UserResponse } from '../api/authApi'
+import { getOnboardingStatus } from '../api/onboardingApi'
 
 const TOKEN_STORAGE_KEY = 'playr_token'
 
@@ -8,9 +9,11 @@ export interface AuthContextValue {
   user: UserResponse | null
   token: string | null
   isLoading: boolean
+  hasCompletedOnboarding: boolean | null
   login: (usernameOrEmail: string, password: string) => Promise<void>
   register: (email: string, username: string, password: string) => Promise<void>
   logout: () => void
+  refreshOnboardingStatus: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -19,6 +22,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<UserResponse | null>(null)
   const [token, setToken] = useState<string | null>(() => localStorage.getItem(TOKEN_STORAGE_KEY))
   const [isLoading, setIsLoading] = useState(true)
+  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState<boolean | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -26,6 +30,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async function loadUser() {
       if (!token) {
         setUser(null)
+        setHasCompletedOnboarding(null)
         setIsLoading(false)
         return
       }
@@ -36,11 +41,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!cancelled) {
           setUser(currentUser)
         }
+        try {
+          const status = await getOnboardingStatus(token)
+          if (!cancelled) {
+            setHasCompletedOnboarding(status.hasCompletedOnboarding)
+          }
+        } catch {
+          if (!cancelled) {
+            setHasCompletedOnboarding(true)
+          }
+        }
       } catch {
         if (!cancelled) {
           localStorage.removeItem(TOKEN_STORAGE_KEY)
           setToken(null)
           setUser(null)
+          setHasCompletedOnboarding(null)
         }
       } finally {
         if (!cancelled) {
@@ -71,10 +87,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem(TOKEN_STORAGE_KEY)
     setToken(null)
     setUser(null)
+    setHasCompletedOnboarding(null)
   }, [])
 
+  const refreshOnboardingStatus = useCallback(async () => {
+    if (!token) return
+    try {
+      const status = await getOnboardingStatus(token)
+      setHasCompletedOnboarding(status.hasCompletedOnboarding)
+    } catch {
+      // Leave the current value in place; the user can retry from the onboarding page.
+    }
+  }, [token])
+
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, login, register, logout }}>
+    <AuthContext.Provider
+      value={{ user, token, isLoading, hasCompletedOnboarding, login, register, logout, refreshOnboardingStatus }}
+    >
       {children}
     </AuthContext.Provider>
   )

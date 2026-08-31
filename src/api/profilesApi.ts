@@ -4,6 +4,9 @@ import type { PostFeedItem } from './postsApi'
 export type ProfileStatus = 'Online' | 'LookingForGame' | 'Busy' | 'Inactive' | 'Offline'
 export type PlayStyle = 'Competitive' | 'Chill'
 export type RelationshipStatus = 'None' | 'InvitePending' | 'Friends'
+export type PlaystylePreference = 'Casual' | 'Competitive' | 'Both'
+export type UsuallyPlayingWith = 'Solo' | 'WithFriends' | 'LookingForPlayers'
+export type TypicalPlayTime = 'Evenings' | 'Weekends' | 'Daytime' | 'Varies'
 
 export interface ProfileData {
   userId: string
@@ -11,16 +14,21 @@ export interface ProfileData {
   displayName: string
   bio: string | null
   avatarUrl: string | null
+  coverImageUrl: string | null
   region: string | null
   languages: string[]
   platforms: string[]
+  genres: string[]
   externalLinks: Record<string, string>
-  currentlyPlayingGames: string[]
   status: ProfileStatus
   lookingForGameId: string | null
   lookingForGameName: string | null
   lookingForPlayStyle: PlayStyle | null
   lookingForGameNote: string | null
+  playstylePreference: PlaystylePreference | null
+  usuallyPlayingWith: UsuallyPlayingWith | null
+  typicalPlayTimes: TypicalPlayTime[]
+  hasCompletedOnboarding: boolean
   createdAt: string
   updatedAt: string
   relationshipStatus: RelationshipStatus | null
@@ -33,8 +41,8 @@ export interface UpdateProfileData {
   region?: string | null
   languages: string[]
   platforms: string[]
+  genres: string[]
   externalLinks: Record<string, string>
-  currentlyPlayingGames: string[]
 }
 
 export interface UpdateStatusData {
@@ -114,6 +122,22 @@ export async function uploadAvatar(token: string, file: File): Promise<ProfileDa
   return response.json()
 }
 
+export async function uploadCoverImage(token: string, file: File): Promise<ProfileData> {
+  const form = new FormData()
+  form.append('CoverImage', file)
+
+  const response = await fetch(`${API_BASE_URL}/api/profiles/me/cover-image`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: form,
+  })
+  if (!response.ok) {
+    const message = await parseErrorMessage(response, 'Failed to upload cover image.')
+    throw new ApiError(response.status, message)
+  }
+  return response.json()
+}
+
 export interface ProfileSearchResult {
   userId: string
   username: string
@@ -152,4 +176,49 @@ export async function getLookingForGamePlayers(token: string): Promise<LookingFo
     throw new ApiError(response.status, message)
   }
   return response.json()
+}
+
+export interface PlayingNowEntry {
+  gameId: string
+  gameName: string
+  gameCoverImageUrl: string | null
+  statusText: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+export async function getPlayingNow(username: string): Promise<PlayingNowEntry[]> {
+  const response = await fetch(`${API_BASE_URL}/api/profiles/${username}/playing-now`)
+  if (!response.ok) {
+    const message = await parseErrorMessage(response, 'Failed to load playing now.')
+    throw new ApiError(response.status, message)
+  }
+  return response.json()
+}
+
+export async function setPlayingNow(token: string, gameId: string, statusText?: string | null): Promise<PlayingNowEntry> {
+  const response = await fetch(`${API_BASE_URL}/api/profiles/me/playing-now`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ gameId, statusText }),
+  })
+  if (!response.ok) {
+    const message = await parseErrorMessage(response, 'Failed to update playing now.')
+    throw new ApiError(response.status, message)
+  }
+  return response.json()
+}
+
+export async function removePlayingNow(token: string, gameId: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/profiles/me/playing-now/${gameId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (!response.ok) {
+    const message = await parseErrorMessage(response, 'Failed to remove playing now entry.')
+    throw new ApiError(response.status, message)
+  }
 }

@@ -40,8 +40,9 @@ vi.mock('../context/CreatePostModalContext', () => ({
 
 const profile: profilesApi.ProfileData = {
   userId: 'u1', username: 'player', displayName: 'Player One', bio: 'My bio',
-  avatarUrl: null, region: 'EU', languages: [], platforms: ['PC'],
-  externalLinks: {}, currentlyPlayingGames: [], status: 'Online' as const, lookingForGameId: null, lookingForGameName: null, lookingForPlayStyle: null, lookingForGameNote: null,
+  avatarUrl: null, coverImageUrl: null, region: 'EU', languages: [], platforms: ['PC'], genres: [],
+  externalLinks: {}, status: 'Online' as const, lookingForGameId: null, lookingForGameName: null, lookingForPlayStyle: null, lookingForGameNote: null,
+  playstylePreference: null, usuallyPlayingWith: null, typicalPlayTimes: [], hasCompletedOnboarding: true,
   createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
   relationshipStatus: null, pendingInvitationId: null,
 }

@@ -1,4 +1,63 @@
 ﻿{
+  "onboarding": {
+    "back": "Back",
+    "next": "Continue",
+    "finishing": "Finishing…",
+    "errors": {
+      "generic": "Something went wrong. Please try again."
+    },
+    "welcome": {
+      "title": "Build your gaming profile",
+      "description": "Tell us what you play and what kind of player you are. You can change everything later.",
+      "cta": "Get started"
+    },
+    "platforms": {
+      "title": "Where do you play?",
+      "description": "Select one or more platforms."
+    },
+    "genres": {
+      "title": "What do you enjoy?",
+      "description": "Select the genres you like."
+    },
+    "gamesStep": {
+      "title": "What are you playing?",
+      "searchPlaceholder": "Search for games…",
+      "searching": "Searching…",
+      "searchError": "Failed to search games.",
+      "addError": "Failed to add game.",
+      "selectedLabel": "Your games",
+      "removeGameAriaLabel": "Remove {{name}}"
+    },
+    "playstyle": {
+      "title": "Your playstyle",
+      "playstyleLabel": "Playstyle",
+      "playstyleOptions": {
+        "Casual": "Casual",
+        "Competitive": "Competitive",
+        "Both": "Both"
+      },
+      "usuallyPlayingLabel": "Usually playing",
+      "usuallyPlayingOptions": {
+        "Solo": "Solo",
+        "WithFriends": "With friends",
+        "LookingForPlayers": "Looking for players"
+      },
+      "typicalPlayTimeLabel": "Typical play time",
+      "typicalPlayTimeOptions": {
+        "Evenings": "Evenings",
+        "Weekends": "Weekends",
+        "Daytime": "Daytime",
+        "Varies": "Varies"
+      }
+    },
+    "customization": {
+      "title": "Customize your profile",
+      "avatarLabel": "Avatar",
+      "coverLabel": "Cover image",
+      "bioLabel": "Bio",
+      "finish": "Finish profile"
+    }
+  },
   "chats": {
     "eyebrow": "Stay connected",
     "title": "Chats",

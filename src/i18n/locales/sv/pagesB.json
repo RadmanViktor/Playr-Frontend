@@ -1,4 +1,63 @@
 ﻿{
+  "onboarding": {
+    "back": "Tillbaka",
+    "next": "Fortsätt",
+    "finishing": "Slutför…",
+    "errors": {
+      "generic": "Något gick fel. Försök igen."
+    },
+    "welcome": {
+      "title": "Bygg din spelprofil",
+      "description": "Berätta vad du spelar och vad för slags spelare du är. Du kan ändra allt senare.",
+      "cta": "Kom igång"
+    },
+    "platforms": {
+      "title": "Var spelar du?",
+      "description": "Välj en eller flera plattformar."
+    },
+    "genres": {
+      "title": "Vad gillar du?",
+      "description": "Välj de genrer du gillar."
+    },
+    "gamesStep": {
+      "title": "Vad spelar du?",
+      "searchPlaceholder": "Sök efter spel…",
+      "searching": "Söker…",
+      "searchError": "Kunde inte söka efter spel.",
+      "addError": "Kunde inte lägga till spelet.",
+      "selectedLabel": "Dina spel",
+      "removeGameAriaLabel": "Ta bort {{name}}"
+    },
+    "playstyle": {
+      "title": "Din spelstil",
+      "playstyleLabel": "Spelstil",
+      "playstyleOptions": {
+        "Casual": "Avslappnad",
+        "Competitive": "Tävlingsinriktad",
+        "Both": "Båda"
+      },
+      "usuallyPlayingLabel": "Spelar oftast",
+      "usuallyPlayingOptions": {
+        "Solo": "Solo",
+        "WithFriends": "Med vänner",
+        "LookingForPlayers": "Söker spelare"
+      },
+      "typicalPlayTimeLabel": "Vanlig speltid",
+      "typicalPlayTimeOptions": {
+        "Evenings": "Kvällar",
+        "Weekends": "Helger",
+        "Daytime": "Dagtid",
+        "Varies": "Varierar"
+      }
+    },
+    "customization": {
+      "title": "Anpassa din profil",
+      "avatarLabel": "Avatar",
+      "coverLabel": "Omslagsbild",
+      "bioLabel": "Bio",
+      "finish": "Slutför profil"
+    }
+  },
   "chats": {
     "eyebrow": "Håll kontakten",
     "title": "Chattar",
