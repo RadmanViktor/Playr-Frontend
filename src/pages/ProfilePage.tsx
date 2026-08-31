@@ -6,6 +6,7 @@ import { ProfileHeader } from '../components/ProfileHeader'
 import { PostCard } from '../components/PostCard'
 import { MyGamesLibrary } from '../components/MyGamesLibrary'
 import { PlayingNowSection } from '../components/PlayingNowSection'
+import { FavoriteGamesSection } from '../components/FavoriteGamesSection'
 import { Button } from '../components/ui/Button'
 import { Badge } from '../components/ui/Badge'
 import { FollowListModal } from '../components/ui/FollowListModal'
@@ -345,6 +346,8 @@ export default function ProfilePage() {
         {activeTab === 'overview' && (
           <div className="flex flex-col gap-4">
             <PlayingNowSection username={profile.username} isOwner={isOwner} />
+
+            <FavoriteGamesSection username={profile.username} isOwner={isOwner} />
 
             <div className="rounded-xl border border-border bg-surface p-6">
               <h2 className="text-lg font-semibold text-text">{t('profile.overview.recentPosts')}</h2>

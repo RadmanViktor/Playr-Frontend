@@ -58,6 +58,21 @@
       "editAriaLabel": "Edit {{gameName}}",
       "removeAriaLabel": "Remove {{gameName}} from playing now"
     },
+    "favorites": {
+      "title": "Favorite games",
+      "loading": "Loading…",
+      "loadError": "Failed to load favorite games.",
+      "emptyOwner": "You haven't added any favorite games yet.",
+      "emptyOther": "No favorite games yet.",
+      "addGame": "Add favorite",
+      "chooseGameError": "Choose a game first.",
+      "addError": "Failed to add favorite game.",
+      "removeError": "Failed to remove favorite game.",
+      "maxReachedError": "You can only have up to {{max}} favorite games.",
+      "cancel": "Cancel",
+      "save": "Add",
+      "removeAriaLabel": "Remove {{gameName}} from favorites"
+    },
     "about": {
       "gaming": "Gaming",
       "platforms": "Platforms",

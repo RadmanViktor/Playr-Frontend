@@ -58,6 +58,21 @@
       "editAriaLabel": "Redigera {{gameName}}",
       "removeAriaLabel": "Ta bort {{gameName}} från spelar just nu"
     },
+    "favorites": {
+      "title": "Favoritspel",
+      "loading": "Laddar…",
+      "loadError": "Det gick inte att läsa in favoritspel.",
+      "emptyOwner": "Du har inte lagt till några favoritspel än.",
+      "emptyOther": "Inga favoritspel än.",
+      "addGame": "Lägg till favorit",
+      "chooseGameError": "Välj ett spel först.",
+      "addError": "Det gick inte att lägga till favoritspel.",
+      "removeError": "Det gick inte att ta bort favoritspel.",
+      "maxReachedError": "Du kan bara ha upp till {{max}} favoritspel.",
+      "cancel": "Avbryt",
+      "save": "Lägg till",
+      "removeAriaLabel": "Ta bort {{gameName}} från favoriter"
+    },
     "about": {
       "gaming": "Spelande",
       "platforms": "Plattformar",
