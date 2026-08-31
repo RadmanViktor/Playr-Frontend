@@ -4,8 +4,6 @@ import type { PostFeedItem } from './postsApi'
 export type ProfileStatus = 'Online' | 'LookingForGame' | 'Busy' | 'Inactive' | 'Offline'
 export type PlayStyle = 'Competitive' | 'Chill'
 export type RelationshipStatus = 'None' | 'InvitePending' | 'Friends'
-export type PlaystylePreference = 'Casual' | 'Competitive' | 'Both'
-export type UsuallyPlayingWith = 'Solo' | 'WithFriends' | 'LookingForPlayers'
 export type TypicalPlayTime = 'Evenings' | 'Weekends' | 'Daytime' | 'Varies'
 
 export interface ProfileData {
@@ -25,8 +23,6 @@ export interface ProfileData {
   lookingForGameName: string | null
   lookingForPlayStyle: PlayStyle | null
   lookingForGameNote: string | null
-  playstylePreference: PlaystylePreference | null
-  usuallyPlayingWith: UsuallyPlayingWith | null
   typicalPlayTimes: TypicalPlayTime[]
   hasCompletedOnboarding: boolean
   createdAt: string
@@ -43,6 +39,7 @@ export interface UpdateProfileData {
   platforms: string[]
   genres: string[]
   externalLinks: Record<string, string>
+  typicalPlayTimes?: TypicalPlayTime[]
 }
 
 export interface UpdateStatusData {

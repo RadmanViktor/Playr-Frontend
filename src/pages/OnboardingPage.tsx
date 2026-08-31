@@ -13,17 +13,10 @@ import {
   type Game,
 } from '../api/gamesApi'
 import { uploadAvatar, uploadCoverImage } from '../api/profilesApi'
-import {
-  completeOnboarding,
-  type PlaystylePreference,
-  type TypicalPlayTime,
-  type UsuallyPlayingWith,
-} from '../api/onboardingApi'
+import { completeOnboarding, type TypicalPlayTime } from '../api/onboardingApi'
 
 const PLATFORMS = ['PC', 'PlayStation', 'Xbox', 'Nintendo']
 const GENRES = ['FPS', 'RPG', 'Survival', 'MMO', 'Strategy', 'Horror', 'Racing', 'Sports', 'Co-op', 'Indie']
-const PLAYSTYLES: PlaystylePreference[] = ['Casual', 'Competitive', 'Both']
-const USUALLY_PLAYING: UsuallyPlayingWith[] = ['Solo', 'WithFriends', 'LookingForPlayers']
 const PLAY_TIMES: TypicalPlayTime[] = ['Evenings', 'Weekends', 'Daytime', 'Varies']
 
 const TOTAL_STEPS = 6
@@ -45,8 +38,6 @@ export default function OnboardingPage() {
   const [platforms, setPlatforms] = useState<string[]>([])
   const [genres, setGenres] = useState<string[]>([])
   const [selectedGames, setSelectedGames] = useState<Game[]>([])
-  const [playstylePreference, setPlaystylePreference] = useState<PlaystylePreference | null>(null)
-  const [usuallyPlayingWith, setUsuallyPlayingWith] = useState<UsuallyPlayingWith | null>(null)
   const [typicalPlayTimes, setTypicalPlayTimes] = useState<TypicalPlayTime[]>([])
   const [bio, setBio] = useState('')
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
@@ -152,8 +143,6 @@ export default function OnboardingPage() {
         genres,
         gameIds: selectedGames.map((g) => g.id),
         playingNow: [],
-        playstylePreference,
-        usuallyPlayingWith,
         typicalPlayTimes,
         bio: bio.trim() || null,
       })
@@ -305,40 +294,6 @@ export default function OnboardingPage() {
         {step === 5 && (
           <div className="flex flex-col gap-5">
             <h2 className="text-xl font-semibold text-text">{t('onboarding.playstyle.title')}</h2>
-
-            <div className="flex flex-col gap-2">
-              <span className="text-sm text-muted">{t('onboarding.playstyle.playstyleLabel')}</span>
-              <div className="flex flex-wrap gap-2">
-                {PLAYSTYLES.map((value) => (
-                  <button
-                    key={value}
-                    type="button"
-                    aria-pressed={playstylePreference === value}
-                    onClick={() => setPlaystylePreference(value)}
-                    className={chipClass(playstylePreference === value)}
-                  >
-                    {t(`onboarding.playstyle.playstyleOptions.${value}`)}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <span className="text-sm text-muted">{t('onboarding.playstyle.usuallyPlayingLabel')}</span>
-              <div className="flex flex-wrap gap-2">
-                {USUALLY_PLAYING.map((value) => (
-                  <button
-                    key={value}
-                    type="button"
-                    aria-pressed={usuallyPlayingWith === value}
-                    onClick={() => setUsuallyPlayingWith(value)}
-                    className={chipClass(usuallyPlayingWith === value)}
-                  >
-                    {t(`onboarding.playstyle.usuallyPlayingOptions.${value}`)}
-                  </button>
-                ))}
-              </div>
-            </div>
 
             <div className="flex flex-col gap-2">
               <span className="text-sm text-muted">{t('onboarding.playstyle.typicalPlayTimeLabel')}</span>

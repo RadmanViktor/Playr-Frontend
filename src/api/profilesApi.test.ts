@@ -12,7 +12,7 @@ const sampleProfile = {
   avatarUrl: null, coverImageUrl: null, region: 'EU', languages: ['English'], platforms: ['PC'],
   genres: [], externalLinks: { Steam: 'https://steam.com/player' },
   lookingForGameId: null, lookingForGameName: null, lookingForPlayStyle: null,
-  playstylePreference: null, usuallyPlayingWith: null, typicalPlayTimes: [], hasCompletedOnboarding: true,
+  typicalPlayTimes: [], hasCompletedOnboarding: true,
   status: 'Online', createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
 }
 

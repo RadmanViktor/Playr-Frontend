@@ -28,12 +28,30 @@
     "followError": "Det gick inte att följa spelaren.",
     "unfollowError": "Det gick inte att sluta följa spelaren.",
     "tabs": {
+      "overview": "Översikt",
       "posts": "Inlägg",
-      "steam": "Steam",
-      "games": "Spel"
+      "games": "Spel",
+      "about": "Om"
     },
     "noPosts": "Inga inlägg än.",
-    "createPost": "Skapa inlägg"
+    "createPost": "Skapa inlägg",
+    "overview": {
+      "recentPosts": "Senaste inläggen",
+      "viewAllPosts": "Visa alla inlägg",
+      "noPosts": "Inga inlägg än."
+    },
+    "about": {
+      "gaming": "Spelande",
+      "platforms": "Plattformar",
+      "genres": "Genrer",
+      "typicalPlayTimes": "Typisk speltid",
+      "noneSet": "Inte inställt än.",
+      "connectedAccounts": "Anslutna konton",
+      "steam": "Steam",
+      "connected": "Ansluten",
+      "notConnected": "Inte ansluten",
+      "manageConnections": "Hantera anslutningar"
+    }
   },
   "postDetail": {
     "loading": "Laddar…",

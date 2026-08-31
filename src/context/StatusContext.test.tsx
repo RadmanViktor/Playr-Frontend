@@ -27,8 +27,6 @@ function profile(overrides: Partial<ProfileData> = {}): ProfileData {
     lookingForGameName: null,
     lookingForPlayStyle: null,
     lookingForGameNote: null,
-    playstylePreference: null,
-    usuallyPlayingWith: null,
     typicalPlayTimes: [],
     hasCompletedOnboarding: true,
     createdAt: '2024-01-01T00:00:00Z',

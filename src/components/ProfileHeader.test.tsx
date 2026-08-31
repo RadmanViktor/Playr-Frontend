@@ -8,7 +8,7 @@ const profile: ProfileData = {
   avatarUrl: null, coverImageUrl: null, region: 'EU', languages: ['English', 'Swedish'],
   platforms: ['PC', 'PlayStation'], genres: [], externalLinks: { Steam: 'https://steamcommunity.com/id/nexusnova' },
   status: 'Online' as const, lookingForGameId: null, lookingForGameName: null, lookingForPlayStyle: null, lookingForGameNote: null,
-  playstylePreference: null, usuallyPlayingWith: null, typicalPlayTimes: [], hasCompletedOnboarding: true,
+  typicalPlayTimes: [], hasCompletedOnboarding: true,
   createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
   relationshipStatus: null, pendingInvitationId: null,
 }

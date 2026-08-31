@@ -12,7 +12,7 @@ const profile: ProfileData = {
   avatarUrl: null, coverImageUrl: null, region: 'EU', languages: ['English'], platforms: ['PC'],
   genres: [], externalLinks: { Steam: 'https://steam.com' },
   status: 'Online' as const, lookingForGameId: null, lookingForGameName: null, lookingForPlayStyle: null, lookingForGameNote: null,
-  playstylePreference: null, usuallyPlayingWith: null, typicalPlayTimes: [], hasCompletedOnboarding: true,
+  typicalPlayTimes: [], hasCompletedOnboarding: true,
   createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
   relationshipStatus: null, pendingInvitationId: null,
 }
@@ -45,6 +45,21 @@ describe('EditProfileForm', () => {
     await user.click(screen.getByRole('button', { name: /save/i }))
     await waitFor(() => expect(onSave).toHaveBeenCalledWith(updated))
     expect(profilesApi.updateProfile).toHaveBeenCalledWith('tok', expect.objectContaining({ displayName: 'Player One' }))
+  })
+
+  it('selects and submits typical play times', async () => {
+    const user = userEvent.setup()
+    render(<EditProfileForm profile={profile} token="tok" onSave={vi.fn()} onCancel={vi.fn()} />)
+    await user.click(screen.getByRole('button', { name: 'Evenings' }))
+    await user.click(screen.getByRole('button', { name: /save/i }))
+    await waitFor(() =>
+      expect(profilesApi.updateProfile).toHaveBeenCalledWith(
+        'tok',
+        expect.objectContaining({
+          typicalPlayTimes: ['Evenings'],
+        }),
+      ),
+    )
   })
 
   it('calls onCancel when Cancel is clicked', async () => {

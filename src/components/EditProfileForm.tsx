@@ -3,11 +3,18 @@ import { useTranslation } from 'react-i18next'
 import { Button } from './ui/Button'
 import { AvatarUploadInput } from './AvatarUploadInput'
 import { CoverImageUploadInput } from './CoverImageUploadInput'
-import { updateProfile, uploadAvatar, uploadCoverImage, type ProfileData } from '../api/profilesApi'
+import {
+  updateProfile,
+  uploadAvatar,
+  uploadCoverImage,
+  type ProfileData,
+  type TypicalPlayTime,
+} from '../api/profilesApi'
 import { ApiError } from '../api/http'
 
 const PLATFORMS = ['PC', 'Xbox', 'PlayStation', 'Switch']
 const GENRES = ['FPS', 'RPG', 'Survival', 'MMO', 'Strategy', 'Horror', 'Racing', 'Sports', 'Co-op', 'Indie']
+const PLAY_TIMES: TypicalPlayTime[] = ['Evenings', 'Weekends', 'Daytime', 'Varies']
 
 interface EditProfileFormProps {
   profile: ProfileData
@@ -20,6 +27,7 @@ interface LinkRow { key: string; value: string }
 
 export function EditProfileForm({ profile, token, onSave, onCancel }: EditProfileFormProps) {
   const { t } = useTranslation('componentsB')
+  const { t: tOnboarding } = useTranslation('pagesB')
   const [displayName, setDisplayName] = useState(profile.displayName)
   const [bio, setBio] = useState(profile.bio ?? '')
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
@@ -29,6 +37,7 @@ export function EditProfileForm({ profile, token, onSave, onCancel }: EditProfil
   const [region, setRegion] = useState(profile.region ?? '')
   const [platforms, setPlatforms] = useState<string[]>(profile.platforms)
   const [genres, setGenres] = useState<string[]>(profile.genres)
+  const [typicalPlayTimes, setTypicalPlayTimes] = useState<TypicalPlayTime[]>(profile.typicalPlayTimes)
   const [links, setLinks] = useState<LinkRow[]>(
     Object.entries(profile.externalLinks).map(([key, value]) => ({ key, value }))
   )
@@ -44,6 +53,12 @@ export function EditProfileForm({ profile, token, onSave, onCancel }: EditProfil
   function toggleGenre(genre: string) {
     setGenres((prev) =>
       prev.includes(genre) ? prev.filter((g) => g !== genre) : [...prev, genre]
+    )
+  }
+
+  function toggleTypicalPlayTime(time: TypicalPlayTime) {
+    setTypicalPlayTimes((prev) =>
+      prev.includes(time) ? prev.filter((t) => t !== time) : [...prev, time]
     )
   }
 
@@ -83,6 +98,7 @@ export function EditProfileForm({ profile, token, onSave, onCancel }: EditProfil
         platforms,
         genres,
         externalLinks,
+        typicalPlayTimes,
       })
       onSave(updated)
     } catch (err) {
@@ -175,6 +191,25 @@ export function EditProfileForm({ profile, token, onSave, onCancel }: EditProfil
               }`}
             >
               {genre}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <span className="text-sm text-muted">{tOnboarding('onboarding.playstyle.typicalPlayTimeLabel')}</span>
+        <div className="flex flex-wrap gap-2">
+          {PLAY_TIMES.map((value) => (
+            <button
+              key={value}
+              type="button"
+              aria-pressed={typicalPlayTimes.includes(value)}
+              onClick={() => toggleTypicalPlayTime(value)}
+              className={`rounded-full px-3 py-1 text-xs font-medium transition-colors cursor-pointer ${
+                typicalPlayTimes.includes(value) ? 'bg-primary text-white' : 'bg-surface-raised text-muted hover:text-text'
+              }`}
+            >
+              {tOnboarding(`onboarding.playstyle.typicalPlayTimeOptions.${value}`)}
             </button>
           ))}
         </div>

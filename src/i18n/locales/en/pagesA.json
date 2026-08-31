@@ -28,12 +28,30 @@
     "followError": "Failed to follow player.",
     "unfollowError": "Failed to unfollow player.",
     "tabs": {
+      "overview": "Overview",
       "posts": "Posts",
-      "steam": "Steam",
-      "games": "Games"
+      "games": "Games",
+      "about": "About"
     },
     "noPosts": "No posts yet.",
-    "createPost": "Create Post"
+    "createPost": "Create Post",
+    "overview": {
+      "recentPosts": "Recent posts",
+      "viewAllPosts": "View all posts",
+      "noPosts": "No posts yet."
+    },
+    "about": {
+      "gaming": "Gaming",
+      "platforms": "Platforms",
+      "genres": "Genres",
+      "typicalPlayTimes": "Typical play time",
+      "noneSet": "Not set yet.",
+      "connectedAccounts": "Connected accounts",
+      "steam": "Steam",
+      "connected": "Connected",
+      "notConnected": "Not connected",
+      "manageConnections": "Manage connections"
+    }
   },
   "postDetail": {
     "loading": "Loading…",

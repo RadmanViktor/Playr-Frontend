@@ -1,7 +1,5 @@
 import { API_BASE_URL, ApiError, parseErrorMessage } from './http'
 
-export type PlaystylePreference = 'Casual' | 'Competitive' | 'Both'
-export type UsuallyPlayingWith = 'Solo' | 'WithFriends' | 'LookingForPlayers'
 export type TypicalPlayTime = 'Evenings' | 'Weekends' | 'Daytime' | 'Varies'
 
 export interface OnboardingStatus {
@@ -18,8 +16,6 @@ export interface CompleteOnboardingData {
   genres: string[]
   gameIds: string[]
   playingNow: PlayingNowItemInput[]
-  playstylePreference?: PlaystylePreference | null
-  usuallyPlayingWith?: UsuallyPlayingWith | null
   typicalPlayTimes: TypicalPlayTime[]
   bio?: string | null
 }

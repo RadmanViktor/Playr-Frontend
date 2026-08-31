@@ -29,19 +29,7 @@
       "removeGameAriaLabel": "Ta bort {{name}}"
     },
     "playstyle": {
-      "title": "Din spelstil",
-      "playstyleLabel": "Spelstil",
-      "playstyleOptions": {
-        "Casual": "Avslappnad",
-        "Competitive": "Tävlingsinriktad",
-        "Both": "Båda"
-      },
-      "usuallyPlayingLabel": "Spelar oftast",
-      "usuallyPlayingOptions": {
-        "Solo": "Solo",
-        "WithFriends": "Med vänner",
-        "LookingForPlayers": "Söker spelare"
-      },
+      "title": "När brukar du spela?",
       "typicalPlayTimeLabel": "Vanlig speltid",
       "typicalPlayTimeOptions": {
         "Evenings": "Kvällar",
