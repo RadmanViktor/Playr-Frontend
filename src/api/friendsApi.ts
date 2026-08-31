@@ -18,3 +18,18 @@ export async function getFriends(token: string): Promise<Friend[]> {
   }
   return response.json()
 }
+
+export interface FriendsCount {
+  friendsCount: number
+}
+
+export async function getFriendsCount(token: string, userId: string): Promise<FriendsCount> {
+  const response = await fetch(`${API_BASE_URL}/api/friends/${userId}/count`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (!response.ok) {
+    const message = await parseErrorMessage(response, 'Failed to load friends count.')
+    throw new ApiError(response.status, message)
+  }
+  return response.json()
+}

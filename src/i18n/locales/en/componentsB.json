@@ -94,8 +94,10 @@
     "followLoading": "Loading...",
     "followers_one": "Follower",
     "followers_other": "Followers",
-    "followingCount_one": "Following",
-    "followingCount_other": "Following",
+      "followingCount_one": "Following",
+      "followingCount_other": "Following",
+      "friendsCount_one": "Friend",
+      "friendsCount_other": "Friends",
     "posts_one": "post",
     "posts_other": "posts",
     "joined": "Joined {{date}}"
@@ -107,6 +109,7 @@
     "bioLabel": "Bio",
     "bioCounter": "{{count}} / {{max}}",
     "avatarLabel": "Avatar",
+    "coverImageLabel": "Cover image",
     "regionLabel": "Region",
     "regionPlaceholder": "e.g. EU, NA, AS",
     "platformsLabel": "Platforms",
@@ -124,6 +127,10 @@
     "unsupportedFileType": "Unsupported file type. Allowed: jpg, jpeg, png, webp, gif.",
     "fileTooLarge": "Images cannot be larger than 10 MB.",
     "uploadAvatarAriaLabel": "Upload avatar"
+  },
+  "coverImageUploadInput": {
+    "change": "Change cover image",
+    "uploadCoverImageAriaLabel": "Upload cover image"
   },
   "passwordStrengthMeter": {
     "requirementLength": "at least 8 characters",

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Avatar, type AvatarStatus } from './ui/Avatar'
 import { Badge } from './ui/Badge'
 import { Button } from './ui/Button'
+import { resolveMediaUrl } from '../api/http'
 import type { ProfileData } from '../api/profilesApi'
 
 interface ProfileHeaderProps {
@@ -22,6 +23,7 @@ interface ProfileHeaderProps {
   onUnfollowClick?: () => void
   followersCount?: number
   followingCount?: number
+  friendsCount?: number
   onFollowersClick?: () => void
   onFollowingClick?: () => void
 }
@@ -55,15 +57,27 @@ export function ProfileHeader({
   onUnfollowClick,
   followersCount = 0,
   followingCount = 0,
+  friendsCount = 0,
   onFollowersClick,
   onFollowingClick,
 }: ProfileHeaderProps) {
   const { t } = useTranslation('componentsB')
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-surface">
-      {/* Gradient banner */}
-      <div className="relative h-32 bg-gradient-to-br from-primary/60 via-primary/25 to-surface sm:h-40">
-        <div className="absolute -bottom-12 left-6">
+      {/* Cover image / gradient banner */}
+      <div
+        className="relative h-40 bg-gradient-to-br from-primary/60 via-primary/25 to-surface bg-cover bg-center sm:h-52"
+        style={profile.coverImageUrl ? { backgroundImage: `url(${resolveMediaUrl(profile.coverImageUrl)})` } : undefined}
+      >
+        {profile.coverImageUrl && (
+          <>
+            {/* Subtle darken so the banner reads as a backdrop rather than raw photo */}
+            <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/10 to-black/10" />
+            {/* Purple brand tint to tie the image into PLAYR's palette */}
+            <div className="absolute inset-0 bg-primary/10 mix-blend-overlay" />
+          </>
+        )}
+        <div className="absolute -bottom-12 left-6 rounded-full ring-4 ring-surface shadow-lg">
           <Avatar
             src={profile.avatarUrl ?? undefined}
             alt={profile.displayName}
@@ -182,6 +196,9 @@ export function ProfileHeader({
               <span className="font-semibold text-text">{followingCount}</span> {t('profileHeader.followingCount', { count: followingCount })}
             </span>
           )}
+          <span className="flex items-center gap-1.5">
+            <span className="font-semibold text-text">{friendsCount}</span> {t('profileHeader.friendsCount', { count: friendsCount })}
+          </span>
           {profile.region && (
             <span className="flex items-center gap-1.5">
               <Globe className="h-4 w-4" aria-hidden="true" />
@@ -198,10 +215,13 @@ export function ProfileHeader({
           <p className="text-sm text-text leading-relaxed">{profile.bio}</p>
         )}
 
-        {profile.platforms.length > 0 && (
+        {(profile.platforms.length > 0 || profile.genres.length > 0) && (
           <div className="flex flex-wrap gap-2">
             {profile.platforms.map((platform) => (
-              <Badge key={platform} variant="tag">{platform}</Badge>
+              <Badge key={`platform-${platform}`} variant="tag">{platform}</Badge>
+            ))}
+            {profile.genres.map((genre) => (
+              <Badge key={`genre-${genre}`} variant="tag">{genre}</Badge>
             ))}
           </div>
         )}

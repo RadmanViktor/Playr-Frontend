@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import { Plus } from 'lucide-react'
 import { ProfileHeader } from '../components/ProfileHeader'
 import { PostCard } from '../components/PostCard'
-import { SteamGamesList } from '../components/SteamGamesList'
 import { MyGamesLibrary } from '../components/MyGamesLibrary'
 import { Button } from '../components/ui/Button'
 import { FollowListModal } from '../components/ui/FollowListModal'
@@ -14,6 +13,7 @@ import {
   cancelFriendRequest,
   getSentFriendRequests,
 } from '../api/friendRequestsApi'
+import { getFriendsCount } from '../api/friendsApi'
 import {
   followUser,
   unfollowUser,
@@ -40,7 +40,7 @@ export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState<'posts' | 'games' | 'library'>('posts')
+  const [activeTab, setActiveTab] = useState<'posts' | 'library'>('posts')
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [pendingFriendRequestId, setPendingFriendRequestId] = useState<string | null>(null)
   const [isSendingFriendRequest, setIsSendingFriendRequest] = useState(false)
@@ -50,6 +50,7 @@ export default function ProfilePage() {
   const [isFollowLoading, setIsFollowLoading] = useState(false)
   const [followersCount, setFollowersCount] = useState(0)
   const [followingCount, setFollowingCount] = useState(0)
+  const [friendsCount, setFriendsCount] = useState(0)
   const [followError, setFollowError] = useState<string | null>(null)
   const [followListModal, setFollowListModal] = useState<'followers' | 'following' | null>(null)
 
@@ -100,6 +101,13 @@ export default function ProfilePage() {
         if (cancelled) return
         setFollowersCount(counts.followersCount)
         setFollowingCount(counts.followingCount)
+      })
+      .catch(() => {
+        /* ignore - non-critical */
+      })
+    getFriendsCount(token, profile.userId)
+      .then((counts) => {
+        if (!cancelled) setFriendsCount(counts.friendsCount)
       })
       .catch(() => {
         /* ignore - non-critical */
@@ -228,7 +236,7 @@ export default function ProfilePage() {
     return () => clearTimeout(timeoutId)
   }, [successMessage])
 
-  function handleTabChange(tab: 'posts' | 'games' | 'library') {
+  function handleTabChange(tab: 'posts' | 'library') {
     if (tab === activeTab) return
     const applyChange = () => setActiveTab(tab)
     const doc = document as Document & {
@@ -265,6 +273,7 @@ export default function ProfilePage() {
         onUnfollowClick={handleUnfollow}
         followersCount={followersCount}
         followingCount={followingCount}
+        friendsCount={friendsCount}
         onFollowersClick={() => setFollowListModal('followers')}
         onFollowingClick={() => setFollowListModal('following')}
       />
@@ -297,12 +306,8 @@ export default function ProfilePage() {
 
       <div className="relative flex gap-2 rounded-lg border border-border bg-surface-raised p-1">
         <div
-          className={`absolute inset-y-1 w-[calc(33.333%-0.334rem)] rounded-md bg-primary shadow-sm transition-transform duration-300 ease-out ${
-            activeTab === 'games'
-              ? 'translate-x-[calc(100%+0.5rem)]'
-              : activeTab === 'library'
-                ? 'translate-x-[calc(200%+1rem)]'
-                : 'translate-x-0'
+          className={`absolute inset-y-1 w-[calc(50%-0.375rem)] rounded-md bg-primary shadow-sm transition-transform duration-300 ease-out ${
+            activeTab === 'library' ? 'translate-x-[calc(100%+0.5rem)]' : 'translate-x-0'
           }`}
           aria-hidden
         />
@@ -313,14 +318,6 @@ export default function ProfilePage() {
           onClick={() => handleTabChange('posts')}
         >
           {t('profile.tabs.posts')}
-        </button>
-        <button
-          className={`relative z-10 flex-1 rounded-md px-4 py-2 text-base font-semibold transition-colors duration-300 ${
-            activeTab === 'games' ? 'text-white' : 'text-muted hover:text-text'
-          }`}
-          onClick={() => handleTabChange('games')}
-        >
-          {t('profile.tabs.steam')}
         </button>
         <button
           className={`relative z-10 flex-1 rounded-md px-4 py-2 text-base font-semibold transition-colors duration-300 ${
@@ -357,8 +354,6 @@ export default function ProfilePage() {
               ))
             )}
           </>
-        ) : activeTab === 'games' ? (
-          <SteamGamesList userId={profile.userId} />
         ) : (
           <MyGamesLibrary username={profile.username} isOwner={isOwner} />
         )}

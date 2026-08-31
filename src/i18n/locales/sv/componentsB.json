@@ -96,6 +96,8 @@
     "followers_other": "Följare",
     "followingCount_one": "Följer",
     "followingCount_other": "Följer",
+    "friendsCount_one": "Vän",
+    "friendsCount_other": "Vänner",
     "posts_one": "inlägg",
     "posts_other": "inlägg",
     "joined": "Gick med {{date}}"
@@ -107,6 +109,7 @@
     "bioLabel": "Bio",
     "bioCounter": "{{count}} / {{max}}",
     "avatarLabel": "Avatar",
+    "coverImageLabel": "Omslagsbild",
     "regionLabel": "Region",
     "regionPlaceholder": "t.ex. EU, NA, AS",
     "platformsLabel": "Plattformar",
@@ -124,6 +127,10 @@
     "unsupportedFileType": "Filtypen stöds inte. Tillåtna: jpg, jpeg, png, webp, gif.",
     "fileTooLarge": "Bilder får inte vara större än 10 MB.",
     "uploadAvatarAriaLabel": "Ladda upp avatar"
+  },
+  "coverImageUploadInput": {
+    "change": "Byt omslagsbild",
+    "uploadCoverImageAriaLabel": "Ladda upp omslagsbild"
   },
   "passwordStrengthMeter": {
     "requirementLength": "minst 8 tecken",

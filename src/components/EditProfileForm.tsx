@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Button } from './ui/Button'
 import { AvatarUploadInput } from './AvatarUploadInput'
-import { updateProfile, uploadAvatar, type ProfileData } from '../api/profilesApi'
+import { CoverImageUploadInput } from './CoverImageUploadInput'
+import { updateProfile, uploadAvatar, uploadCoverImage, type ProfileData } from '../api/profilesApi'
 import { ApiError } from '../api/http'
 
 const PLATFORMS = ['PC', 'Xbox', 'PlayStation', 'Switch']
@@ -23,6 +24,8 @@ export function EditProfileForm({ profile, token, onSave, onCancel }: EditProfil
   const [bio, setBio] = useState(profile.bio ?? '')
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [avatarError, setAvatarError] = useState<string | null>(null)
+  const [coverImageFile, setCoverImageFile] = useState<File | null>(null)
+  const [coverImageError, setCoverImageError] = useState<string | null>(null)
   const [region, setRegion] = useState(profile.region ?? '')
   const [platforms, setPlatforms] = useState<string[]>(profile.platforms)
   const [genres, setGenres] = useState<string[]>(profile.genres)
@@ -68,6 +71,9 @@ export function EditProfileForm({ profile, token, onSave, onCancel }: EditProfil
     try {
       if (avatarFile) {
         await uploadAvatar(token, avatarFile)
+      }
+      if (coverImageFile) {
+        await uploadCoverImage(token, coverImageFile)
       }
       const updated = await updateProfile(token, {
         displayName: displayName.trim(),
@@ -117,6 +123,17 @@ export function EditProfileForm({ profile, token, onSave, onCancel }: EditProfil
           onFileChange={setAvatarFile}
           error={avatarError}
           onError={setAvatarError}
+        />
+      </label>
+
+      <label className="flex flex-col gap-1 text-sm text-muted">
+        {t('editProfileForm.coverImageLabel')}
+        <CoverImageUploadInput
+          currentCoverImageUrl={profile.coverImageUrl}
+          file={coverImageFile}
+          onFileChange={setCoverImageFile}
+          error={coverImageError}
+          onError={setCoverImageError}
         />
       </label>
 
