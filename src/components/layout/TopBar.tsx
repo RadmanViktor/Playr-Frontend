@@ -42,18 +42,11 @@ import {
   onFriendRequestUpdated,
 } from '../../lib/chatHubConnection'
 
-const statusAvatarMap = {
-  Online: 'online',
-  LookingForGame: 'looking-for-game',
-  Busy: 'busy',
-  Inactive: 'inactive',
-  Offline: 'offline',
-} as const
 
 export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
   const { t } = useTranslation('layout')
   const { user, token, logout } = useAuth()
-  const { status, avatarUrl } = useStatus()
+  const { avatarUrl } = useStatus()
   const { openChatWithUser } = useChat()
   const { notifications, unreadCount, isLoading: notificationsLoading, markRead, markAllRead } = useNotifications()
   const navigate = useNavigate()
@@ -696,7 +689,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
               className="rounded-full focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
               aria-label={t('topBar.myProfile')}
             >
-              <Avatar src={avatarUrl ?? undefined} alt={user.displayName ?? user.username} status={statusAvatarMap[status]} />
+              <Avatar src={avatarUrl ?? undefined} alt={user.displayName ?? user.username} />
             </button>
             {isProfileMenuOpen && (
               <div className="absolute right-0 top-full z-50 mt-1 w-48 rounded-lg border border-border bg-surface shadow-lg overflow-hidden">

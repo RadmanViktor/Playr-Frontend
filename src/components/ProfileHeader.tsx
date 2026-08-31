@@ -1,6 +1,6 @@
 import { Globe, Link as LinkIcon, FileText, Calendar, UserPlus, UserCheck, UserRoundPlus, MessageCircle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { Avatar, type AvatarStatus } from './ui/Avatar'
+import { Avatar } from './ui/Avatar'
 import { Badge } from './ui/Badge'
 import { Button } from './ui/Button'
 import { resolveMediaUrl } from '../api/http'
@@ -24,14 +24,6 @@ interface ProfileHeaderProps {
   friendsCount?: number
   onFollowersClick?: () => void
   onFollowingClick?: () => void
-}
-
-const statusAvatarMap: Record<ProfileData['status'], AvatarStatus> = {
-  Online: 'online',
-  LookingForGame: 'looking-for-game',
-  Busy: 'busy',
-  Inactive: 'inactive',
-  Offline: 'offline',
 }
 
 function formatJoinDate(createdAt: string): string {
@@ -78,7 +70,6 @@ export function ProfileHeader({
             src={profile.avatarUrl ?? undefined}
             alt={profile.displayName}
             size="xl"
-            status={statusAvatarMap[profile.status]}
           />
         </div>
       </div>
