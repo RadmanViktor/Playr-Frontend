@@ -39,7 +39,7 @@ export async function updateNotificationPreferences(
   return response.json()
 }
 
-export type NotificationType = 'PostMention' | 'CommentMention' | 'NewFollower'
+export type NotificationType = 'PostMention' | 'CommentMention' | 'NewFollower' | 'BadgeUnlocked' | 'LfgApplicationReceived'
 
 export interface NotificationActor {
   userId: string
@@ -56,6 +56,7 @@ export interface NotificationItem {
   actor: NotificationActor
   postId: string | null
   commentId: string | null
+  lfgGroupId: string | null
 }
 
 export interface NotificationFeed {

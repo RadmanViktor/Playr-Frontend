@@ -103,6 +103,24 @@
     "invitedBadge": "Invited",
     "invite": "Invite",
     "cancel": "Cancel",
-    "cancelling": "Cancelling..."
+    "cancelling": "Cancelling...",
+    "modeAvailable": "Make yourself available",
+    "modeCreateGroup": "Create a group",
+    "groupsTitle": "Groups looking for players",
+    "playersTitle": "Players who are available",
+    "groupsLoadError": "Failed to load groups. Please try again.",
+    "groupCounter": "{{accepted}}/{{wanted}}",
+    "groupFilledNotice": "Your group for {{gameName}} is ready! A group chat has been created.",
+    "groupCancelled": "Group for {{gameName}} cancelled.",
+    "groupActionError": "Something went wrong. Please try again.",
+    "cancelGroup": "Cancel group",
+    "ownGroupActiveTitle": "You have an active group for {{gameName}}",
+    "ownGroupActiveSubtitle": "{{accepted}}/{{wanted}} players have accepted. Cancel the group to create a new one or make yourself available.",
+    "applicationSent": "Application sent",
+    "applicationSentNotice": "Your application has been sent.",
+    "applyToGroup": "Apply",
+    "reviewApplications": "Applications ({{count}})",
+    "accept": "Accept",
+    "decline": "Decline"
   }
 }

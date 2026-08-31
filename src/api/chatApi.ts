@@ -7,13 +7,24 @@ export interface ChatParticipant {
   avatarUrl: string | null
 }
 
+export type ConversationType = 'Direct' | 'Group'
+
 export interface Conversation {
   id: string
-  otherParticipant: ChatParticipant
+  type: ConversationType
+  title: string | null
+  // Null for Group conversations - use `participants` to build a display name instead.
+  otherParticipant: ChatParticipant | null
   lastMessage: string | null
   lastMessageAt: string | null
   createdAt: string
   updatedAt: string
+  participants: ChatParticipant[]
+}
+
+/** Participants excluding the given user id - the "other side" of a Direct or Group chat. */
+export function getOtherParticipants(conversation: Conversation, currentUserId?: string | null): ChatParticipant[] {
+  return conversation.participants.filter((p) => p.userId !== currentUserId)
 }
 
 export interface ChatMessage {

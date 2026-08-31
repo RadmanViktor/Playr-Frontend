@@ -50,5 +50,17 @@
     "cancel": "Cancel",
     "saving": "Saving...",
     "save": "Save"
+  },
+  "lfgGroupApplyModal": {
+    "title": "Apply to group",
+    "promptText": "Apply to join",
+    "promptSuffix": "'s group for {{gameName}}",
+    "messageLabel": "Message (optional)",
+    "placeholderText": "Say hi and tell them why you'd like to join...",
+    "cancel": "Cancel",
+    "sending": "Sending...",
+    "actionLabel": "Apply",
+    "errorNotLoggedIn": "You must be logged in to apply.",
+    "errorGeneric": "Failed to apply. Please try again."
   }
 }

@@ -70,9 +70,11 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       const title =
         notification.type === 'NewFollower'
           ? `${notification.actor.displayName} started following you`
-          : `${notification.actor.displayName} tagged you`
+          : notification.type === 'LfgApplicationReceived'
+            ? `${notification.actor.displayName} applied to join your group`
+            : `${notification.actor.displayName} tagged you`
       const body =
-        notification.type === 'NewFollower'
+        notification.type === 'NewFollower' || notification.type === 'LfgApplicationReceived'
           ? ''
           : notification.type === 'CommentMention'
             ? 'in a comment'

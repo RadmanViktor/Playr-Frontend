@@ -5,6 +5,7 @@ import type { Invitation } from '../api/invitationsApi'
 import type { FriendRequest } from '../api/friendRequestsApi'
 import type { NotificationItem } from '../api/notificationsApi'
 import type { ProfileStatus } from '../api/profilesApi'
+import type { LfgGroup, LfgGroupApplication, LfgGroupInvite } from '../api/lfgGroupsApi'
 
 export interface FollowEvent {
   followerUserId: string
@@ -29,6 +30,9 @@ type FriendRequestListener = (friendRequest: FriendRequest) => void
 type NotificationListener = (notification: NotificationItem) => void
 type FollowListener = (followEvent: FollowEvent) => void
 type UserStatusChangedListener = (event: UserStatusChangedEvent) => void
+type LfgGroupListener = (group: LfgGroup) => void
+type LfgApplicationListener = (application: LfgGroupApplication) => void
+type LfgGroupInviteListener = (invite: LfgGroupInvite) => void
 
 let connection: HubConnection | null = null
 let currentToken: string | null = null
@@ -41,6 +45,10 @@ const notificationReceivedListeners = new Set<NotificationListener>()
 const followReceivedListeners = new Set<FollowListener>()
 const followRemovedListeners = new Set<FollowListener>()
 const userStatusChangedListeners = new Set<UserStatusChangedListener>()
+const lfgGroupUpdatedListeners = new Set<LfgGroupListener>()
+const lfgApplicationReceivedListeners = new Set<LfgApplicationListener>()
+const lfgGroupInviteReceivedListeners = new Set<LfgGroupInviteListener>()
+const lfgGroupFilledListeners = new Set<LfgGroupListener>()
 
 function buildConnection(token: string): HubConnection {
   return new HubConnectionBuilder()
@@ -88,6 +96,18 @@ export async function connectChatHub(token: string): Promise<void> {
   })
   hub.on('UserStatusChanged', (event: UserStatusChangedEvent) => {
     userStatusChangedListeners.forEach((listener) => listener(event))
+  })
+  hub.on('LfgGroupUpdated', (group: LfgGroup) => {
+    lfgGroupUpdatedListeners.forEach((listener) => listener(group))
+  })
+  hub.on('LfgApplicationReceived', (application: LfgGroupApplication) => {
+    lfgApplicationReceivedListeners.forEach((listener) => listener(application))
+  })
+  hub.on('LfgGroupInviteReceived', (invite: LfgGroupInvite) => {
+    lfgGroupInviteReceivedListeners.forEach((listener) => listener(invite))
+  })
+  hub.on('LfgGroupFilled', (group: LfgGroup) => {
+    lfgGroupFilledListeners.forEach((listener) => listener(group))
   })
 
   try {
@@ -162,4 +182,28 @@ export function onFollowRemoved(listener: FollowListener): () => void {
 export function onUserStatusChanged(listener: UserStatusChangedListener): () => void {
   userStatusChangedListeners.add(listener)
   return () => userStatusChangedListeners.delete(listener)
+}
+
+/** Subscribe to updates on an LFG group you created (e.g. accepted count changes), pushed in real time. */
+export function onLfgGroupUpdated(listener: LfgGroupListener): () => void {
+  lfgGroupUpdatedListeners.add(listener)
+  return () => lfgGroupUpdatedListeners.delete(listener)
+}
+
+/** Subscribe to new applications received on LFG groups you created. */
+export function onLfgApplicationReceived(listener: LfgApplicationListener): () => void {
+  lfgApplicationReceivedListeners.add(listener)
+  return () => lfgApplicationReceivedListeners.delete(listener)
+}
+
+/** Subscribe to LFG group invites sent to the current user. */
+export function onLfgGroupInviteReceived(listener: LfgGroupInviteListener): () => void {
+  lfgGroupInviteReceivedListeners.add(listener)
+  return () => lfgGroupInviteReceivedListeners.delete(listener)
+}
+
+/** Subscribe to an LFG group becoming filled, pushed to all members (including the creator). */
+export function onLfgGroupFilled(listener: LfgGroupListener): () => void {
+  lfgGroupFilledListeners.add(listener)
+  return () => lfgGroupFilledListeners.delete(listener)
 }

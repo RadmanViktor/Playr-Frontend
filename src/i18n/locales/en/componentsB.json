@@ -82,6 +82,15 @@
     "notePlaceholder": "Anything specific?",
     "saving": "Saving..."
   },
+  "createGroupPanel": {
+    "playersWantedLabel": "Number of players you're looking for",
+    "decreasePlayersWantedAriaLabel": "Decrease number of players wanted",
+    "increasePlayersWantedAriaLabel": "Increase number of players wanted",
+    "chooseGame": "Choose a game first.",
+    "createError": "Failed to create group. Please try again.",
+    "creating": "Creating...",
+    "createGroup": "Create group"
+  },
   "profileHeader": {
     "settings": "Settings",
     "signOut": "Sign out",
@@ -188,7 +197,17 @@
     "removeSelectedFileAriaLabel": "Remove selected file",
     "attachPhotoOrVideoAriaLabel": "Attach photo or video",
     "messagePlaceholder": "Write a message...",
-    "send": "Send"
+    "send": "Send",
+    "groupChatDefaultTitle": "Group chat",
+    "groupParticipantsCount_one": "{{count}} member",
+    "groupParticipantsCount_other": "{{count}} members"
+  },
+  "groupFilledCelebration": {
+    "title": "Your group is ready!",
+    "subtitle": "You're {{count}} players for {{gameName}}. The group chat has been created.",
+    "openChat": "Open group chat",
+    "dismiss": "Dismiss",
+    "closeAriaLabel": "Close"
   },
   "badgeSection": {
     "title": "Your badges",

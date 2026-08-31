@@ -1,11 +1,14 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { ChatWindow } from '../components/ChatWindow'
 import { Toast } from '../components/ui/Toast'
-import { getOrCreateConversation, type ChatMessage, type Conversation } from '../api/chatApi'
+import { GroupFilledCelebration } from '../components/ui/GroupFilledCelebration'
+import { getConversations, getOrCreateConversation, type ChatMessage, type Conversation } from '../api/chatApi'
+import type { LfgGroup } from '../api/lfgGroupsApi'
 import { useAuth } from './AuthContext'
 import { useNotificationPreferences } from './NotificationPreferencesContext'
-import { connectChatHub, disconnectChatHub, onChatMessage } from '../lib/chatHubConnection'
+import { connectChatHub, disconnectChatHub, onChatMessage, onLfgGroupFilled } from '../lib/chatHubConnection'
 import { playNotificationSound } from '../lib/sound'
 import { showBrowserNotification } from '../lib/browserNotifications'
 import { useIsMobile } from '../lib/useIsMobile'
@@ -41,7 +44,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null)
   const [notificationToast, setNotificationToast] = useState<string | null>(null)
   const [unreadConversationIds, setUnreadConversationIds] = useState<Set<string>>(new Set())
+  const [filledGroupCelebration, setFilledGroupCelebration] = useState<LfgGroup | null>(null)
   const isMobile = useIsMobile()
+  const navigate = useNavigate()
 
   // On mobile a chat window is fullscreen, so stacking several of them just
   // buries all but the last one under an identical `inset-0` overlay. Render
@@ -62,6 +67,13 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       disconnectChatHub()
     }
   }, [token])
+
+  useEffect(() => {
+    if (!user) return
+    return onLfgGroupFilled((group) => {
+      setFilledGroupCelebration(group)
+    })
+  }, [user])
 
   const showConversation = useCallback((conversation: Conversation, successMessage: string | null) => {
     setOpenChats((prev) => {
@@ -95,20 +107,60 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       // already visible on screen, so the user never has to hunt for a new
       // message - it always surfaces itself.
       if (!isConversationActiveOnScreen) {
-        const conversation: Conversation = {
-          id: message.conversationId,
-          otherParticipant: {
-            userId: message.senderUserId,
-            username: message.senderUsername,
-            displayName: message.senderDisplayName,
-            avatarUrl: message.senderAvatarUrl,
-          },
-          lastMessage: message.body,
-          lastMessageAt: message.createdAt,
-          createdAt: message.createdAt,
-          updatedAt: message.createdAt,
+        const senderParticipant = {
+          userId: message.senderUserId,
+          username: message.senderUsername,
+          displayName: message.senderDisplayName,
+          avatarUrl: message.senderAvatarUrl,
         }
-        showConversation(conversation, null)
+        // We don't know from the message payload alone whether the
+        // underlying conversation is Direct or Group (e.g. a brand new
+        // group chat the user hasn't opened yet), so fetch the real
+        // conversation list and use the matching entry - this keeps the
+        // group's stacked avatars/title correct instead of always
+        // rendering as if it were a 1:1 chat with the sender. Falls back
+        // to a synthesized Direct conversation only if the lookup fails
+        // (e.g. a transient network error).
+        if (token) {
+          getConversations(token)
+            .then((conversations) => {
+              const match = conversations.find((c) => c.id === message.conversationId)
+              if (match) {
+                showConversation(match, null)
+              } else {
+                showConversation(
+                  {
+                    id: message.conversationId,
+                    type: 'Direct',
+                    title: null,
+                    otherParticipant: senderParticipant,
+                    lastMessage: message.body,
+                    lastMessageAt: message.createdAt,
+                    createdAt: message.createdAt,
+                    updatedAt: message.createdAt,
+                    participants: [senderParticipant],
+                  },
+                  null,
+                )
+              }
+            })
+            .catch(() => {
+              showConversation(
+                {
+                  id: message.conversationId,
+                  type: 'Direct',
+                  title: null,
+                  otherParticipant: senderParticipant,
+                  lastMessage: message.body,
+                  lastMessageAt: message.createdAt,
+                  createdAt: message.createdAt,
+                  updatedAt: message.createdAt,
+                  participants: [senderParticipant],
+                },
+                null,
+              )
+            })
+        }
       }
 
       const shouldNotify = document.hidden || !document.hasFocus() || !isConversationActiveOnScreen
@@ -136,7 +188,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         setNotificationToast(`${message.senderDisplayName}: ${message.body}`)
       }
     })
-  }, [user, visibleChats, preferences, showConversation])
+  }, [user, token, visibleChats, preferences, showConversation])
 
   const openChatWithUser = useCallback(
     async (userId: string, options?: OpenChatOptions) => {
@@ -203,6 +255,16 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       ))}
       {notificationToast && (
         <Toast message={notificationToast} onDismiss={() => setNotificationToast(null)} />
+      )}
+      {filledGroupCelebration && (
+        <GroupFilledCelebration
+          group={filledGroupCelebration}
+          onClose={() => setFilledGroupCelebration(null)}
+          onOpenChat={() => {
+            setFilledGroupCelebration(null)
+            navigate('/chats')
+          }}
+        />
       )}
     </ChatContext.Provider>
   )

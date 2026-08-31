@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 import type { Conversation } from '../api/chatApi'
 import { ChatProvider, useChat } from './ChatContext'
 import { MOBILE_MEDIA_QUERY } from '../lib/useIsMobile'
@@ -16,6 +17,14 @@ vi.mock('./NotificationPreferencesContext', () => ({
   }),
 }))
 
+vi.mock('../api/chatApi', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../api/chatApi')>()
+  return {
+    ...actual,
+    getConversations: vi.fn().mockResolvedValue([]),
+  }
+})
+
 let chatMessageHandler: ((message: unknown) => void) | null = null
 
 vi.mock('../lib/chatHubConnection', () => ({
@@ -27,6 +36,7 @@ vi.mock('../lib/chatHubConnection', () => ({
       chatMessageHandler = null
     }
   }),
+  onLfgGroupFilled: vi.fn(() => () => {}),
 }))
 
 // Stand-in so the test asserts on mounting, not on ChatWindow internals
@@ -42,27 +52,31 @@ vi.mock('../components/ChatWindow', () => ({
     onToggleMinimize: () => void
   }) => (
     <div data-testid="chat-window" data-minimized={isMinimized}>
-      {conversation.otherParticipant.displayName}
+      {conversation.otherParticipant?.displayName}
       <button type="button" onClick={onToggleMinimize}>
-        Toggle {conversation.otherParticipant.displayName}
+        Toggle {conversation.otherParticipant?.displayName}
       </button>
     </div>
   ),
 }))
 
 function conversation(id: string, name: string): Conversation {
+  const other = {
+    userId: `u-${id}`,
+    username: name.toLowerCase(),
+    displayName: name,
+    avatarUrl: null,
+  }
   return {
     id,
-    otherParticipant: {
-      userId: `u-${id}`,
-      username: name.toLowerCase(),
-      displayName: name,
-      avatarUrl: null,
-    },
+    type: 'Direct',
+    title: null,
+    otherParticipant: other,
     lastMessage: null,
     lastMessageAt: null,
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z',
+    participants: [other],
   }
 }
 
@@ -84,9 +98,11 @@ function Opener() {
 
 function renderProvider() {
   return render(
-    <ChatProvider>
-      <Opener />
-    </ChatProvider>,
+    <MemoryRouter>
+      <ChatProvider>
+        <Opener />
+      </ChatProvider>
+    </MemoryRouter>,
   )
 }
 

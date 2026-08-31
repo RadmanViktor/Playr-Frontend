@@ -80,6 +80,15 @@
     "notePlaceholder": "Något specifikt?",
     "saving": "Sparar..."
   },
+  "createGroupPanel": {
+    "playersWantedLabel": "Antal spelare du söker",
+    "decreasePlayersWantedAriaLabel": "Minska antal spelare som söks",
+    "increasePlayersWantedAriaLabel": "Öka antal spelare som söks",
+    "chooseGame": "Välj ett spel först.",
+    "createError": "Det gick inte att skapa gruppen. Försök igen.",
+    "creating": "Skapar...",
+    "createGroup": "Skapa grupp"
+  },
   "profileHeader": {
     "settings": "Inställningar",
     "signOut": "Logga ut",
@@ -186,7 +195,17 @@
     "removeSelectedFileAriaLabel": "Ta bort vald fil",
     "attachPhotoOrVideoAriaLabel": "Bifoga foto eller video",
     "messagePlaceholder": "Skriv ett meddelande...",
-    "send": "Skicka"
+    "send": "Skicka",
+    "groupChatDefaultTitle": "Gruppchatt",
+    "groupParticipantsCount_one": "{{count}} medlem",
+    "groupParticipantsCount_other": "{{count}} medlemmar"
+  },
+  "groupFilledCelebration": {
+    "title": "Din grupp är redo!",
+    "subtitle": "Ni är {{count}} spelare för {{gameName}}. Gruppchatten har skapats.",
+    "openChat": "Öppna gruppchatten",
+    "dismiss": "Stäng",
+    "closeAriaLabel": "Stäng"
   },
   "badgeSection": {
     "title": "Dina märken",

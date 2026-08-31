@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Card } from './ui/Card'
 import { Avatar, type AvatarStatus } from './ui/Avatar'
-import { getConversations, type Conversation } from '../api/chatApi'
+import { AvatarStack } from './ui/AvatarStack'
+import { getConversations, getOtherParticipants, type Conversation } from '../api/chatApi'
 import { getProfile, type ProfileStatus } from '../api/profilesApi'
 import { useAuth } from '../context/AuthContext'
 import { useChat } from '../context/ChatContext'
@@ -27,7 +28,7 @@ function formatRelativeTime(dateString: string, t: (key: string, opts?: Record<s
 
 export function ConversationsList() {
   const { t } = useTranslation('componentsB')
-  const { token } = useAuth()
+  const { token, user } = useAuth()
   const { openConversation, error: chatError, unreadConversationIds } = useChat()
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -48,11 +49,13 @@ export function ConversationsList() {
     if (conversations.length === 0) return
     let cancelled = false
     Promise.all(
-      conversations.map((conversation) =>
-        getProfile(conversation.otherParticipant.username)
-          .then((profile) => [conversation.otherParticipant.username, profile.status] as const)
-          .catch(() => null),
-      ),
+      conversations
+        .filter((conversation) => conversation.type !== 'Group' && conversation.otherParticipant)
+        .map((conversation) =>
+          getProfile(conversation.otherParticipant!.username)
+            .then((profile) => [conversation.otherParticipant!.username, profile.status] as const)
+            .catch(() => null),
+        ),
     ).then((results) => {
       if (cancelled) return
       setStatusByUsername((prev) => {
@@ -70,9 +73,9 @@ export function ConversationsList() {
 
   useEffect(() => {
     return onUserStatusChanged((event) => {
-      const conversation = conversations.find((c) => c.otherParticipant.userId === event.userId)
-      if (!conversation) return
-      setStatusByUsername((prev) => ({ ...prev, [conversation.otherParticipant.username]: event.status }))
+      const conversation = conversations.find((c) => c.otherParticipant?.userId === event.userId)
+      if (!conversation || !conversation.otherParticipant) return
+      setStatusByUsername((prev) => ({ ...prev, [conversation.otherParticipant!.username]: event.status }))
     })
   }, [conversations])
 
@@ -90,6 +93,11 @@ export function ConversationsList() {
 
       {conversations.map((conversation) => {
         const isUnread = unreadConversationIds.has(conversation.id)
+        const isGroup = conversation.type === 'Group'
+        const otherParticipants = getOtherParticipants(conversation, user?.id)
+        const displayName = isGroup
+          ? conversation.title ?? (otherParticipants.map((p) => p.displayName).join(', ') || t('chatWindow.groupChatDefaultTitle'))
+          : conversation.otherParticipant?.displayName ?? otherParticipants[0]?.displayName ?? ''
         return (
           <Card
             key={conversation.id}
@@ -97,16 +105,22 @@ export function ConversationsList() {
             onClick={() => openConversation(conversation)}
           >
             <div className="flex min-w-0 items-center gap-3">
-              <Avatar
-                src={conversation.otherParticipant.avatarUrl ?? undefined}
-                alt={conversation.otherParticipant.displayName}
-                status={statusByUsername[conversation.otherParticipant.username]
-                  ? statusAvatarMap[statusByUsername[conversation.otherParticipant.username]]
-                  : undefined}
-              />
+              {isGroup ? (
+                <AvatarStack participants={otherParticipants} size="md" />
+              ) : (
+                <Avatar
+                  src={conversation.otherParticipant?.avatarUrl ?? undefined}
+                  alt={displayName}
+                  status={
+                    conversation.otherParticipant && statusByUsername[conversation.otherParticipant.username]
+                      ? statusAvatarMap[statusByUsername[conversation.otherParticipant.username]]
+                      : undefined
+                  }
+                />
+              )}
               <div className="min-w-0">
                 <p className={`truncate text-sm ${isUnread ? 'font-semibold text-text' : 'font-medium text-text'}`}>
-                  {conversation.otherParticipant.displayName}
+                  {displayName}
                 </p>
                 <p className={`truncate text-xs ${isUnread ? 'font-medium text-text' : 'text-muted'}`}>
                   {conversation.lastMessage ?? t('conversationsList.noMessagesYet')}

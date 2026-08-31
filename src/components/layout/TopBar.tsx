@@ -337,6 +337,8 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
     await markRead(notification.id)
     if (notification.type === 'NewFollower') {
       navigate(`/profile/${notification.actor.username}`)
+    } else if (notification.type === 'LfgApplicationReceived') {
+      navigate('/find-players')
     } else if (notification.postId) {
       navigate(
         notification.commentId
@@ -551,7 +553,9 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
                             ? t('topBar.notifications.newFollower')
                             : notification.type === 'CommentMention'
                               ? t('topBar.notifications.taggedInComment')
-                              : t('topBar.notifications.taggedInPost')}
+                              : notification.type === 'LfgApplicationReceived'
+                                ? t('topBar.notifications.lfgApplicationReceived')
+                                : t('topBar.notifications.taggedInPost')}
                         </p>
                         <p className="mt-0.5 text-xs text-muted">{formatNotificationTime(notification.createdAt)}</p>
                       </div>

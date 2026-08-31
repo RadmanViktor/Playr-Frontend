@@ -42,6 +42,7 @@
       "empty": "Inga aviseringar än",
       "taggedInComment": "taggade dig i en kommentar",
       "taggedInPost": "taggade dig i ett inlägg",
+      "lfgApplicationReceived": "ansökte till din grupp",
       "newFollower": "började följa dig",
       "loadMore": "Ladda fler",
       "timeMinutes_one": "{{count}} min sedan",

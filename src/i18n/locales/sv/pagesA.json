@@ -103,6 +103,24 @@
     "invitedBadge": "Inbjuden",
     "invite": "Bjud in",
     "cancel": "Avbryt",
-    "cancelling": "Avbryter..."
+    "cancelling": "Avbryter...",
+    "modeAvailable": "Gör dig tillgänglig",
+    "modeCreateGroup": "Skapa grupp",
+    "groupsTitle": "Grupper som söker spelare",
+    "playersTitle": "Spelare som är tillgängliga",
+    "groupsLoadError": "Det gick inte att ladda grupper. Försök igen.",
+    "groupCounter": "{{accepted}}/{{wanted}}",
+    "groupFilledNotice": "Din grupp för {{gameName}} är redo! Gruppchatten har skapats.",
+    "groupCancelled": "Gruppen för {{gameName}} har avbrutits.",
+    "groupActionError": "Något gick fel. Försök igen.",
+    "cancelGroup": "Avbryt gruppen",
+    "ownGroupActiveTitle": "Du har en aktiv grupp för {{gameName}}",
+    "ownGroupActiveSubtitle": "{{accepted}}/{{wanted}} spelare har accepterat. Avbryt gruppen för att skapa en ny eller göra dig tillgänglig.",
+    "applicationSent": "Ansökan skickad",
+    "applicationSentNotice": "Din ansökan har skickats.",
+    "applyToGroup": "Ansök",
+    "reviewApplications": "Ansökningar ({{count}})",
+    "accept": "Acceptera",
+    "decline": "Neka"
   }
 }

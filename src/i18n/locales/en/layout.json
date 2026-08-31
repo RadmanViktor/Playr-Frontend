@@ -42,6 +42,7 @@
       "empty": "No notifications yet",
       "taggedInComment": "tagged you in a comment",
       "taggedInPost": "tagged you in a post",
+      "lfgApplicationReceived": "applied to join your group",
       "newFollower": "started following you",
       "loadMore": "Load more",
       "timeMinutes_one": "{{count}}m ago",

@@ -50,5 +50,17 @@
     "cancel": "Avbryt",
     "saving": "Sparar...",
     "save": "Spara"
+  },
+  "lfgGroupApplyModal": {
+    "title": "Ansök till grupp",
+    "promptText": "Ansök om att gå med i",
+    "promptSuffix": "s grupp för {{gameName}}",
+    "messageLabel": "Meddelande (valfritt)",
+    "placeholderText": "Säg hej och berätta varför du vill vara med...",
+    "cancel": "Avbryt",
+    "sending": "Skickar...",
+    "actionLabel": "Ansök",
+    "errorNotLoggedIn": "Du måste vara inloggad för att ansöka.",
+    "errorGeneric": "Det gick inte att skicka ansökan. Försök igen."
   }
 }

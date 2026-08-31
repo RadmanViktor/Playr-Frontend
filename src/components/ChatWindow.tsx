@@ -2,10 +2,11 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ChevronDown, ChevronUp, Paperclip, X } from 'lucide-react'
 import { Avatar, type AvatarStatus } from './ui/Avatar'
+import { AvatarStack } from './ui/AvatarStack'
 import { Button } from './ui/Button'
 import { EmojiPickerButton } from './EmojiPickerButton'
 import { isVideoFile, validateMediaFile } from './MediaUploadInput'
-import { getMessages, sendMessage, type ChatMessage, type Conversation } from '../api/chatApi'
+import { getMessages, getOtherParticipants, sendMessage, type ChatMessage, type Conversation } from '../api/chatApi'
 import { resolveMediaUrl } from '../api/http'
 import { getProfile, type ProfileStatus } from '../api/profilesApi'
 import { useAuth } from '../context/AuthContext'
@@ -64,9 +65,17 @@ export function ChatWindow({
   const [otherStatus, setOtherStatus] = useState<ProfileStatus | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const chatUsernames = [conversation.otherParticipant.username, user?.username].filter(
+  const isGroup = conversation.type === 'Group'
+  const otherParticipants = getOtherParticipants(conversation, user?.id)
+  const chatUsernames = [...otherParticipants.map((p) => p.username), user?.username].filter(
     (username): username is string => Boolean(username),
   )
+  const headerTitle = isGroup
+    ? conversation.title ?? (otherParticipants.map((p) => p.displayName).join(', ') || t('chatWindow.groupChatDefaultTitle'))
+    : conversation.otherParticipant?.displayName ?? otherParticipants[0]?.displayName ?? ''
+  const headerSubtitle = isGroup
+    ? t('chatWindow.groupParticipantsCount', { count: otherParticipants.length + 1 })
+    : `@${conversation.otherParticipant?.username ?? otherParticipants[0]?.username ?? ''}`
 
   const isMobile = useIsMobile()
   // Only relevant for the fullscreen mobile layout; the docked desktop window
@@ -85,6 +94,7 @@ export function ChatWindow({
   useEffect(() => {
     let cancelled = false
     setOtherStatus(null)
+    if (isGroup || !conversation.otherParticipant) return
     getProfile(conversation.otherParticipant.username)
       .then((profile) => {
         if (!cancelled) setOtherStatus(profile.status)
@@ -95,14 +105,16 @@ export function ChatWindow({
     return () => {
       cancelled = true
     }
-  }, [conversation.otherParticipant.username])
+  }, [isGroup, conversation.otherParticipant])
 
   useEffect(() => {
+    if (isGroup || !conversation.otherParticipant) return
+    const otherUserId = conversation.otherParticipant.userId
     return onUserStatusChanged((event) => {
-      if (event.userId !== conversation.otherParticipant.userId) return
+      if (event.userId !== otherUserId) return
       setOtherStatus(event.status)
     })
-  }, [conversation.otherParticipant.userId])
+  }, [isGroup, conversation.otherParticipant])
 
   useEffect(() => {
     if (!token) return
@@ -215,15 +227,19 @@ export function ChatWindow({
           isFullscreen ? 'pt-[max(0.75rem,env(safe-area-inset-top))]' : ''
         }`}
       >
-        <Avatar
-          src={conversation.otherParticipant.avatarUrl ?? undefined}
-          alt={conversation.otherParticipant.displayName}
-          size="sm"
-          status={otherStatus ? statusAvatarMap[otherStatus] : undefined}
-        />
+        {isGroup ? (
+          <AvatarStack participants={otherParticipants} size="sm" />
+        ) : (
+          <Avatar
+            src={conversation.otherParticipant?.avatarUrl ?? undefined}
+            alt={headerTitle}
+            size="sm"
+            status={otherStatus ? statusAvatarMap[otherStatus] : undefined}
+          />
+        )}
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-text">{conversation.otherParticipant.displayName}</p>
-          <p className="truncate text-xs text-muted">@{conversation.otherParticipant.username}</p>
+          <p className="truncate text-sm font-semibold text-text">{headerTitle}</p>
+          <p className="truncate text-xs text-muted">{headerSubtitle}</p>
         </div>
         <button
           type="button"
