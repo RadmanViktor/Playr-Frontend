@@ -30,16 +30,10 @@
     "tabs": {
       "overview": "Översikt",
       "posts": "Inlägg",
-      "games": "Spel",
-      "about": "Om"
+      "games": "Recensioner"
     },
     "noPosts": "Inga inlägg än.",
     "createPost": "Skapa inlägg",
-    "overview": {
-      "recentPosts": "Senaste inläggen",
-      "viewAllPosts": "Visa alla inlägg",
-      "noPosts": "Inga inlägg än."
-    },
     "playingNow": {
       "title": "Spelar just nu",
       "loading": "Laddar…",
@@ -72,18 +66,6 @@
       "cancel": "Avbryt",
       "save": "Lägg till",
       "removeAriaLabel": "Ta bort {{gameName}} från favoriter"
-    },
-    "about": {
-      "gaming": "Spelande",
-      "platforms": "Plattformar",
-      "genres": "Genrer",
-      "typicalPlayTimes": "Typisk speltid",
-      "noneSet": "Inte inställt än.",
-      "connectedAccounts": "Anslutna konton",
-      "steam": "Steam",
-      "connected": "Ansluten",
-      "notConnected": "Inte ansluten",
-      "manageConnections": "Hantera anslutningar"
     }
   },
   "postDetail": {

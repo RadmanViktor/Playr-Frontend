@@ -30,16 +30,10 @@
     "tabs": {
       "overview": "Overview",
       "posts": "Posts",
-      "games": "Games",
-      "about": "About"
+      "games": "Reviews"
     },
     "noPosts": "No posts yet.",
     "createPost": "Create Post",
-    "overview": {
-      "recentPosts": "Recent posts",
-      "viewAllPosts": "View all posts",
-      "noPosts": "No posts yet."
-    },
     "playingNow": {
       "title": "Playing now",
       "loading": "Loading…",
@@ -72,18 +66,6 @@
       "cancel": "Cancel",
       "save": "Add",
       "removeAriaLabel": "Remove {{gameName}} from favorites"
-    },
-    "about": {
-      "gaming": "Gaming",
-      "platforms": "Platforms",
-      "genres": "Genres",
-      "typicalPlayTimes": "Typical play time",
-      "noneSet": "Not set yet.",
-      "connectedAccounts": "Connected accounts",
-      "steam": "Steam",
-      "connected": "Connected",
-      "notConnected": "Not connected",
-      "manageConnections": "Manage connections"
     }
   },
   "postDetail": {

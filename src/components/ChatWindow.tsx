@@ -12,6 +12,7 @@ import { useAuth } from '../context/AuthContext'
 import { linkifyChatMessage } from '../lib/linkify'
 import { useIsMobile } from '../lib/useIsMobile'
 import { useVisualViewportHeight } from '../lib/useVisualViewportHeight'
+import { onUserStatusChanged } from '../lib/chatHubConnection'
 
 const statusAvatarMap: Record<ProfileStatus, AvatarStatus> = {
   Online: 'online',
@@ -95,6 +96,13 @@ export function ChatWindow({
       cancelled = true
     }
   }, [conversation.otherParticipant.username])
+
+  useEffect(() => {
+    return onUserStatusChanged((event) => {
+      if (event.userId !== conversation.otherParticipant.userId) return
+      setOtherStatus(event.status)
+    })
+  }, [conversation.otherParticipant.userId])
 
   useEffect(() => {
     if (!token) return

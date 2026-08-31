@@ -15,6 +15,7 @@ import { getProfile, type ProfileStatus } from '../api/profilesApi'
 import { useAuth } from '../context/AuthContext'
 import { useChat } from '../context/ChatContext'
 import { ApiError } from '../api/http'
+import { onUserStatusChanged } from '../lib/chatHubConnection'
 
 const statusAvatarMap: Record<ProfileStatus, AvatarStatus> = {
   Online: 'online',
@@ -87,6 +88,14 @@ export default function FriendsPage() {
     return () => {
       cancelled = true
     }
+  }, [friends])
+
+  useEffect(() => {
+    return onUserStatusChanged((event) => {
+      const friend = friends.find((f) => f.userId === event.userId)
+      if (!friend) return
+      setStatusByUsername((prev) => ({ ...prev, [friend.username]: event.status }))
+    })
   }, [friends])
 
   async function handleOpenChat(friend: Friend) {

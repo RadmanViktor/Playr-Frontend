@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Plus } from 'lucide-react'
 import { ProfileHeader } from '../components/ProfileHeader'
@@ -8,7 +8,6 @@ import { MyGamesLibrary } from '../components/MyGamesLibrary'
 import { PlayingNowSection } from '../components/PlayingNowSection'
 import { FavoriteGamesSection } from '../components/FavoriteGamesSection'
 import { Button } from '../components/ui/Button'
-import { Badge } from '../components/ui/Badge'
 import { FollowListModal } from '../components/ui/FollowListModal'
 import { getProfile, getProfilePosts, type ProfileData } from '../api/profilesApi'
 import {
@@ -24,19 +23,17 @@ import {
   getFollowCounts,
 } from '../api/followApi'
 import { type PostFeedItem } from '../api/postsApi'
-import { getSteamStatus, type SteamAccount } from '../api/steamApi'
 import { ApiError } from '../api/http'
 import { useAuth } from '../context/AuthContext'
 import { useChat } from '../context/ChatContext'
 import { useCreatePostModal } from '../context/CreatePostModalContext'
-import { onFollowReceived, onFollowRemoved } from '../lib/chatHubConnection'
+import { onFollowReceived, onFollowRemoved, onUserStatusChanged } from '../lib/chatHubConnection'
 
-type ProfileTab = 'overview' | 'posts' | 'games' | 'about'
-const PROFILE_TABS: ProfileTab[] = ['overview', 'posts', 'games', 'about']
+type ProfileTab = 'overview' | 'posts' | 'games'
+const PROFILE_TABS: ProfileTab[] = ['overview', 'posts', 'games']
 
 export default function ProfilePage() {
   const { t } = useTranslation('pagesA')
-  const { t: tOnboarding } = useTranslation('pagesB')
   const { username } = useParams<{ username: string }>()
   const { user, token } = useAuth()
   const { openChatWithUser } = useChat()
@@ -60,7 +57,6 @@ export default function ProfilePage() {
   const [friendsCount, setFriendsCount] = useState(0)
   const [followError, setFollowError] = useState<string | null>(null)
   const [followListModal, setFollowListModal] = useState<'followers' | 'following' | null>(null)
-  const [steamAccount, setSteamAccount] = useState<SteamAccount | null>(null)
 
   useEffect(() => {
     if (!username) return
@@ -100,24 +96,6 @@ export default function ProfilePage() {
   }, [token, profile, user])
 
   const isOwner = !!user && !!profile && user.id === profile.userId
-
-  useEffect(() => {
-    if (!token || !isOwner) {
-      setSteamAccount(null)
-      return
-    }
-    let cancelled = false
-    getSteamStatus(token)
-      .then((account) => {
-        if (!cancelled) setSteamAccount(account)
-      })
-      .catch(() => {
-        /* ignore - non-critical */
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [token, isOwner])
 
   useEffect(() => {
     if (!token || !profile) return
@@ -185,6 +163,14 @@ export default function ProfilePage() {
       unsubscribeRemoved()
     }
   }, [profile, user])
+
+  useEffect(() => {
+    if (!profile) return
+    return onUserStatusChanged((event) => {
+      if (event.userId !== profile.userId) return
+      setProfile((prev) => (prev ? { ...prev, status: event.status } : prev))
+    })
+  }, [profile])
 
   async function handleAddFriend() {
     if (!token || !profile) return
@@ -323,9 +309,9 @@ export default function ProfilePage() {
         </div>
       )}
 
-      <div className="relative grid grid-cols-4 gap-2 rounded-lg border border-border bg-surface-raised p-1">
+      <div className="relative grid grid-cols-3 gap-2 rounded-lg border border-border bg-surface-raised p-1">
         <div
-          className="absolute inset-y-1 w-[calc(25%-0.375rem)] rounded-md bg-primary shadow-sm transition-transform duration-300 ease-out"
+          className="absolute inset-y-1 w-[calc(33.333%-0.375rem)] rounded-md bg-primary shadow-sm transition-transform duration-300 ease-out"
           style={{ transform: `translateX(calc(${PROFILE_TABS.indexOf(activeTab)} * (100% + 0.5rem)))` }}
           aria-hidden
         />
@@ -348,32 +334,6 @@ export default function ProfilePage() {
             <PlayingNowSection username={profile.username} isOwner={isOwner} />
 
             <FavoriteGamesSection username={profile.username} isOwner={isOwner} />
-
-            <div className="rounded-xl border border-border bg-surface p-6">
-              <h2 className="text-lg font-semibold text-text">{t('profile.overview.recentPosts')}</h2>
-              <div className="mt-4 flex flex-col gap-4">
-                {posts.length === 0 ? (
-                  <p className="text-muted">{t('profile.overview.noPosts')}</p>
-                ) : (
-                  posts.slice(0, 3).map((post) => (
-                    <PostCard
-                      key={post.id}
-                      post={post}
-                      currentUserId={user?.id}
-                      onUpdate={(updated) => setPosts((prev) => prev.map((p) => (p.id === updated.id ? updated : p)))}
-                      onDelete={(postId) => setPosts((prev) => prev.filter((p) => p.id !== postId))}
-                    />
-                  ))
-                )}
-              </div>
-              {posts.length > 0 && (
-                <div className="mt-4 flex justify-end">
-                  <Button variant="secondary" size="sm" onClick={() => handleTabChange('posts')}>
-                    {t('profile.overview.viewAllPosts')}
-                  </Button>
-                </div>
-              )}
-            </div>
           </div>
         )}
 
@@ -404,55 +364,6 @@ export default function ProfilePage() {
         )}
 
         {activeTab === 'games' && <MyGamesLibrary username={profile.username} isOwner={isOwner} />}
-
-        {activeTab === 'about' && (
-          <div className="flex flex-col gap-4">
-            <div className="rounded-xl border border-border bg-surface p-6">
-              <h2 className="text-lg font-semibold text-text">{t('profile.about.gaming')}</h2>
-              <div className="mt-4 flex flex-col gap-4">
-                <div>
-                  <h3 className="text-sm font-medium text-muted">{t('profile.about.platforms')}</h3>
-                  <p className="mt-1 text-text">
-                    {profile.platforms.length > 0 ? profile.platforms.join(' · ') : t('profile.about.noneSet')}
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-muted">{t('profile.about.genres')}</h3>
-                  <p className="mt-1 text-text">
-                    {profile.genres.length > 0 ? profile.genres.join(' · ') : t('profile.about.noneSet')}
-                  </p>
-                </div>
-                <div>
-                  <h3 className="text-sm font-medium text-muted">{t('profile.about.typicalPlayTimes')}</h3>
-                  <p className="mt-1 text-text">
-                    {profile.typicalPlayTimes.length > 0
-                      ? profile.typicalPlayTimes
-                          .map((time) => tOnboarding(`onboarding.playstyle.typicalPlayTimeOptions.${time}`))
-                          .join(' · ')
-                      : t('profile.about.noneSet')}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-xl border border-border bg-surface p-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-text">{t('profile.about.connectedAccounts')}</h2>
-                {isOwner && (
-                  <Link to="/settings" className="text-sm text-primary hover:underline">
-                    {t('profile.about.manageConnections')}
-                  </Link>
-                )}
-              </div>
-              <div className="mt-4 flex items-center justify-between">
-                <span className="text-text">{t('profile.about.steam')}</span>
-                <Badge variant={steamAccount ? 'completed' : 'tag'}>
-                  {steamAccount ? t('profile.about.connected') : t('profile.about.notConnected')}
-                </Badge>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
 
       {isOwner && activeTab === 'posts' && (

@@ -4,6 +4,7 @@ import type { ChatMessage } from '../api/chatApi'
 import type { Invitation } from '../api/invitationsApi'
 import type { FriendRequest } from '../api/friendRequestsApi'
 import type { NotificationItem } from '../api/notificationsApi'
+import type { ProfileStatus } from '../api/profilesApi'
 
 export interface FollowEvent {
   followerUserId: string
@@ -17,11 +18,17 @@ export interface FollowEvent {
   createdAt: string
 }
 
+export interface UserStatusChangedEvent {
+  userId: string
+  status: ProfileStatus
+}
+
 type MessageListener = (message: ChatMessage) => void
 type InvitationListener = (invitation: Invitation) => void
 type FriendRequestListener = (friendRequest: FriendRequest) => void
 type NotificationListener = (notification: NotificationItem) => void
 type FollowListener = (followEvent: FollowEvent) => void
+type UserStatusChangedListener = (event: UserStatusChangedEvent) => void
 
 let connection: HubConnection | null = null
 let currentToken: string | null = null
@@ -33,6 +40,7 @@ const friendRequestUpdatedListeners = new Set<FriendRequestListener>()
 const notificationReceivedListeners = new Set<NotificationListener>()
 const followReceivedListeners = new Set<FollowListener>()
 const followRemovedListeners = new Set<FollowListener>()
+const userStatusChangedListeners = new Set<UserStatusChangedListener>()
 
 function buildConnection(token: string): HubConnection {
   return new HubConnectionBuilder()
@@ -77,6 +85,9 @@ export async function connectChatHub(token: string): Promise<void> {
   })
   hub.on('FollowRemoved', (followEvent: FollowEvent) => {
     followRemovedListeners.forEach((listener) => listener(followEvent))
+  })
+  hub.on('UserStatusChanged', (event: UserStatusChangedEvent) => {
+    userStatusChangedListeners.forEach((listener) => listener(event))
   })
 
   try {
@@ -145,4 +156,10 @@ export function onFollowReceived(listener: FollowListener): () => void {
 export function onFollowRemoved(listener: FollowListener): () => void {
   followRemovedListeners.add(listener)
   return () => followRemovedListeners.delete(listener)
+}
+
+/** Subscribe to any user's online/offline/looking-for-game status changes, pushed in real time. */
+export function onUserStatusChanged(listener: UserStatusChangedListener): () => void {
+  userStatusChangedListeners.add(listener)
+  return () => userStatusChangedListeners.delete(listener)
 }

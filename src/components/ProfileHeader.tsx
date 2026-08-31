@@ -1,10 +1,18 @@
 import { Globe, Link as LinkIcon, FileText, Calendar, UserPlus, UserCheck, UserRoundPlus, MessageCircle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { Avatar } from './ui/Avatar'
+import { Avatar, type AvatarStatus } from './ui/Avatar'
 import { Badge } from './ui/Badge'
 import { Button } from './ui/Button'
 import { resolveMediaUrl } from '../api/http'
-import type { ProfileData } from '../api/profilesApi'
+import type { ProfileData, ProfileStatus } from '../api/profilesApi'
+
+const statusAvatarMap: Record<ProfileStatus, AvatarStatus> = {
+  Online: 'online',
+  LookingForGame: 'looking-for-game',
+  Busy: 'busy',
+  Inactive: 'inactive',
+  Offline: 'offline',
+}
 
 interface ProfileHeaderProps {
   profile: ProfileData
@@ -50,6 +58,7 @@ export function ProfileHeader({
   onFollowingClick,
 }: ProfileHeaderProps) {
   const { t } = useTranslation('componentsB')
+  const { t: tOnboarding } = useTranslation('pagesB')
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-surface">
       {/* Cover image / gradient banner */}
@@ -70,6 +79,7 @@ export function ProfileHeader({
             src={profile.avatarUrl ?? undefined}
             alt={profile.displayName}
             size="xl"
+            status={statusAvatarMap[profile.status]}
           />
         </div>
       </div>
@@ -190,13 +200,18 @@ export function ProfileHeader({
           <p className="text-sm text-text leading-snug line-clamp-3">{profile.bio}</p>
         )}
 
-        {(profile.platforms.length > 0 || profile.genres.length > 0) && (
+        {(profile.platforms.length > 0 || profile.genres.length > 0 || profile.typicalPlayTimes.length > 0) && (
           <div className="flex flex-wrap gap-2">
             {profile.platforms.map((platform) => (
               <Badge key={`platform-${platform}`} variant="tag">{platform}</Badge>
             ))}
             {profile.genres.map((genre) => (
               <Badge key={`genre-${genre}`} variant="tag">{genre}</Badge>
+            ))}
+            {profile.typicalPlayTimes.map((time) => (
+              <Badge key={`playtime-${time}`} variant="tag">
+                {tOnboarding(`onboarding.playstyle.typicalPlayTimeOptions.${time}`)}
+              </Badge>
             ))}
           </div>
         )}

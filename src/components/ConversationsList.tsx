@@ -6,6 +6,7 @@ import { getConversations, type Conversation } from '../api/chatApi'
 import { getProfile, type ProfileStatus } from '../api/profilesApi'
 import { useAuth } from '../context/AuthContext'
 import { useChat } from '../context/ChatContext'
+import { onUserStatusChanged } from '../lib/chatHubConnection'
 
 const statusAvatarMap: Record<ProfileStatus, AvatarStatus> = {
   Online: 'online',
@@ -65,6 +66,14 @@ export function ConversationsList() {
     return () => {
       cancelled = true
     }
+  }, [conversations])
+
+  useEffect(() => {
+    return onUserStatusChanged((event) => {
+      const conversation = conversations.find((c) => c.otherParticipant.userId === event.userId)
+      if (!conversation) return
+      setStatusByUsername((prev) => ({ ...prev, [conversation.otherParticipant.username]: event.status }))
+    })
   }, [conversations])
 
   if (isLoading) return <p className="text-muted">{t('conversationsList.loading')}</p>
