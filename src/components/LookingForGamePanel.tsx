@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Card } from './ui/Card'
 import { Badge } from './ui/Badge'
 import { Button } from './ui/Button'
 import { GamePickerInput } from './GamePickerInput'
-import { getGames, type Game } from '../api/gamesApi'
+import type { Game } from '../api/gamesApi'
 import type { PlayStyle } from '../api/profilesApi'
 import { useStatus } from '../context/StatusContext'
 
@@ -29,44 +29,26 @@ export function LookingForGamePanel({ onChanged }: LookingForGamePanelProps) {
     updateStatus,
   } = useStatus()
 
-  const [games, setGames] = useState<Game[]>([])
-  const [gamesError, setGamesError] = useState<string | null>(null)
-  const [gamesLoadKey, setGamesLoadKey] = useState(0)
-  const [selectedGameId, setSelectedGameId] = useState<string | null>(null)
+  const [selectedGame, setSelectedGame] = useState<Game | null>(null)
   const [selectedPlayStyle, setSelectedPlayStyle] = useState<PlayStyle | null>(null)
   const [note, setNote] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isExpanded, setIsExpanded] = useState(false)
 
-  useEffect(() => {
-    let cancelled = false
-    setGamesError(null)
-    getGames()
-      .then((result) => {
-        if (!cancelled) setGames(result)
-      })
-      .catch(() => {
-        if (!cancelled) setGamesError(t('lookingForGamePanel.loadGamesError'))
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [gamesLoadKey])
-
   const isActive = status === 'LookingForGame'
 
   async function handleStart() {
     setError(null)
-    if (!selectedGameId || !selectedPlayStyle) {
+    if (!selectedGame || !selectedPlayStyle) {
       setError(t('lookingForGamePanel.chooseGameAndStyle'))
       return
     }
 
     setIsSaving(true)
     try {
-      await updateStatus('LookingForGame', selectedGameId, selectedPlayStyle, note.trim() || null)
-      setSelectedGameId(null)
+      await updateStatus('LookingForGame', selectedGame.id, selectedPlayStyle, note.trim() || null)
+      setSelectedGame(null)
       setSelectedPlayStyle(null)
       setNote('')
       setIsExpanded(false)
@@ -150,14 +132,7 @@ export function LookingForGamePanel({ onChanged }: LookingForGamePanelProps) {
               <label htmlFor="lfg-game" className="mb-1 block text-xs font-medium text-muted">
                 {t('lookingForGamePanel.gameLabel')}
               </label>
-              <GamePickerInput
-                games={games}
-                value={selectedGameId ?? ''}
-                onChange={setSelectedGameId}
-                error={gamesError}
-                onRetry={() => setGamesLoadKey((k) => k + 1)}
-                onGameAdded={(game) => setGames((current) => [...current, game].sort((a, b) => a.name.localeCompare(b.name)))}
-              />
+              <GamePickerInput selectedGame={selectedGame} onSelect={setSelectedGame} />
             </div>
 
             <div>

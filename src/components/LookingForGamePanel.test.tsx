@@ -8,7 +8,7 @@ import type { ProfileStatus } from '../api/profilesApi'
 vi.mock('../api/gamesApi')
 
 vi.mock('../context/AuthContext', () => ({
-  useAuth: () => ({ token: null, user: null, isLoading: false, login: vi.fn(), register: vi.fn(), logout: vi.fn() }),
+  useAuth: () => ({ token: 'test-token', user: null, isLoading: false, login: vi.fn(), register: vi.fn(), logout: vi.fn() }),
 }))
 
 const updateStatus = vi.fn().mockResolvedValue(undefined)
@@ -27,9 +27,13 @@ vi.mock('../context/StatusContext', () => ({
 const games: gamesApi.Game[] = [
   { id: 'game-1', name: 'Apex Legends', coverImageUrl: null, genre: null },
 ]
+const externalResults: gamesApi.ExternalGameSearchResult[] = [
+  { rawgId: 1, name: 'Apex Legends', coverImageUrl: null, genre: null },
+]
 
 beforeEach(() => {
-  vi.mocked(gamesApi.getGames).mockResolvedValue(games)
+  vi.mocked(gamesApi.searchExternalGames).mockResolvedValue(externalResults)
+  vi.mocked(gamesApi.createGame).mockResolvedValue(games[0])
   statusState.status = 'Online'
   statusState.lookingForGameId = null
   statusState.lookingForGameName = null
@@ -51,7 +55,7 @@ describe('LookingForGamePanel', () => {
 
     await waitFor(() => expect(screen.getByText('Select a game')).toBeInTheDocument())
     await user.click(screen.getByText('Select a game'))
-    await user.click(screen.getByRole('button', { name: 'Apex Legends' }))
+    await user.click(await screen.findByRole('button', { name: 'Apex Legends' }))
     await user.click(screen.getByRole('button', { name: 'Competitive' }))
     await user.type(screen.getByPlaceholderText('Anything specific?'), 'need a 4th')
     await user.click(screen.getByRole('button', { name: 'Make me available!' }))

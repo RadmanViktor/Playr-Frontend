@@ -8,7 +8,7 @@ import { EmojiPickerButton } from './EmojiPickerButton'
 import { GamePickerInput } from './GamePickerInput'
 import { MentionInput, type MentionDraft } from './MentionInput'
 import { useAuth } from '../context/AuthContext'
-import { getGames, type Game } from '../api/gamesApi'
+import type { Game } from '../api/gamesApi'
 import { createPost, type PostFeedItem, type PostScope } from '../api/postsApi'
 import { ApiError } from '../api/http'
 import { MOOD_OPTIONS, moodOptionToApi, type MoodOption } from '../lib/mood'
@@ -36,10 +36,7 @@ export function CreatePostModal({ scope = 'Feed', onClose, onPostCreated }: Crea
   const { t } = useTranslation('componentsA')
   const { token } = useAuth()
 
-  const [games, setGames] = useState<Game[]>([])
-  const [gamesError, setGamesError] = useState<string | null>(null)
-  const [gamesLoadKey, setGamesLoadKey] = useState(0)
-  const [selectedGameId, setSelectedGameId] = useState('')
+  const [selectedGame, setSelectedGame] = useState<Game | null>(null)
   const [selectedMood, setSelectedMood] = useState<MoodOption>('None')
   const [text, setText] = useState('')
   const [mentions, setMentions] = useState<MentionDraft[]>([])
@@ -50,16 +47,6 @@ export function CreatePostModal({ scope = 'Feed', onClose, onPostCreated }: Crea
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [uploadProgress, setUploadProgress] = useState<number | null>(null)
   const [confirmingDiscard, setConfirmingDiscard] = useState(false)
-
-  useEffect(() => {
-    setGamesError(null)
-    getGames()
-      .then((g) => {
-        setGames(g)
-        if (g.length > 0) setSelectedGameId((current) => current || g[0].id)
-      })
-      .catch(() => setGamesError(t('createPostModal.errors.loadGamesFailed')))
-  }, [gamesLoadKey])
 
   useEffect(() => {
     function handlePaste(e: ClipboardEvent) {
@@ -103,7 +90,7 @@ export function CreatePostModal({ scope = 'Feed', onClose, onPostCreated }: Crea
     setSubmitError(null)
 
     const trimmed = text.trim()
-    if (!selectedGameId) { setSubmitError(t('createPostModal.errors.selectGame')); return }
+    if (!selectedGame) { setSubmitError(t('createPostModal.errors.selectGame')); return }
     if (!trimmed) { setTextError(t('createPostModal.errors.textRequired')); return }
     if (trimmed.length > 1000) { setTextError(t('createPostModal.errors.textTooLong')); return }
 
@@ -113,7 +100,7 @@ export function CreatePostModal({ scope = 'Feed', onClose, onPostCreated }: Crea
       const post = await createPost(
         token!,
         {
-          gameId: selectedGameId,
+          gameId: selectedGame.id,
           textContent: trimmed,
           mood: moodOptionToApi(selectedMood),
           media: mediaFiles,
@@ -122,7 +109,7 @@ export function CreatePostModal({ scope = 'Feed', onClose, onPostCreated }: Crea
         },
         mediaFiles.length > 0 ? setUploadProgress : undefined
       )
-      addRecentGameId(selectedGameId)
+      addRecentGameId(selectedGame.id)
       onPostCreated(post)
     } catch (err) {
       setSubmitError(err instanceof ApiError ? err.message : t('createPostModal.errors.genericError'))
@@ -166,14 +153,7 @@ export function CreatePostModal({ scope = 'Feed', onClose, onPostCreated }: Crea
           <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
             <label className="flex flex-col gap-1 text-sm text-muted">
               {t('createPostModal.gameLabel')}
-              <GamePickerInput
-                games={games}
-                value={selectedGameId}
-                onChange={setSelectedGameId}
-                error={gamesError}
-                onRetry={() => setGamesLoadKey((k) => k + 1)}
-                onGameAdded={(game) => setGames((current) => [...current, game].sort((a, b) => a.name.localeCompare(b.name)))}
-              />
+              <GamePickerInput selectedGame={selectedGame} onSelect={setSelectedGame} />
             </label>
 
             <div className="flex flex-col gap-2">

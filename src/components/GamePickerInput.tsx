@@ -1,90 +1,55 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ChevronDown, Gamepad2, Loader2, RefreshCw } from 'lucide-react'
+import { ChevronDown, Gamepad2, Loader2 } from 'lucide-react'
 import { createGame, searchExternalGames, type ExternalGameSearchResult, type Game } from '../api/gamesApi'
 import { resolveMediaUrl } from '../api/http'
 import { useAuth } from '../context/AuthContext'
-import { getRecentGameIds } from '../lib/recentGames'
 import { useIsMobile } from '../lib/useIsMobile'
 
 interface GamePickerInputProps {
-  games: Game[]
-  value: string
-  onChange: (gameId: string) => void
-  error?: string | null
-  onRetry?: () => void
+  selectedGame: Game | null
+  onSelect: (game: Game) => void
   disabled?: boolean
-  onGameAdded?: (game: Game) => void
 }
 
-export function GamePickerInput({ games, value, onChange, error, onRetry, disabled, onGameAdded }: GamePickerInputProps) {
+export function GamePickerInput({ selectedGame, onSelect, disabled }: GamePickerInputProps) {
   const { t } = useTranslation('componentsB')
   const { token } = useAuth()
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
   const [highlightedIndex, setHighlightedIndex] = useState(0)
-  const [externalResults, setExternalResults] = useState<ExternalGameSearchResult[]>([])
-  const [externalSearching, setExternalSearching] = useState(false)
-  const [externalError, setExternalError] = useState<string | null>(null)
+  const [results, setResults] = useState<ExternalGameSearchResult[]>([])
+  const [searching, setSearching] = useState(false)
+  const [searchError, setSearchError] = useState<string | null>(null)
   const [addingRawgId, setAddingRawgId] = useState<number | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const isMobile = useIsMobile()
 
-  const selectedGame = games.find((g) => g.id === value) ?? null
-
-  const orderedGames = useMemo(() => {
-    const recentIds = getRecentGameIds()
-    const recent = recentIds
-      .map((id) => games.find((g) => g.id === id))
-      .filter((g): g is Game => Boolean(g))
-    const rest = games.filter((g) => !recentIds.includes(g.id))
-    return [...recent, ...rest]
-  }, [games])
-
-  const filteredGames = useMemo(() => {
-    const trimmed = query.trim().toLowerCase()
-    if (!trimmed) return orderedGames
-    return orderedGames.filter((g) => g.name.toLowerCase().includes(trimmed))
-  }, [orderedGames, query])
-
-  // Search RAWG's full game catalog whenever the user types, so any game can
-  // be found even if it isn't in our local catalog yet.
+  // Always search RAWG's catalog: an empty query returns a default/popular
+  // selection so the dropdown has something useful to show before typing.
   useEffect(() => {
-    const trimmed = query.trim()
-    if (!trimmed || !token) {
-      setExternalResults([])
-      setExternalError(null)
-      setExternalSearching(false)
-      return
-    }
-
+    if (!open || !token) return
     let cancelled = false
-    setExternalSearching(true)
-    setExternalError(null)
+    setSearching(true)
+    setSearchError(null)
     const timeoutId = setTimeout(() => {
-      searchExternalGames(token, trimmed)
+      searchExternalGames(token, query.trim())
         .then((r) => {
-          if (!cancelled) setExternalResults(r)
+          if (!cancelled) setResults(r)
         })
         .catch(() => {
-          if (!cancelled) setExternalError(t('gamePickerInput.searchError'))
+          if (!cancelled) setSearchError(t('gamePickerInput.searchError'))
         })
         .finally(() => {
-          if (!cancelled) setExternalSearching(false)
+          if (!cancelled) setSearching(false)
         })
-    }, 300)
+    }, 250)
 
     return () => {
       cancelled = true
       clearTimeout(timeoutId)
     }
-  }, [query, token])
-
-  // Hide RAWG results that already match a game we're showing from the local list.
-  const filteredExternalResults = useMemo(() => {
-    const shownNames = new Set(filteredGames.map((g) => g.name.trim().toLowerCase()))
-    return externalResults.filter((r) => !shownNames.has(r.name.trim().toLowerCase()))
-  }, [externalResults, filteredGames])
+  }, [query, token, open, t])
 
   useEffect(() => {
     setHighlightedIndex(0)
@@ -102,27 +67,20 @@ export function GamePickerInput({ games, value, onChange, error, onRetry, disabl
     return () => document.removeEventListener('mousedown', handleMouseDown)
   }, [open])
 
-  function selectGame(gameId: string) {
-    onChange(gameId)
-    setOpen(false)
-    setQuery('')
-  }
-
-  async function selectExternalGame(result: ExternalGameSearchResult) {
+  async function selectResult(result: ExternalGameSearchResult) {
     if (!token) return
     setAddingRawgId(result.rawgId)
     try {
       const game = await createGame(token, result)
-      onGameAdded?.(game)
-      selectGame(game.id)
+      onSelect(game)
+      setOpen(false)
+      setQuery('')
     } catch {
-      setExternalError(t('gamePickerInput.addError'))
+      setSearchError(t('gamePickerInput.addError'))
     } finally {
       setAddingRawgId(null)
     }
   }
-
-  const combinedCount = filteredGames.length + filteredExternalResults.length
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (!open) {
@@ -134,41 +92,18 @@ export function GamePickerInput({ games, value, onChange, error, onRetry, disabl
     }
     if (e.key === 'ArrowDown') {
       e.preventDefault()
-      setHighlightedIndex((i) => Math.min(i + 1, combinedCount - 1))
+      setHighlightedIndex((i) => Math.min(i + 1, results.length - 1))
     } else if (e.key === 'ArrowUp') {
       e.preventDefault()
       setHighlightedIndex((i) => Math.max(i - 1, 0))
     } else if (e.key === 'Enter') {
       e.preventDefault()
-      if (highlightedIndex < filteredGames.length) {
-        const game = filteredGames[highlightedIndex]
-        if (game) selectGame(game.id)
-      } else {
-        const result = filteredExternalResults[highlightedIndex - filteredGames.length]
-        if (result) void selectExternalGame(result)
-      }
+      const result = results[highlightedIndex]
+      if (result) void selectResult(result)
     } else if (e.key === 'Escape') {
       setOpen(false)
       setQuery('')
     }
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center gap-2 rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm text-frustrated">
-        <span className="flex-1">{error}</span>
-        {onRetry && (
-          <button
-            type="button"
-            onClick={onRetry}
-            className="flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-text hover:bg-border cursor-pointer"
-          >
-            <RefreshCw className="h-3.5 w-3.5" aria-hidden="true" />
-            {t('gamePickerInput.tryAgain')}
-          </button>
-        )}
-      </div>
-    )
   }
 
   return (
@@ -187,7 +122,9 @@ export function GamePickerInput({ games, value, onChange, error, onRetry, disabl
         ) : (
           <Gamepad2 className="h-5 w-5 text-muted" aria-hidden="true" />
         )}
-        <span className="flex-1 truncate text-sm">{selectedGame ? selectedGame.name : t('gamePickerInput.selectGamePlaceholder')}</span>
+        <span className="flex-1 truncate text-sm">
+          {selectedGame ? selectedGame.name : t('gamePickerInput.selectGamePlaceholder')}
+        </span>
         <ChevronDown className="h-4 w-4 text-muted" aria-hidden="true" />
       </button>
 
@@ -206,65 +143,41 @@ export function GamePickerInput({ games, value, onChange, error, onRetry, disabl
             className="w-full border-b border-border bg-transparent px-3 py-2 text-sm text-text outline-none placeholder:text-muted"
           />
           <div className="max-h-56 overflow-y-auto">
-            {filteredGames.length === 0 && filteredExternalResults.length === 0 && !externalSearching ? (
-              <p className="px-3 py-2 text-sm text-muted">{t('gamePickerInput.noGamesFound')}</p>
-            ) : (
-              <>
-                {filteredGames.map((game, index) => (
-                  <button
-                    key={game.id}
-                    type="button"
-                    onClick={() => selectGame(game.id)}
-                    onMouseEnter={() => setHighlightedIndex(index)}
-                    className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm cursor-pointer ${
-                      index === highlightedIndex ? 'bg-surface-raised text-text' : 'text-muted hover:text-text'
-                    }`}
-                  >
-                    {game.coverImageUrl ? (
-                      <img src={resolveMediaUrl(game.coverImageUrl)!} alt="" className="h-6 w-6 rounded object-cover" />
-                    ) : (
-                      <Gamepad2 className="h-5 w-5 shrink-0" aria-hidden="true" />
-                    )}
-                    <span className="truncate">{game.name}</span>
-                  </button>
-                ))}
-
-                {filteredExternalResults.map((result, resultIndex) => {
-                  const index = filteredGames.length + resultIndex
-                  return (
-                    <button
-                      key={result.rawgId}
-                      type="button"
-                      disabled={addingRawgId !== null}
-                      onClick={() => void selectExternalGame(result)}
-                      onMouseEnter={() => setHighlightedIndex(index)}
-                      className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm cursor-pointer disabled:opacity-50 ${
-                        index === highlightedIndex ? 'bg-surface-raised text-text' : 'text-muted hover:text-text'
-                      }`}
-                    >
-                      {result.coverImageUrl ? (
-                        <img src={resolveMediaUrl(result.coverImageUrl)!} alt="" className="h-6 w-6 rounded object-cover" />
-                      ) : (
-                        <Gamepad2 className="h-5 w-5 shrink-0" aria-hidden="true" />
-                      )}
-                      <span className="flex-1 truncate">{result.name}</span>
-                      {addingRawgId === result.rawgId && (
-                        <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden="true" />
-                      )}
-                    </button>
-                  )
-                })}
-              </>
-            )}
-
-            {externalSearching && (
+            {searching && results.length === 0 && (
               <div className="flex items-center gap-2 px-3 py-2 text-sm text-muted">
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
                 {t('gamePickerInput.searching')}
               </div>
             )}
 
-            {externalError && <p className="px-3 py-2 text-sm text-frustrated">{externalError}</p>}
+            {!searching && searchError && <p className="px-3 py-2 text-sm text-frustrated">{searchError}</p>}
+
+            {!searching && !searchError && results.length === 0 && (
+              <p className="px-3 py-2 text-sm text-muted">{t('gamePickerInput.noGamesFound')}</p>
+            )}
+
+            {results.map((result, index) => (
+              <button
+                key={result.rawgId}
+                type="button"
+                disabled={addingRawgId !== null}
+                onClick={() => void selectResult(result)}
+                onMouseEnter={() => setHighlightedIndex(index)}
+                className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm cursor-pointer disabled:opacity-50 ${
+                  index === highlightedIndex ? 'bg-surface-raised text-text' : 'text-muted hover:text-text'
+                }`}
+              >
+                {result.coverImageUrl ? (
+                  <img src={resolveMediaUrl(result.coverImageUrl)!} alt="" className="h-6 w-6 rounded object-cover" />
+                ) : (
+                  <Gamepad2 className="h-5 w-5 shrink-0" aria-hidden="true" />
+                )}
+                <span className="flex-1 truncate">{result.name}</span>
+                {addingRawgId === result.rawgId && (
+                  <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden="true" />
+                )}
+              </button>
+            ))}
           </div>
         </div>
       )}
