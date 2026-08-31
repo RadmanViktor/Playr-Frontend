@@ -40,6 +40,24 @@
       "viewAllPosts": "Visa alla inlägg",
       "noPosts": "Inga inlägg än."
     },
+    "playingNow": {
+      "title": "Spelar just nu",
+      "loading": "Laddar…",
+      "loadError": "Det gick inte att läsa in \"Spelar just nu\".",
+      "loadGamesError": "Det gick inte att läsa in spel.",
+      "emptyOwner": "Du har inte markerat att du spelar något just nu.",
+      "emptyOther": "Spelar inget just nu.",
+      "addGame": "Lägg till spel",
+      "editTitle": "Redigera",
+      "statusPlaceholder": "Valfri status, t.ex. \"Kör Premier med kompisar\"",
+      "chooseGameError": "Välj ett spel först.",
+      "saveError": "Det gick inte att spara.",
+      "removeError": "Det gick inte att ta bort.",
+      "save": "Spara",
+      "cancel": "Avbryt",
+      "editAriaLabel": "Redigera {{gameName}}",
+      "removeAriaLabel": "Ta bort {{gameName}} från spelar just nu"
+    },
     "about": {
       "gaming": "Spelande",
       "platforms": "Plattformar",

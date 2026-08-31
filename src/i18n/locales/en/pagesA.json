@@ -40,6 +40,24 @@
       "viewAllPosts": "View all posts",
       "noPosts": "No posts yet."
     },
+    "playingNow": {
+      "title": "Playing now",
+      "loading": "Loading…",
+      "loadError": "Failed to load playing now.",
+      "loadGamesError": "Failed to load games.",
+      "emptyOwner": "You're not marked as playing anything right now.",
+      "emptyOther": "Not playing anything right now.",
+      "addGame": "Add game",
+      "editTitle": "Edit",
+      "statusPlaceholder": "Optional status, e.g. \"Grinding Premier with friends\"",
+      "chooseGameError": "Choose a game first.",
+      "saveError": "Failed to save.",
+      "removeError": "Failed to remove.",
+      "save": "Save",
+      "cancel": "Cancel",
+      "editAriaLabel": "Edit {{gameName}}",
+      "removeAriaLabel": "Remove {{gameName}} from playing now"
+    },
     "about": {
       "gaming": "Gaming",
       "platforms": "Platforms",

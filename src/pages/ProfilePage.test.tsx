@@ -50,6 +50,7 @@ beforeEach(async () => {
   logoutMock.mockClear()
   vi.mocked(profilesApi.getProfile).mockResolvedValue(profile)
   vi.mocked(profilesApi.getProfilePosts).mockResolvedValue([])
+  vi.mocked(profilesApi.getPlayingNow).mockResolvedValue([])
 })
 
 function renderProfile(username = 'player') {
