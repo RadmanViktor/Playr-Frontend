@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Avatar } from './ui/Avatar'
 import { Camera } from 'lucide-react'
+import { usePasteImage } from '../lib/usePasteImage'
 
 const ALLOWED_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.gif']
 const MAX_BYTES = 10 * 1024 * 1024
@@ -64,9 +65,11 @@ export function AvatarUploadInput({
     onFileChange(selected)
   }
 
+  const { bindings } = usePasteImage((pastedFile) => handleFileSelected(pastedFile))
+
   return (
     <div className="flex flex-col gap-2">
-      <label className="group relative w-fit cursor-pointer">
+      <label className="group relative w-fit cursor-pointer" {...bindings}>
         <Avatar src={previewUrl ?? currentAvatarUrl ?? undefined} alt={displayName} size="xl" />
         <span className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
           <Camera className="h-6 w-6 text-white" aria-hidden="true" />

@@ -20,6 +20,7 @@ export interface Conversation {
   createdAt: string
   updatedAt: string
   participants: ChatParticipant[]
+  lfgGroupId: string | null
 }
 
 /** Participants excluding the given user id - the "other side" of a Direct or Group chat. */

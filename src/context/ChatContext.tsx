@@ -1,6 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { ChatWindow } from '../components/ChatWindow'
 import { Toast } from '../components/ui/Toast'
 import { GroupFilledCelebration } from '../components/ui/GroupFilledCelebration'
@@ -46,7 +45,6 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [unreadConversationIds, setUnreadConversationIds] = useState<Set<string>>(new Set())
   const [filledGroupCelebration, setFilledGroupCelebration] = useState<LfgGroup | null>(null)
   const isMobile = useIsMobile()
-  const navigate = useNavigate()
 
   // On mobile a chat window is fullscreen, so stacking several of them just
   // buries all but the last one under an identical `inset-0` overlay. Render
@@ -68,13 +66,6 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     }
   }, [token])
 
-  useEffect(() => {
-    if (!user) return
-    return onLfgGroupFilled((group) => {
-      setFilledGroupCelebration(group)
-    })
-  }, [user])
-
   const showConversation = useCallback((conversation: Conversation, successMessage: string | null) => {
     setOpenChats((prev) => {
       const existingIndex = prev.findIndex((chat) => chat.conversation.id === conversation.id)
@@ -89,6 +80,25 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       return next
     })
   }, [])
+
+  useEffect(() => {
+    if (!user) return
+    return onLfgGroupFilled((group) => {
+      setFilledGroupCelebration(group)
+      if (token) {
+        getConversations(token)
+          .then((conversations) => {
+            const match = conversations.find((c) => c.lfgGroupId === group.id)
+            if (match) {
+              showConversation(match, null)
+            }
+          })
+          .catch(() => {
+            /* the celebration + a manual "Öppna gruppchatten" fallback still work */
+          })
+      }
+    })
+  }, [user, token, showConversation])
 
   useEffect(() => {
     if (!user) return
@@ -139,6 +149,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
                     createdAt: message.createdAt,
                     updatedAt: message.createdAt,
                     participants: [senderParticipant],
+                    lfgGroupId: null,
                   },
                   null,
                 )
@@ -156,6 +167,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
                   createdAt: message.createdAt,
                   updatedAt: message.createdAt,
                   participants: [senderParticipant],
+                  lfgGroupId: null,
                 },
                 null,
               )
@@ -260,10 +272,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         <GroupFilledCelebration
           group={filledGroupCelebration}
           onClose={() => setFilledGroupCelebration(null)}
-          onOpenChat={() => {
-            setFilledGroupCelebration(null)
-            navigate('/chats')
-          }}
+          onOpenChat={() => setFilledGroupCelebration(null)}
         />
       )}
     </ChatContext.Provider>

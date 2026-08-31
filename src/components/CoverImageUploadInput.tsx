@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Camera } from 'lucide-react'
 import { resolveMediaUrl } from '../api/http'
 import { validateAvatarFile } from './AvatarUploadInput'
+import { usePasteImage } from '../lib/usePasteImage'
 
 interface CoverImageUploadInputProps {
   currentCoverImageUrl?: string | null
@@ -50,9 +51,14 @@ export function CoverImageUploadInput({
 
   const backgroundUrl = previewUrl ?? resolveMediaUrl(currentCoverImageUrl ?? null)
 
+  const { bindings } = usePasteImage((pastedFile) => handleFileSelected(pastedFile))
+
   return (
     <div className="flex flex-col gap-2">
-      <label className="group relative block h-28 w-full cursor-pointer overflow-hidden rounded-xl border border-border bg-gradient-to-br from-primary/60 via-primary/25 to-surface bg-cover bg-center">
+      <label
+        className="group relative block h-28 w-full cursor-pointer overflow-hidden rounded-xl border border-border bg-gradient-to-br from-primary/60 via-primary/25 to-surface bg-cover bg-center"
+        {...bindings}
+      >
         <span
           className="absolute inset-0 bg-cover bg-center"
           style={backgroundUrl ? { backgroundImage: `url(${backgroundUrl})` } : undefined}

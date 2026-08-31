@@ -77,6 +77,7 @@ function conversation(id: string, name: string): Conversation {
     createdAt: '2024-01-01T00:00:00Z',
     updatedAt: '2024-01-01T00:00:00Z',
     participants: [other],
+    lfgGroupId: null,
   }
 }
 
