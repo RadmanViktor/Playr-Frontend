@@ -9,8 +9,6 @@ import type { ProfileData } from '../api/profilesApi'
 interface ProfileHeaderProps {
   profile: ProfileData
   isOwner: boolean
-  onEditClick: () => void
-  onSignOutClick?: () => void
   postCount?: number
   onAddFriendClick?: () => void
   onCancelFriendRequestClick?: () => void
@@ -43,8 +41,6 @@ function formatJoinDate(createdAt: string): string {
 export function ProfileHeader({
   profile,
   isOwner,
-  onEditClick,
-  onSignOutClick,
   postCount = 0,
   onAddFriendClick,
   onCancelFriendRequestClick,
@@ -99,18 +95,6 @@ export function ProfileHeader({
               <p className="text-sm text-muted">@{profile.username}</p>
             )}
           </div>
-          {isOwner && (
-            <div className="flex flex-wrap items-center gap-2">
-              <Button variant="secondary" size="sm" onClick={onEditClick}>
-                {t('profileHeader.settings')}
-              </Button>
-              {onSignOutClick && (
-                <Button variant="ghost" size="sm" onClick={onSignOutClick}>
-                  {t('profileHeader.signOut')}
-                </Button>
-              )}
-            </div>
-          )}
           {!isOwner && (
             <div className="flex flex-wrap items-center gap-2">
               {(onFollowClick || onUnfollowClick) && (
@@ -212,7 +196,7 @@ export function ProfileHeader({
         </div>
 
         {profile.bio && (
-          <p className="text-sm text-text leading-relaxed">{profile.bio}</p>
+          <p className="text-sm text-text leading-snug line-clamp-3">{profile.bio}</p>
         )}
 
         {(profile.platforms.length > 0 || profile.genres.length > 0) && (

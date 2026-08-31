@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, type MouseEvent as ReactMouseEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Mail, Menu, Bell } from 'lucide-react'
+import { Mail, Menu, Bell, Settings, LogOut, UserRound } from 'lucide-react'
 import { IconButton } from '../ui/IconButton'
 import { Avatar } from '../ui/Avatar'
 import { useAuth } from '../../context/AuthContext'
@@ -52,7 +52,7 @@ const statusAvatarMap = {
 
 export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
   const { t } = useTranslation('layout')
-  const { user, token } = useAuth()
+  const { user, token, logout } = useAuth()
   const { status, avatarUrl } = useStatus()
   const { openChatWithUser } = useChat()
   const { notifications, unreadCount, isLoading: notificationsLoading, markRead, markAllRead } = useNotifications()
@@ -77,6 +77,8 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
   const incomingInvitationCount = invitations.length + incomingFriendRequests.length
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
   const notificationsRef = useRef<HTMLDivElement>(null)
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false)
+  const profileMenuRef = useRef<HTMLDivElement>(null)
 
   type PendingItem = {
     id: string
@@ -308,6 +310,34 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
     document.addEventListener('mousedown', handleMouseDown)
     return () => document.removeEventListener('mousedown', handleMouseDown)
   }, [isNotificationsOpen])
+
+  // Close profile menu on outside click
+  useEffect(() => {
+    if (!isProfileMenuOpen) return
+    function handleMouseDown(e: MouseEvent) {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(e.target as Node)) {
+        setIsProfileMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleMouseDown)
+    return () => document.removeEventListener('mousedown', handleMouseDown)
+  }, [isProfileMenuOpen])
+
+  function handleViewProfile() {
+    setIsProfileMenuOpen(false)
+    if (user) navigate(`/profile/${user.username}`)
+  }
+
+  function handleSettingsClick() {
+    setIsProfileMenuOpen(false)
+    navigate('/settings')
+  }
+
+  function handleSignOutClick() {
+    setIsProfileMenuOpen(false)
+    logout()
+    navigate('/login', { replace: true })
+  }
 
   async function handleNotificationClick(notification: NotificationItem) {
     setIsNotificationsOpen(false)
@@ -660,13 +690,43 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
           )}
         </div>
         {user && (
-          <button
-            onClick={() => navigate(`/profile/${user.username}`)}
-            className="rounded-full focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
-            aria-label={t('topBar.myProfile')}
-          >
-            <Avatar src={avatarUrl ?? undefined} alt={user.displayName ?? user.username} status={statusAvatarMap[status]} />
-          </button>
+          <div className="relative" ref={profileMenuRef}>
+            <button
+              onClick={() => setIsProfileMenuOpen((open) => !open)}
+              className="rounded-full focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
+              aria-label={t('topBar.myProfile')}
+            >
+              <Avatar src={avatarUrl ?? undefined} alt={user.displayName ?? user.username} status={statusAvatarMap[status]} />
+            </button>
+            {isProfileMenuOpen && (
+              <div className="absolute right-0 top-full z-50 mt-1 w-48 rounded-lg border border-border bg-surface shadow-lg overflow-hidden">
+                <button
+                  type="button"
+                  onClick={handleViewProfile}
+                  className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-text hover:bg-surface-raised cursor-pointer"
+                >
+                  <UserRound className="h-4 w-4" aria-hidden="true" />
+                  {t('topBar.profileMenu.viewProfile')}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSettingsClick}
+                  className="flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm text-text hover:bg-surface-raised cursor-pointer"
+                >
+                  <Settings className="h-4 w-4" aria-hidden="true" />
+                  {t('topBar.profileMenu.settings')}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSignOutClick}
+                  className="flex w-full items-center gap-2 border-t border-border px-4 py-2.5 text-left text-sm text-frustrated hover:bg-surface-raised cursor-pointer"
+                >
+                  <LogOut className="h-4 w-4" aria-hidden="true" />
+                  {t('topBar.profileMenu.signOut')}
+                </button>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </header>

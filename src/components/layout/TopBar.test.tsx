@@ -105,4 +105,12 @@ describe('TopBar', () => {
     fireEvent.click(screen.getByText('Bob Smith'))
     expect(getRecentSearches().some((s) => s.userId === 'u2')).toBe(true)
   })
+
+  it('opens the profile menu with view profile, settings and sign out', () => {
+    render(<TopBar />, { wrapper: MemoryRouter })
+    fireEvent.click(screen.getByRole('button', { name: 'My profile' }))
+    expect(screen.getByRole('button', { name: /view profile/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /settings/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument()
+  })
 })

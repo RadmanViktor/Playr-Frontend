@@ -23,6 +23,11 @@
     "searchPlaceholder": "Search PLAYR",
     "loading": "Loading...",
     "myProfile": "My profile",
+    "profileMenu": {
+      "viewProfile": "View profile",
+      "settings": "Settings",
+      "signOut": "Sign out"
+    },
     "search": {
       "noRecentSearches": "No recent searches",
       "recentSearches": "Recent searches",

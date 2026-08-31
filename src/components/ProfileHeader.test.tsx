@@ -1,6 +1,5 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { ProfileHeader } from './ProfileHeader'
 import type { ProfileData } from '../api/profilesApi'
 
@@ -16,65 +15,48 @@ const profile: ProfileData = {
 
 describe('ProfileHeader', () => {
   it('renders displayName and username', () => {
-    render(<ProfileHeader profile={profile} isOwner={false} onEditClick={vi.fn()} />)
+    render(<ProfileHeader profile={profile} isOwner={false} />)
     expect(screen.getByText('Nexus Nova')).toBeInTheDocument()
     expect(screen.getByText('@nexusnova')).toBeInTheDocument()
   })
 
   it('renders bio', () => {
-    render(<ProfileHeader profile={profile} isOwner={false} onEditClick={vi.fn()} />)
+    render(<ProfileHeader profile={profile} isOwner={false} />)
     expect(screen.getByText('Gaming is life')).toBeInTheDocument()
   })
 
   it('renders region', () => {
-    render(<ProfileHeader profile={profile} isOwner={false} onEditClick={vi.fn()} />)
+    render(<ProfileHeader profile={profile} isOwner={false} />)
     expect(screen.getByText('EU')).toBeInTheDocument()
   })
 
   it('renders platform badges', () => {
-    render(<ProfileHeader profile={profile} isOwner={false} onEditClick={vi.fn()} />)
+    render(<ProfileHeader profile={profile} isOwner={false} />)
     expect(screen.getByText('PC')).toBeInTheDocument()
     expect(screen.getByText('PlayStation')).toBeInTheDocument()
   })
 
+  it('renders genre badges', () => {
+    render(<ProfileHeader profile={{ ...profile, genres: ['FPS', 'RPG'] }} isOwner={false} />)
+    expect(screen.getByText('FPS')).toBeInTheDocument()
+    expect(screen.getByText('RPG')).toBeInTheDocument()
+  })
+
   it('renders external links as anchors', () => {
-    render(<ProfileHeader profile={profile} isOwner={false} onEditClick={vi.fn()} />)
+    render(<ProfileHeader profile={profile} isOwner={false} />)
     const link = screen.getByRole('link', { name: /steam/i })
     expect(link).toHaveAttribute('href', 'https://steamcommunity.com/id/nexusnova')
     expect(link).toHaveAttribute('target', '_blank')
   })
 
-  it('shows Settings button when isOwner', () => {
-    render(<ProfileHeader profile={profile} isOwner={true} onEditClick={vi.fn()} />)
-    expect(screen.getByRole('button', { name: /settings/i })).toBeInTheDocument()
-  })
-
-  it('shows Sign out button under Settings when owner can sign out', () => {
-    render(<ProfileHeader profile={profile} isOwner={true} onEditClick={vi.fn()} onSignOutClick={vi.fn()} />)
-    const settingsButton = screen.getByRole('button', { name: /settings/i })
-    const signOutButton = screen.getByRole('button', { name: /sign out/i })
-    expect(settingsButton.compareDocumentPosition(signOutButton) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
-  })
-
-  it('hides Settings button when not isOwner', () => {
-    render(<ProfileHeader profile={profile} isOwner={false} onEditClick={vi.fn()} />)
+  it('does not show Settings or Sign out buttons, even when isOwner', () => {
+    render(<ProfileHeader profile={profile} isOwner={true} />)
     expect(screen.queryByRole('button', { name: /settings/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /sign out/i })).not.toBeInTheDocument()
   })
 
-  it('calls onEditClick when Settings is clicked', async () => {
-    const onEditClick = vi.fn()
-    const user = userEvent.setup()
-    render(<ProfileHeader profile={profile} isOwner={true} onEditClick={onEditClick} />)
-    await user.click(screen.getByRole('button', { name: /settings/i }))
-    expect(onEditClick).toHaveBeenCalledOnce()
-  })
-
-  it('calls onSignOutClick when Sign out is clicked', async () => {
-    const onSignOutClick = vi.fn()
-    const user = userEvent.setup()
-    render(<ProfileHeader profile={profile} isOwner={true} onEditClick={vi.fn()} onSignOutClick={onSignOutClick} />)
-    await user.click(screen.getByRole('button', { name: /sign out/i }))
-    expect(onSignOutClick).toHaveBeenCalledOnce()
+  it('renders friends count', () => {
+    render(<ProfileHeader profile={profile} isOwner={false} friendsCount={5} />)
+    expect(screen.getByText('5')).toBeInTheDocument()
   })
 })

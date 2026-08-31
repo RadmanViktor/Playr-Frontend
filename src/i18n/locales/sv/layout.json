@@ -23,6 +23,11 @@
     "searchPlaceholder": "Sök PLAYR",
     "loading": "Laddar...",
     "myProfile": "Min profil",
+    "profileMenu": {
+      "viewProfile": "Visa profil",
+      "settings": "Inställningar",
+      "signOut": "Logga ut"
+    },
     "search": {
       "noRecentSearches": "Inga senaste sökningar",
       "recentSearches": "Senaste sökningar",

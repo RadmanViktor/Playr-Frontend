@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Plus } from 'lucide-react'
 import { ProfileHeader } from '../components/ProfileHeader'
@@ -30,10 +30,9 @@ import { onFollowReceived, onFollowRemoved } from '../lib/chatHubConnection'
 export default function ProfilePage() {
   const { t } = useTranslation('pagesA')
   const { username } = useParams<{ username: string }>()
-  const { user, token, logout } = useAuth()
+  const { user, token } = useAuth()
   const { openChatWithUser } = useChat()
   const { openCreatePost, subscribePostCreated } = useCreatePostModal()
-  const navigate = useNavigate()
 
   const [profile, setProfile] = useState<ProfileData | null>(null)
   const [posts, setPosts] = useState<PostFeedItem[]>([])
@@ -160,11 +159,6 @@ export default function ProfilePage() {
     }
   }, [profile, user])
 
-  function handleSignOut() {
-    logout()
-    navigate('/login', { replace: true })
-  }
-
   async function handleAddFriend() {
     if (!token || !profile) return
     setIsSendingFriendRequest(true)
@@ -259,8 +253,6 @@ export default function ProfilePage() {
       <ProfileHeader
         profile={profile}
         isOwner={isOwner}
-        onEditClick={() => navigate('/settings')}
-        onSignOutClick={handleSignOut}
         postCount={posts.length}
         onAddFriendClick={handleAddFriend}
         onCancelFriendRequestClick={handleCancelFriendRequest}
