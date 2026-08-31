@@ -33,6 +33,8 @@ function profile(overrides: Partial<ProfileData> = {}): ProfileData {
     updatedAt: '2024-01-01T00:00:00Z',
     relationshipStatus: null,
     pendingInvitationId: null,
+    activeBadgeType: null,
+    activeBadgeLevel: null,
     ...overrides,
   }
 }

@@ -26,6 +26,8 @@ export interface PostFeedItem {
   authorUsername: string
   authorDisplayName: string
   authorAvatarUrl: string | null
+  authorActiveBadgeType: string | null
+  authorActiveBadgeLevel: string | null
   gameId: string
   gameName: string
   gameCoverImageUrl: string | null

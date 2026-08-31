@@ -12,6 +12,8 @@ const baseComment: CommentItemType = {
   authorUsername: 'nexusnova',
   authorDisplayName: 'NexusNova',
   authorAvatarUrl: null,
+  authorActiveBadgeType: null,
+  authorActiveBadgeLevel: null,
   textContent: 'Nice post!',
   createdAt: new Date(Date.now() - 60_000).toISOString(),
   updatedAt: null,

@@ -29,6 +29,8 @@ export interface ProfileData {
   updatedAt: string
   relationshipStatus: RelationshipStatus | null
   pendingInvitationId: string | null
+  activeBadgeType: string | null
+  activeBadgeLevel: string | null
 }
 
 export interface UpdateProfileData {

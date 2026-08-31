@@ -101,7 +101,13 @@ export function CommentItem({ comment, currentUserId, onSave, onDelete, onReact,
     <div className="flex-1">
       <div className="rounded-lg bg-surface-raised px-3 py-2">
         <Link to={`/profile/${comment.authorUsername}`} className="mb-4 flex items-center gap-2">
-          <Avatar src={comment.authorAvatarUrl ?? undefined} alt={comment.authorDisplayName} size="sm" />
+          <Avatar
+            src={comment.authorAvatarUrl ?? undefined}
+            alt={comment.authorDisplayName}
+            size="sm"
+            badgeType={comment.authorActiveBadgeType}
+            badgeLevel={comment.authorActiveBadgeLevel}
+          />
           <span className="text-xs font-semibold text-primary hover:underline">{comment.authorDisplayName}</span>
         </Link>
         {isEditing ? (

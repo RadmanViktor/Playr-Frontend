@@ -23,6 +23,8 @@ const sampleComment: CommentItem = {
   authorUsername: 'nexusnova',
   authorDisplayName: 'NexusNova',
   authorAvatarUrl: null,
+  authorActiveBadgeType: null,
+  authorActiveBadgeLevel: null,
   textContent: 'Nice post!',
   createdAt: new Date().toISOString(),
   updatedAt: null,

@@ -9,6 +9,10 @@ interface AvatarProps {
   alt: string
   size?: Size
   status?: AvatarStatus
+  /** Active badge type from the profile/post/comment DTOs, e.g. "Creator", "Poster". */
+  badgeType?: string | null
+  /** Active badge level, e.g. "Bronze", "Silver", "Gold". */
+  badgeLevel?: string | null
 }
 
 const sizeClasses: Record<Size, string> = {
@@ -26,7 +30,27 @@ const statusColor: Record<AvatarStatus, string> = {
   offline: 'bg-muted',
 }
 
-export function Avatar({ src, alt, size = 'md', status }: AvatarProps) {
+/**
+ * Maps a badge type/level to the CSS ring class defined in index.css. "Creator" gets
+ * the special animated neon ring regardless of level; everything else gets a plain
+ * ring colored by tier. Returns null if there's no badge to show.
+ */
+function getBadgeRingClass(badgeType?: string | null, badgeLevel?: string | null): string | null {
+  if (!badgeType) return null
+  if (badgeType === 'Creator') return 'badge-ring-creator'
+  switch (badgeLevel) {
+    case 'Bronze':
+      return 'badge-ring-bronze'
+    case 'Silver':
+      return 'badge-ring-silver'
+    case 'Gold':
+      return 'badge-ring-gold'
+    default:
+      return null
+  }
+}
+
+export function Avatar({ src, alt, size = 'md', status, badgeType, badgeLevel }: AvatarProps) {
   // The API returns server-relative avatar paths. Resolving here rather than at
   // each of the ~10 call sites keeps them from silently rendering broken images.
   const resolvedSrc = resolveMediaUrl(src)
@@ -36,7 +60,7 @@ export function Avatar({ src, alt, size = 'md', status }: AvatarProps) {
   const [failedSrc, setFailedSrc] = useState<string | null>(null)
   const showImage = resolvedSrc !== null && resolvedSrc !== failedSrc
 
-  return (
+  const avatar = (
     // overflow-hidden: a broken image renders its alt text at the element's
     // intrinsic size, which otherwise escapes the avatar box and wrecks the
     // surrounding layout.
@@ -63,6 +87,23 @@ export function Avatar({ src, alt, size = 'md', status }: AvatarProps) {
           className={`absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-surface ${statusColor[status]}`}
         />
       )}
+    </span>
+  )
+
+  const ringClass = getBadgeRingClass(badgeType, badgeLevel)
+  if (!ringClass) {
+    return avatar
+  }
+
+  return (
+    <span
+      data-testid="avatar-badge-ring"
+      data-badge-type={badgeType}
+      data-badge-level={badgeLevel ?? undefined}
+      title={badgeType === 'Creator' ? 'Creator' : `${badgeType} (${badgeLevel})`}
+      className={`badge-ring ${ringClass}`}
+    >
+      {avatar}
     </span>
   )
 }

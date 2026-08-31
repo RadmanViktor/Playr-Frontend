@@ -164,7 +164,12 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate, defaultComme
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Link to={`/profile/${post.authorUsername}`} className="shrink-0">
-            <Avatar src={post.authorAvatarUrl ?? undefined} alt={post.authorDisplayName} />
+            <Avatar
+              src={post.authorAvatarUrl ?? undefined}
+              alt={post.authorDisplayName}
+              badgeType={post.authorActiveBadgeType}
+              badgeLevel={post.authorActiveBadgeLevel}
+            />
           </Link>
           <Link to={`/profile/${post.authorUsername}`} className="hover:underline">
             <p className="text-sm font-semibold text-text">

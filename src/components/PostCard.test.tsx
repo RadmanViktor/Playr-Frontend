@@ -15,7 +15,7 @@ vi.mock('../context/AuthContext', () => ({
 
 const base: PostFeedItem = {
   id: 'p1', authorId: 'a1', authorUsername: 'nexusnova', authorDisplayName: 'NexusNova',
-  authorAvatarUrl: null, gameId: 'g1', gameName: 'Elden Ring', gameCoverImageUrl: null,
+  authorAvatarUrl: null, authorActiveBadgeType: null, authorActiveBadgeLevel: null, gameId: 'g1', gameName: 'Elden Ring', gameCoverImageUrl: null,
   textContent: 'Finally beat Radahn!', mood: 'Enjoying',
   scope: 'Feed',
   media: [],

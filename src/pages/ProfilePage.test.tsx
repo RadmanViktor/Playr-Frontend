@@ -43,7 +43,7 @@ const profile: profilesApi.ProfileData = {
   externalLinks: {}, status: 'Online' as const, lookingForGameId: null, lookingForGameName: null, lookingForPlayStyle: null, lookingForGameNote: null,
   typicalPlayTimes: [], hasCompletedOnboarding: true,
   createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
-  relationshipStatus: null, pendingInvitationId: null,
+  relationshipStatus: null, pendingInvitationId: null, activeBadgeType: null, activeBadgeLevel: null,
 }
 
 beforeEach(async () => {

@@ -25,6 +25,8 @@ export interface CommentItem {
   authorUsername: string
   authorDisplayName: string
   authorAvatarUrl: string | null
+  authorActiveBadgeType: string | null
+  authorActiveBadgeLevel: string | null
   textContent: string
   createdAt: string
   updatedAt: string | null

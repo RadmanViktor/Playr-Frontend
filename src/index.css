@@ -38,6 +38,69 @@
   animation: tab-content-in 0.15s ease-out;
 }
 
+/* Avatar badge rings (see components/ui/Avatar.tsx). Wraps the avatar in a
+   padded, rounded span whose background shows through as a ring. */
+.badge-ring {
+  display: inline-flex;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  padding: 2px;
+}
+
+.badge-ring-bronze {
+  background: #cd7f32;
+}
+
+.badge-ring-silver {
+  background: #c0c0c0;
+}
+
+.badge-ring-gold {
+  background: #ffd700;
+}
+
+/* Registering --badge-angle as a custom property lets the browser animate it
+   smoothly (a plain custom property can only ever jump between values). */
+@property --badge-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.badge-ring-creator {
+  background: conic-gradient(from var(--badge-angle), #ff2ec4, #7a2ff0, #2ec4ff, #ff2ec4);
+  animation:
+    badge-ring-rotate 3s linear infinite,
+    badge-ring-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes badge-ring-rotate {
+  to {
+    --badge-angle: 360deg;
+  }
+}
+
+@keyframes badge-ring-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 6px 1px rgba(255, 46, 196, 0.55),
+      0 0 14px 2px rgba(46, 196, 255, 0.35);
+  }
+  50% {
+    box-shadow:
+      0 0 12px 3px rgba(255, 46, 196, 0.85),
+      0 0 26px 6px rgba(46, 196, 255, 0.6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .badge-ring-creator {
+    animation: none;
+    box-shadow: 0 0 10px 2px rgba(255, 46, 196, 0.6);
+  }
+}
+
 html, body, #root {
   height: 100%;
 }

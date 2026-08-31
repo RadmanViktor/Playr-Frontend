@@ -80,6 +80,8 @@ export function ProfileHeader({
             alt={profile.displayName}
             size="xl"
             status={statusAvatarMap[profile.status]}
+            badgeType={profile.activeBadgeType}
+            badgeLevel={profile.activeBadgeLevel}
           />
         </div>
       </div>
