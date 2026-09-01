@@ -60,6 +60,7 @@
     "enterEmailToResend": "Fyll i din e-post ovan för att skicka igen",
     "submit": "Logga in",
     "registerInstead": "Registrera dig istället",
+    "forgotPassword": "Glömt lösenordet?",
     "errors": {
       "usernameOrEmailRequired": "användarnamn eller e-post krävs",
       "passwordRequired": "lösenord krävs",
@@ -110,6 +111,32 @@
       "incompleteLink": "Den här bekräftelselänken är ofullständig.",
       "invalidOrExpired": "Den här bekräftelselänken är ogiltig eller har gått ut.",
       "resendFailed": "Kunde inte skicka bekräftelsemejlet. Försök igen."
+    }
+  },
+  "forgotPassword": {
+    "title": "Återställ ditt lösenord",
+    "description": "Fyll i din e-postadress så skickar vi en länk för att återställa ditt lösenord.",
+    "emailLabel": "E-post",
+    "emailAriaLabel": "e-post",
+    "submit": "Skicka återställningslänk",
+    "sent": "Om den adressen tillhör ett konto är en länk för återställning av lösenord på väg.",
+    "goToLogin": "Gå till inloggning"
+  },
+  "resetPassword": {
+    "title": "Välj ett nytt lösenord",
+    "passwordLabel": "Nytt lösenord",
+    "passwordAriaLabel": "nytt lösenord",
+    "confirmPasswordLabel": "Bekräfta nytt lösenord",
+    "confirmPasswordAriaLabel": "bekräfta nytt lösenord",
+    "showPassword": "visa lösenord",
+    "hidePassword": "dölj lösenord",
+    "submit": "Återställ lösenord",
+    "success": "Ditt lösenord har återställts. Du kan nu logga in.",
+    "goToLogin": "Gå till inloggning",
+    "errors": {
+      "incompleteLink": "Den här återställningslänken är ofullständig eller ogiltig.",
+      "passwordTooWeak": "lösenordet är för svagt",
+      "generic": "Något gick fel."
     }
   },
   "steamAccountSettings": {

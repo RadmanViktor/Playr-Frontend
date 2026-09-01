@@ -60,6 +60,7 @@
     "enterEmailToResend": "Enter your email above to resend",
     "submit": "Log In",
     "registerInstead": "Register instead",
+    "forgotPassword": "Forgot password?",
     "errors": {
       "usernameOrEmailRequired": "username or email is required",
       "passwordRequired": "password is required",
@@ -110,6 +111,32 @@
       "incompleteLink": "This confirmation link is incomplete.",
       "invalidOrExpired": "This confirmation link is invalid or has expired.",
       "resendFailed": "Could not send the confirmation email. Please try again."
+    }
+  },
+  "forgotPassword": {
+    "title": "Reset your password",
+    "description": "Enter your email address and we'll send you a link to reset your password.",
+    "emailLabel": "Email",
+    "emailAriaLabel": "email",
+    "submit": "Send reset link",
+    "sent": "If that address belongs to an account, a password reset link is on its way.",
+    "goToLogin": "Go to login"
+  },
+  "resetPassword": {
+    "title": "Choose a new password",
+    "passwordLabel": "New password",
+    "passwordAriaLabel": "new password",
+    "confirmPasswordLabel": "Confirm new password",
+    "confirmPasswordAriaLabel": "confirm new password",
+    "showPassword": "show password",
+    "hidePassword": "hide password",
+    "submit": "Reset password",
+    "success": "Your password has been reset. You can now log in.",
+    "goToLogin": "Go to login",
+    "errors": {
+      "incompleteLink": "This password reset link is incomplete or invalid.",
+      "passwordTooWeak": "password is too weak",
+      "generic": "Something went wrong."
     }
   },
   "steamAccountSettings": {

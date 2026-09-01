@@ -109,6 +109,11 @@ export default function LoginPage() {
               <span className="text-frustrated">{fieldErrors.password}</span>
             )}
           </label>
+          <p className="-mt-2 text-right text-sm">
+            <Link to="/forgot-password" className="text-primary hover:underline">
+              {t('login.forgotPassword')}
+            </Link>
+          </p>
           {generalError && <p className="text-frustrated">{generalError}</p>}
           {needsConfirmation &&
             (resendState === 'sent' ? (

@@ -93,3 +93,40 @@ export async function resendConfirmation(email: string): Promise<void> {
     throw new ApiError(response.status, message)
   }
 }
+
+/**
+ * Always resolves for any syntactically valid address - the server deliberately
+ * does not reveal whether an account exists.
+ */
+export async function forgotPassword(email: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  })
+
+  if (!response.ok) {
+    const message = await parseErrorMessage(response, 'Could not send the password reset email.')
+    throw new ApiError(response.status, message)
+  }
+}
+
+export async function resetPassword(
+  userId: string,
+  token: string,
+  newPassword: string
+): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, token, newPassword }),
+  })
+
+  if (!response.ok) {
+    const message = await parseErrorMessage(
+      response,
+      'This password reset link is invalid or has expired.'
+    )
+    throw new ApiError(response.status, message)
+  }
+}

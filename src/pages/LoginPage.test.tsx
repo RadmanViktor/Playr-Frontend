@@ -68,6 +68,14 @@ describe('LoginPage', () => {
     )
   })
 
+  it('has a link to the forgot password page', () => {
+    renderLoginPage()
+    expect(screen.getByRole('link', { name: /forgot password/i })).toHaveAttribute(
+      'href',
+      '/forgot-password'
+    )
+  })
+
   it('shows client-side validation errors and does not call login when fields are empty', async () => {
     const loginSpy = vi.spyOn(authApi, 'login')
 
