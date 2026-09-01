@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Gamepad2, Loader2, Plus, Trash2 } from 'lucide-react'
+import { Button } from './ui/Button'
 import {
   addGameToLibrary,
   getGameLibrary,
@@ -81,14 +82,12 @@ export function MyGamesLibrary({ username, isOwner }: MyGamesLibraryProps) {
   return (
     <div className="flex flex-col gap-3">
       {isOwner && (
-        <button
-          type="button"
-          onClick={() => setShowAddGameModal(true)}
-          className="flex w-fit items-center gap-2 rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm font-medium text-primary hover:bg-border cursor-pointer"
-        >
-          <Plus className="h-4 w-4" aria-hidden="true" />
-          {t('myGamesLibrary.addGame')}
-        </button>
+        <div className="flex items-center justify-end">
+          <Button variant="secondary" size="sm" onClick={() => setShowAddGameModal(true)}>
+            <Plus className="h-4 w-4" aria-hidden="true" />
+            {t('myGamesLibrary.addGame')}
+          </Button>
+        </div>
       )}
 
       {error && <p className="text-sm text-frustrated">{error}</p>}
@@ -181,15 +180,10 @@ function RatingEditor({ entry, disabled, onSave }: RatingEditorProps) {
         className="w-full resize-none rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text outline-none focus:border-primary placeholder:text-muted"
       />
       {isDirty && rating > 0 && (
-        <button
-          type="button"
-          disabled={disabled}
-          onClick={() => onSave(rating, reviewText.trim() || null)}
-          className="flex w-fit items-center gap-2 rounded-lg bg-primary px-3 py-1.5 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50 cursor-pointer"
-        >
+        <Button size="sm" className="w-fit" disabled={disabled} onClick={() => onSave(rating, reviewText.trim() || null)}>
           {disabled && <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />}
           {t('myGamesLibrary.saveRating')}
-        </button>
+        </Button>
       )}
     </div>
   )
