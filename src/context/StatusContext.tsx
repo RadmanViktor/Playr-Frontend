@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { getProfile, updateProfileStatus, type PlayStyle, type ProfileData, type ProfileStatus } from '../api/profilesApi'
 import { useAuth } from './AuthContext'
 import { useIdleTimer } from '../lib/useIdleTimer'
+import { onUserStatusChanged } from '../lib/chatHubConnection'
 
 const IDLE_TIMEOUT_MS = 5 * 60 * 1000
 
@@ -113,6 +114,23 @@ export function StatusProvider({ children }: { children: ReactNode }) {
     setLookingForPlayStyle(profile.lookingForPlayStyle)
     setLookingForGameNote(profile.lookingForGameNote)
   }, [])
+
+  // Reflect status changes pushed by the server (e.g. an invitation/application/group
+  // invite being accepted resets a "Looking for game" status back to Online) so the
+  // current tab updates live instead of requiring a reload.
+  useEffect(() => {
+    if (!user) return
+    return onUserStatusChanged((event) => {
+      if (event.userId !== user.id) return
+      setStatus(event.status)
+      if (event.status !== 'LookingForGame') {
+        setLookingForGameId(null)
+        setLookingForGameName(null)
+        setLookingForPlayStyle(null)
+        setLookingForGameNote(null)
+      }
+    })
+  }, [user])
 
   // Keeps the idle-timer callbacks below reading the latest status without
   // needing to be re-subscribed (and thus reset) every time it changes.
