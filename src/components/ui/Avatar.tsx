@@ -32,16 +32,15 @@ const statusColor: Record<AvatarStatus, string> = {
 
 /**
  * Maps a badge type/level to the CSS ring class defined in index.css. "Creator" and
- * "Admin" get their own animated neon rings (pink/purple/blue vs. red/orange), and
+ * "Admin" share the same animated neon ring (pink/purple/blue), and
  * "FirstHundredUsers" gets a gold/white glitter ring, all regardless of level;
  * everything else gets a plain ring colored by tier.
  * Returns null if there's no badge to show.
  */
 function getBadgeRingClass(badgeType?: string | null, badgeLevel?: string | null): string | null {
   if (!badgeType) return null
-  if (badgeType === 'Creator') return 'badge-ring-creator'
+  if (badgeType === 'Creator' || badgeType === 'Admin') return 'badge-ring-creator'
   if (badgeType === 'FirstHundredUsers') return 'badge-ring-founder'
-  if (badgeType === 'Admin') return 'badge-ring-admin'
   switch (badgeLevel) {
     case 'Bronze':
       return 'badge-ring-bronze'

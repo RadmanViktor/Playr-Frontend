@@ -10,19 +10,17 @@ interface BadgeSectionProps {
 /** Small colored dot representing a badge's tier, mirroring the ring colors used on Avatar. */
 function BadgeTierDot({ type, level }: { type: string; level: string }) {
   const className =
-    type === 'Creator'
+    type === 'Creator' || type === 'Admin'
       ? 'bg-gradient-to-tr from-fuchsia-500 via-primary to-cyan-400'
-      : type === 'Admin'
-        ? 'bg-gradient-to-tr from-red-500 via-orange-500 to-red-500'
-        : type === 'FirstHundredUsers'
-          ? 'bg-gradient-to-tr from-amber-200 via-yellow-400 to-amber-200'
-          : level === 'Bronze'
-            ? 'bg-amber-700'
-            : level === 'Silver'
-              ? 'bg-gray-400'
-              : level === 'Gold'
-                ? 'bg-yellow-400'
-                : 'bg-muted'
+      : type === 'FirstHundredUsers'
+        ? 'bg-gradient-to-tr from-amber-200 via-yellow-400 to-amber-200'
+        : level === 'Bronze'
+          ? 'bg-amber-700'
+          : level === 'Silver'
+            ? 'bg-gray-400'
+            : level === 'Gold'
+              ? 'bg-yellow-400'
+              : 'bg-muted'
   return <span aria-hidden="true" className={`h-3 w-3 shrink-0 rounded-full ${className}`} />
 }
 
