@@ -3,6 +3,7 @@ import { Moon, Circle, EyeOff } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from './Button'
 import { Modal } from './Modal'
+import { ApiError } from '../../api/http'
 import type { ProfileStatus } from '../../api/profilesApi'
 import { useStatus } from '../../context/StatusContext'
 
@@ -32,8 +33,8 @@ export function StatusModal({ onClose }: StatusModalProps) {
     try {
       await updateStatus(selectedStatus, null, null, null)
       onClose()
-    } catch {
-      setError(t('statusModal.error'))
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : t('statusModal.error'))
     } finally {
       setIsSaving(false)
     }
