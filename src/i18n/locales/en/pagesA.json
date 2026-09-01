@@ -27,11 +27,11 @@
     "unfollowError": "Failed to unfollow player.",
     "tabs": {
       "overview": "Overview",
-      "posts": "Posts",
+      "posts": "Moments",
       "games": "Reviews"
     },
-    "noPosts": "No posts yet.",
-    "createPost": "Create Post",
+    "noPosts": "No moments yet.",
+    "createPost": "Create Moment",
     "playingNow": {
       "title": "Playing now",
       "loading": "Loading…",
