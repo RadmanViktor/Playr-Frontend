@@ -23,9 +23,14 @@ export async function getGames(): Promise<Game[]> {
   return response.json()
 }
 
-export async function searchExternalGames(token: string, query: string): Promise<ExternalGameSearchResult[]> {
+export async function searchExternalGames(
+  token: string,
+  query: string,
+  signal?: AbortSignal,
+): Promise<ExternalGameSearchResult[]> {
   const response = await fetch(`${API_BASE_URL}/api/games/search-external?query=${encodeURIComponent(query)}`, {
     headers: { Authorization: `Bearer ${token}` },
+    signal,
   })
   if (!response.ok) {
     const message = await parseErrorMessage(response, 'Failed to search games.')

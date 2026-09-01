@@ -1,15 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Gamepad2, Loader2 } from 'lucide-react'
 import { Modal } from './ui/Modal'
 import { useAuth } from '../context/AuthContext'
-import {
-  createGame,
-  searchExternalGames,
-  type ExternalGameSearchResult,
-  type Game,
-} from '../api/gamesApi'
+import { createGame, type ExternalGameSearchResult, type Game } from '../api/gamesApi'
 import { resolveMediaUrl } from '../api/http'
+import { useGameSearch } from '../lib/useGameSearch'
 
 interface AddGameModalProps {
   onClose: () => void
@@ -20,41 +16,10 @@ export function AddGameModal({ onClose, onGameAdded }: AddGameModalProps) {
   const { t } = useTranslation('componentsB')
   const { token } = useAuth()
   const [query, setQuery] = useState('')
-  const [results, setResults] = useState<ExternalGameSearchResult[]>([])
-  const [searching, setSearching] = useState(false)
-  const [searchError, setSearchError] = useState<string | null>(null)
+  const { results, searching, error: searchFailed } = useGameSearch(query, token, { enabled: true })
+  const searchError = searchFailed ? t('addGameModal.searchError') : null
   const [addingRawgId, setAddingRawgId] = useState<number | null>(null)
   const [addError, setAddError] = useState<string | null>(null)
-
-  useEffect(() => {
-    const trimmed = query.trim()
-    if (!trimmed) {
-      setResults([])
-      setSearchError(null)
-      return
-    }
-
-    let cancelled = false
-    setSearching(true)
-    setSearchError(null)
-    const timeoutId = setTimeout(() => {
-      searchExternalGames(token!, trimmed)
-        .then((r) => {
-          if (!cancelled) setResults(r)
-        })
-        .catch(() => {
-          if (!cancelled) setSearchError(t('addGameModal.searchError'))
-        })
-        .finally(() => {
-          if (!cancelled) setSearching(false)
-        })
-    }, 300)
-
-    return () => {
-      cancelled = true
-      clearTimeout(timeoutId)
-    }
-  }, [query, token])
 
   async function handleSelect(result: ExternalGameSearchResult) {
     setAddError(null)

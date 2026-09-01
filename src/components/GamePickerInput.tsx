@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ChevronDown, Gamepad2, Loader2, X } from 'lucide-react'
-import { createGame, searchExternalGames, type ExternalGameSearchResult, type Game } from '../api/gamesApi'
+import { createGame, type ExternalGameSearchResult, type Game } from '../api/gamesApi'
 import { resolveMediaUrl } from '../api/http'
 import { useAuth } from '../context/AuthContext'
 import { addRecentGame, getRecentGames, removeRecentGame } from '../lib/recentGames'
+import { useGameSearch } from '../lib/useGameSearch'
 import { useIsMobile } from '../lib/useIsMobile'
 
 interface GamePickerInputProps {
@@ -19,10 +20,8 @@ export function GamePickerInput({ selectedGame, onSelect, disabled }: GamePicker
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
   const [highlightedIndex, setHighlightedIndex] = useState(0)
-  const [results, setResults] = useState<ExternalGameSearchResult[]>([])
-  const [searching, setSearching] = useState(false)
-  const [searchError, setSearchError] = useState<string | null>(null)
   const [addingRawgId, setAddingRawgId] = useState<number | null>(null)
+  const [selectError, setSelectError] = useState<string | null>(null)
   const [recentGames, setRecentGames] = useState<Game[]>([])
   const containerRef = useRef<HTMLDivElement>(null)
   const isMobile = useIsMobile()
@@ -36,29 +35,12 @@ export function GamePickerInput({ selectedGame, onSelect, disabled }: GamePicker
   // Always search RAWG's catalog: an empty query returns a default/popular
   // selection so the dropdown has something useful to show before typing,
   // unless we already have recently used games to show instead.
-  useEffect(() => {
-    if (!open || !token || showRecent) return
-    let cancelled = false
-    setSearching(true)
-    setSearchError(null)
-    const timeoutId = setTimeout(() => {
-      searchExternalGames(token, query.trim())
-        .then((r) => {
-          if (!cancelled) setResults(r)
-        })
-        .catch(() => {
-          if (!cancelled) setSearchError(t('gamePickerInput.searchError'))
-        })
-        .finally(() => {
-          if (!cancelled) setSearching(false)
-        })
-    }, 250)
-
-    return () => {
-      cancelled = true
-      clearTimeout(timeoutId)
-    }
-  }, [query, token, open, t, showRecent])
+  const {
+    results,
+    searching,
+    error: searchFailed,
+  } = useGameSearch(query, token, { enabled: open && !showRecent, skipEmptyQuery: false })
+  const searchError = selectError ?? (searchFailed ? t('gamePickerInput.searchError') : null)
 
   useEffect(() => {
     setHighlightedIndex(0)
@@ -86,7 +68,7 @@ export function GamePickerInput({ selectedGame, onSelect, disabled }: GamePicker
       setOpen(false)
       setQuery('')
     } catch {
-      setSearchError(t('gamePickerInput.addError'))
+      setSelectError(t('gamePickerInput.addError'))
     } finally {
       setAddingRawgId(null)
     }

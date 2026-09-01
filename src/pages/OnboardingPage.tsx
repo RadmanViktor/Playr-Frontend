@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Gamepad2, Loader2, X } from 'lucide-react'
@@ -6,21 +6,16 @@ import { Button } from '../components/ui/Button'
 import { AvatarUploadInput } from '../components/AvatarUploadInput'
 import { useAuth } from '../context/AuthContext'
 import { ApiError, resolveMediaUrl } from '../api/http'
-import {
-  createGame,
-  searchExternalGames,
-  type ExternalGameSearchResult,
-  type Game,
-} from '../api/gamesApi'
+import { createGame, type ExternalGameSearchResult, type Game } from '../api/gamesApi'
 import { uploadAvatar, uploadCoverImage } from '../api/profilesApi'
 import { completeOnboarding, type TypicalPlayTime } from '../api/onboardingApi'
+import { useGameSearch } from '../lib/useGameSearch'
 
 const PLATFORMS = ['PC', 'PlayStation', 'Xbox', 'Nintendo']
 const GENRES = ['FPS', 'RPG', 'Survival', 'MMO', 'Strategy', 'Horror', 'Racing', 'Sports', 'Co-op', 'Indie']
 const PLAY_TIMES: TypicalPlayTime[] = ['Evenings', 'Weekends', 'Daytime', 'Varies']
 
 const TOTAL_STEPS = 6
-const SEARCH_DEBOUNCE_MS = 400
 
 const chipClass = (active: boolean) =>
   `rounded-full px-4 py-2 text-sm font-medium transition-colors cursor-pointer border ${
@@ -45,22 +40,19 @@ export default function OnboardingPage() {
   const [coverFile, setCoverFile] = useState<File | null>(null)
 
   const [query, setQuery] = useState('')
-  const [externalResults, setExternalResults] = useState<ExternalGameSearchResult[]>([])
-  const [searching, setSearching] = useState(false)
+  const {
+    results: externalResults,
+    searching,
+    error: searchFailed,
+  } = useGameSearch(query, token, { enabled: step === 4 })
   const [addingRawgId, setAddingRawgId] = useState<number | null>(null)
-  const [searchError, setSearchError] = useState<string | null>(null)
-  const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [addError, setAddError] = useState<string | null>(null)
+  const searchError = addError ?? (searchFailed ? t('onboarding.games.searchError') : null)
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
   const coverPreviewUrl = useMemo(() => (coverFile ? URL.createObjectURL(coverFile) : null), [coverFile])
-
-  useEffect(() => {
-    return () => {
-      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current)
-    }
-  }, [])
 
   function togglePlatform(platform: string) {
     setPlatforms((prev) => (prev.includes(platform) ? prev.filter((p) => p !== platform) : [...prev, platform]))
@@ -74,31 +66,9 @@ export default function OnboardingPage() {
     setTypicalPlayTimes((prev) => (prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]))
   }
 
-  function handleSearchInput(value: string) {
-    setQuery(value)
-    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current)
-
-    const trimmed = value.trim()
-    if (!trimmed || !token) {
-      setExternalResults([])
-      setSearching(false)
-      return
-    }
-
-    setSearching(true)
-    setSearchError(null)
-    searchTimeoutRef.current = setTimeout(() => {
-      searchExternalGames(token, trimmed)
-        .then((results) => setExternalResults(results))
-        .catch(() => setSearchError(t('onboarding.games.searchError')))
-        .finally(() => setSearching(false))
-    }, SEARCH_DEBOUNCE_MS)
-  }
-
   function addGameToSelection(game: Game) {
     setSelectedGames((prev) => (prev.some((g) => g.id === game.id) ? prev : [...prev, game]))
     setQuery('')
-    setExternalResults([])
   }
 
   async function handleAddExternalGame(result: ExternalGameSearchResult) {
@@ -108,7 +78,7 @@ export default function OnboardingPage() {
       const game = await createGame(token, result)
       addGameToSelection(game)
     } catch {
-      setSearchError(t('onboarding.games.addError'))
+      setAddError(t('onboarding.games.addError'))
     } finally {
       setAddingRawgId(null)
     }
@@ -226,7 +196,7 @@ export default function OnboardingPage() {
             <input
               type="text"
               value={query}
-              onChange={(e) => handleSearchInput(e.target.value)}
+              onChange={(e) => setQuery(e.target.value)}
               placeholder={t('onboarding.gamesStep.searchPlaceholder')}
               className="w-full rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm text-text outline-none focus:border-primary placeholder:text-muted"
             />
