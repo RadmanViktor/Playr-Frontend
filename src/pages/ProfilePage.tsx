@@ -267,20 +267,20 @@ export default function ProfilePage() {
         profile={profile}
         isOwner={isOwner}
         postCount={posts.length}
-        onAddFriendClick={handleAddFriend}
-        onCancelFriendRequestClick={handleCancelFriendRequest}
+        onAddFriendClick={user ? handleAddFriend : undefined}
+        onCancelFriendRequestClick={user ? handleCancelFriendRequest : undefined}
         isCancellingFriendRequest={isCancellingFriendRequest}
         isFriendRequestPending={!!pendingFriendRequestId || isSendingFriendRequest}
-        onMessageClick={handleMessageClick}
+        onMessageClick={user ? handleMessageClick : undefined}
         isFollowing={isFollowing}
         isFollowLoading={isFollowLoading}
-        onFollowClick={handleFollow}
-        onUnfollowClick={handleUnfollow}
+        onFollowClick={user ? handleFollow : undefined}
+        onUnfollowClick={user ? handleUnfollow : undefined}
         followersCount={followersCount}
         followingCount={followingCount}
         friendsCount={friendsCount}
-        onFollowersClick={() => setFollowListModal('followers')}
-        onFollowingClick={() => setFollowListModal('following')}
+        onFollowersClick={user ? () => setFollowListModal('followers') : undefined}
+        onFollowingClick={user ? () => setFollowListModal('following') : undefined}
       />
 
       {followListModal && (

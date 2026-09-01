@@ -1,8 +1,9 @@
-import { createContext, useCallback, useContext, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { CreatePostModal } from '../components/CreatePostModal'
 import { Toast } from '../components/ui/Toast'
 import type { PostFeedItem, PostScope } from '../api/postsApi'
+import { useAuth } from './AuthContext'
 
 interface CreatePostModalContextValue {
   openCreatePost: (scope?: PostScope) => void
@@ -13,16 +14,22 @@ interface CreatePostModalContextValue {
 const CreatePostModalContext = createContext<CreatePostModalContextValue | null>(null)
 
 export function CreatePostModalProvider({ children }: { children: ReactNode }) {
+  const { user } = useAuth()
   const [isOpen, setIsOpen] = useState(false)
   const [scope, setScope] = useState<PostScope>('Feed')
   const [toastMessage, setToastMessage] = useState<string | null>(null)
   const subscribersRef = useRef(new Set<(post: PostFeedItem) => void>())
 
   const openCreatePost = useCallback((nextScope: PostScope = 'Feed') => {
+    if (!user) return
     setScope(nextScope)
     setIsOpen(true)
-  }, [])
+  }, [user])
   const closeCreatePost = useCallback(() => setIsOpen(false), [])
+
+  useEffect(() => {
+    if (!user) setIsOpen(false)
+  }, [user])
 
   const subscribePostCreated = useCallback((callback: (post: PostFeedItem) => void) => {
     subscribersRef.current.add(callback)
@@ -38,7 +45,7 @@ export function CreatePostModalProvider({ children }: { children: ReactNode }) {
   return (
     <CreatePostModalContext.Provider value={{ openCreatePost, closeCreatePost, subscribePostCreated }}>
       {children}
-      {isOpen && <CreatePostModal scope={scope} onClose={closeCreatePost} onPostCreated={handlePostCreated} />}
+      {isOpen && user && <CreatePostModal scope={scope} onClose={closeCreatePost} onPostCreated={handlePostCreated} />}
       {toastMessage && <Toast message={toastMessage} onDismiss={() => setToastMessage(null)} />}
     </CreatePostModalContext.Provider>
   )

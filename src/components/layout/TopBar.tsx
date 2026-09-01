@@ -516,10 +516,11 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
       </div>
 
       <div className="ml-auto flex items-center gap-2">
-        <div className="relative" ref={notificationsRef}>
-          <IconButton aria-label={t('topBar.notifications.ariaLabel')} onClick={() => setIsNotificationsOpen((open) => !open)}>
-            <Bell className="h-5 w-5" aria-hidden="true" />
-          </IconButton>
+        {user && (
+          <div className="relative" ref={notificationsRef}>
+            <IconButton aria-label={t('topBar.notifications.ariaLabel')} onClick={() => setIsNotificationsOpen((open) => !open)}>
+              <Bell className="h-5 w-5" aria-hidden="true" />
+            </IconButton>
           {unreadCount > 0 && (
             <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-frustrated px-1 text-[10px] font-bold leading-none text-white">
               {unreadCount > 9 ? '9+' : unreadCount}
@@ -601,11 +602,13 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
               )}
             </div>
           )}
-        </div>
-        <div className="relative" ref={invitationsRef}>
-          <IconButton aria-label={t('topBar.invitations.ariaLabel')} onClick={toggleInvitations}>
-            <Mail className="h-5 w-5" aria-hidden="true" />
-          </IconButton>
+          </div>
+        )}
+        {user && (
+          <div className="relative" ref={invitationsRef}>
+            <IconButton aria-label={t('topBar.invitations.ariaLabel')} onClick={toggleInvitations}>
+              <Mail className="h-5 w-5" aria-hidden="true" />
+            </IconButton>
           {incomingInvitationCount > 0 && (
             <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-frustrated px-1 text-[10px] font-bold leading-none text-white">
               {incomingInvitationCount > 9 ? '9+' : incomingInvitationCount}
@@ -721,7 +724,8 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
               )}
             </div>
           )}
-        </div>
+          </div>
+        )}
         {user && (
           <div className="relative" ref={profileMenuRef}>
             <button

@@ -103,10 +103,12 @@ export function Sidebar({ className = '', onNavigate }: SidebarProps) {
         ))}
       </nav>
 
-      <Button className="hidden w-full md:flex" onClick={() => { onNavigate?.(); openCreatePost() }}>
-        <Plus className="h-4 w-4" aria-hidden="true" />
-        {t('sidebar.createPost')}
-      </Button>
+      {user && (
+        <Button className="hidden w-full md:flex" onClick={() => { onNavigate?.(); openCreatePost() }}>
+          <Plus className="h-4 w-4" aria-hidden="true" />
+          {t('sidebar.createPost')}
+        </Button>
+      )}
 
       {isStatusModalOpen && <StatusModal onClose={() => setIsStatusModalOpen(false)} />}
     </aside>
