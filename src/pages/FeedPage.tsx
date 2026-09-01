@@ -54,11 +54,7 @@ export default function FeedPage() {
   return (
     <div className="flex flex-col gap-4 pb-20 md:pb-0">
       <div className="mb-2 border-l-4 border-primary pl-4">
-        <p className="mb-1 text-xs font-semibold uppercase tracking-[0.22em] text-primary">{t('feed.eyebrow')}</p>
         <h1 className="text-3xl font-bold tracking-tight text-text">{t('feed.title')}</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
-          {t('feed.subtitle')}
-        </p>
       </div>
 
       {gamesInFeed.length > 0 && (

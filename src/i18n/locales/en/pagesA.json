@@ -6,9 +6,7 @@
     "emptyState": "You haven't posted anything yet — share your first moment!"
   },
   "feed": {
-    "eyebrow": "What's happening",
     "title": "Feed",
-    "subtitle": "See what your fellow players are up to — highlights, updates, and moments worth sharing.",
     "filterByGame": "Filter by game",
     "allGames": "All games",
     "loading": "Loading…",
@@ -74,9 +72,7 @@
     "loadError": "Failed to load post."
   },
   "friends": {
-    "eyebrow": "Your crew",
     "title": "Friends",
-    "subtitle": "The players you've connected with. Jump into a chat or check out their profile whenever you're ready to play.",
     "friendRequests": "Friend requests",
     "acceptError": "Failed to accept friend request.",
     "declineError": "Failed to decline friend request.",
@@ -89,9 +85,7 @@
     "chat": "Chat"
   },
   "findPlayers": {
-    "eyebrow": "Discover your squad",
     "title": "Find Players",
-    "subtitle": "Meet new friends and find players ready to squad up.",
     "loading": "Loading players...",
     "loadError": "Failed to load players. Please try again.",
     "invitationSent": "Invitation sent",

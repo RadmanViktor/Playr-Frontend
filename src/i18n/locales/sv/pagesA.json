@@ -6,9 +6,7 @@
     "emptyState": "Du har inte postat något än — dela ditt första ögonblick!"
   },
   "feed": {
-    "eyebrow": "Vad som händer",
     "title": "Flöde",
-    "subtitle": "Se vad dina medspelare gör — höjdpunkter, uppdateringar och ögonblick värda att dela.",
     "filterByGame": "Filtrera efter spel",
     "allGames": "Alla spel",
     "loading": "Laddar…",
@@ -74,9 +72,7 @@
     "loadError": "Det gick inte att ladda inlägget."
   },
   "friends": {
-    "eyebrow": "Ditt gäng",
     "title": "Vänner",
-    "subtitle": "Spelarna du kopplat ihop dig med. Hoppa in i en chatt eller kolla in deras profil när du är redo att spela.",
     "friendRequests": "Vänförfrågningar",
     "acceptError": "Det gick inte att acceptera vänförfrågan.",
     "declineError": "Det gick inte att avböja vänförfrågan.",
@@ -89,9 +85,7 @@
     "chat": "Chatta"
   },
   "findPlayers": {
-    "eyebrow": "Upptäck ditt gäng",
     "title": "Hitta spelare",
-    "subtitle": "Träffa nya vänner och hitta spelare redo att köra ihop.",
     "loading": "Laddar spelare...",
     "loadError": "Det gick inte att ladda spelare. Försök igen.",
     "invitationSent": "Inbjudan skickad",

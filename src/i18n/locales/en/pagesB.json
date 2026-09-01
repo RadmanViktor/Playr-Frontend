@@ -47,9 +47,7 @@
     }
   },
   "chats": {
-    "eyebrow": "Stay connected",
-    "title": "Chats",
-    "subtitle": "Keep the conversation going with the players you've teamed up with — plan sessions, trade tips, and stay in sync."
+    "title": "Chats"
   },
   "login": {
     "title": "Log in to PLAYR",
