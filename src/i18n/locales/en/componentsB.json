@@ -219,13 +219,15 @@
     "select": "Select",
     "creatorLevel": "Special badge",
     "founderLevel": "Founding member badge",
+    "adminLevel": "Admin badge",
     "types": {
       "FirstHundredUsers": "Founding Member",
       "Poster": "Poster",
       "GameCritic": "Game Critic",
       "Commentator": "Commentator",
       "Inviter": "Inviter",
-      "Creator": "Creator"
+      "Creator": "Creator",
+      "Admin": "Admin"
     },
     "levels": {
       "Bronze": "Bronze",

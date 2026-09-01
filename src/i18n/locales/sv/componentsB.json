@@ -217,13 +217,15 @@
     "select": "Välj",
     "creatorLevel": "Specialmärke",
     "founderLevel": "Grundarmärke",
+    "adminLevel": "Adminmärke",
     "types": {
       "FirstHundredUsers": "Grundare",
       "Poster": "Posterare",
       "GameCritic": "Spelkritiker",
       "Commentator": "Kommentator",
       "Inviter": "Inbjudare",
-      "Creator": "Skapare"
+      "Creator": "Skapare",
+      "Admin": "Admin"
     },
     "levels": {
       "Bronze": "Brons",

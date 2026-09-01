@@ -12,15 +12,17 @@ function BadgeTierDot({ type, level }: { type: string; level: string }) {
   const className =
     type === 'Creator'
       ? 'bg-gradient-to-tr from-fuchsia-500 via-primary to-cyan-400'
-      : type === 'FirstHundredUsers'
-        ? 'bg-gradient-to-tr from-amber-200 via-yellow-400 to-amber-200'
-        : level === 'Bronze'
-          ? 'bg-amber-700'
-          : level === 'Silver'
-            ? 'bg-gray-400'
-            : level === 'Gold'
-              ? 'bg-yellow-400'
-              : 'bg-muted'
+      : type === 'Admin'
+        ? 'bg-gradient-to-tr from-red-500 via-orange-500 to-red-500'
+        : type === 'FirstHundredUsers'
+          ? 'bg-gradient-to-tr from-amber-200 via-yellow-400 to-amber-200'
+          : level === 'Bronze'
+            ? 'bg-amber-700'
+            : level === 'Silver'
+              ? 'bg-gray-400'
+              : level === 'Gold'
+                ? 'bg-yellow-400'
+                : 'bg-muted'
   return <span aria-hidden="true" className={`h-3 w-3 shrink-0 rounded-full ${className}`} />
 }
 
@@ -94,9 +96,11 @@ export function BadgeSection({ token }: BadgeSectionProps) {
                       <span className="block text-xs text-muted">
                         {badge.type === 'Creator'
                           ? t('badgeSection.creatorLevel')
-                          : badge.type === 'FirstHundredUsers'
-                            ? t('badgeSection.founderLevel')
-                            : t(`badgeSection.levels.${badge.level}`, badge.level)}
+                          : badge.type === 'Admin'
+                            ? t('badgeSection.adminLevel')
+                            : badge.type === 'FirstHundredUsers'
+                              ? t('badgeSection.founderLevel')
+                              : t(`badgeSection.levels.${badge.level}`, badge.level)}
                       </span>
                     </span>
                   </span>
