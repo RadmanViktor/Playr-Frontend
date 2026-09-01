@@ -215,24 +215,52 @@
     "empty": "You haven't unlocked any badges yet. Keep posting, commenting and inviting friends to earn some!",
     "loadError": "Failed to load your badges.",
     "updateError": "Failed to update your active badge.",
-    "active": "Displayed",
-    "select": "Select",
-    "creatorLevel": "Special badge",
-    "founderLevel": "Founding member badge",
-    "adminLevel": "Admin badge",
-    "types": {
-      "FirstHundredUsers": "Founding Member",
-      "Poster": "Poster",
-      "GameCritic": "Game Critic",
-      "Commentator": "Commentator",
-      "Inviter": "Inviter",
-      "Creator": "Creator",
-      "Admin": "Admin"
-    },
-    "levels": {
-      "Bronze": "Bronze",
-      "Silver": "Silver",
-      "Gold": "Gold"
+      "active": "Displayed",
+      "select": "Select",
+      "creatorLevel": "Special badge",
+      "founderLevel": "Founding member badge",
+      "adminLevel": "Admin badge",
+      "upcomingTitle": "Upcoming badges",
+      "upcomingDescription": "Badges you haven't unlocked yet. Keep exploring the community to find out how to earn them.",
+      "types": {
+        "FirstHundredUsers": "Founding Member",
+        "Poster": "Poster",
+        "GameCritic": "Game Critic",
+        "Commentator": "Commentator",
+        "Inviter": "Inviter",
+        "Creator": "Creator",
+        "Admin": "Admin",
+        "Supporter": "Supporter",
+        "Popular": "Popular",
+        "Socialite": "Socialite",
+        "Chatterbox": "Chatterbox",
+        "Collector": "Collector",
+        "Reactor": "Reactor",
+        "Trailblazer": "Trailblazer",
+        "NightOwl": "Night Owl",
+        "Veteran": "Veteran"
+      },
+      "levels": {
+        "Bronze": "Bronze",
+        "Silver": "Silver",
+        "Gold": "Gold"
+      },
+      "categoryHints": {
+        "foundingCommunity": "Tied to when the community was founded",
+        "posting": "Has to do with posting in the community",
+        "ratingGames": "Related to rating games you've played",
+        "commenting": "Has to do with commenting on posts",
+        "invitingFriends": "Related to inviting friends to Playr",
+        "specialRecognition": "A special badge awarded by the Playr team",
+        "likingPosts": "Has to do with liking other people's posts",
+        "postEngagement": "Related to how others engage with your posts",
+        "socialConnections": "Has to do with your social connections",
+        "chatting": "Related to chatting with other players",
+        "gameLibrary": "Has to do with your game library",
+        "commentReactions": "Related to reacting to comments",
+        "gettingStarted": "Tied to getting started on Playr",
+        "timeOfDay": "Has something to do with the time of day",
+        "longevity": "Tied to how long you've been a member"
+      }
     }
-  }
 }

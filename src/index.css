@@ -212,6 +212,13 @@
   }
 }
 
+/* Locked badge preview icons (BadgeSection "upcoming badges" grid): the real icon is shown but
+   desaturated/blurred so the shape is recognizable without revealing exact styling/colors. */
+.badge-icon-locked {
+  filter: grayscale(1) blur(0.5px);
+  opacity: 0.45;
+}
+
 html, body, #root {
   height: 100%;
 }

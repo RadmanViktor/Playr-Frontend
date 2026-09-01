@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Lock } from 'lucide-react'
 import { ApiError } from '../api/http'
 import { getMyBadges, setActiveBadge, type UserBadge } from '../api/badgesApi'
+import { BADGE_CATALOG } from '../constants/badgeCatalog'
 
 interface BadgeSectionProps {
   token: string
@@ -22,6 +24,21 @@ function BadgeTierDot({ type, level }: { type: string; level: string }) {
               ? 'bg-yellow-400'
               : 'bg-muted'
   return <span aria-hidden="true" className={`h-3 w-3 shrink-0 rounded-full ${className}`} />
+}
+
+/** Grayed-out, blurred preview card for a badge the user hasn't unlocked yet. */
+function LockedBadgeCard({ type, categoryHintKey, Icon }: { type: string; categoryHintKey: string; Icon: typeof Lock }) {
+  const { t } = useTranslation('componentsB')
+  return (
+    <div className="flex flex-col items-center gap-2 rounded-lg border border-border bg-surface p-3 text-center">
+      <span className="relative flex h-10 w-10 items-center justify-center">
+        <Icon className="badge-icon-locked h-8 w-8 text-text" aria-hidden="true" />
+        <Lock className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-surface-raised p-0.5 text-muted" aria-hidden="true" />
+      </span>
+      <span className="text-xs font-medium text-text">{t(`badgeSection.types.${type}`, type)}</span>
+      <span className="text-[11px] text-muted">{t(`badgeSection.categoryHints.${categoryHintKey}`)}</span>
+    </div>
+  )
 }
 
 export function BadgeSection({ token }: BadgeSectionProps) {
@@ -58,6 +75,9 @@ export function BadgeSection({ token }: BadgeSectionProps) {
   }
 
   if (isLoading) return null
+
+  const unlockedTypes = new Set(badges.map((badge) => badge.type))
+  const lockedBadges = BADGE_CATALOG.filter((entry) => !unlockedTypes.has(entry.type))
 
   return (
     <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface-raised p-4">
@@ -110,6 +130,20 @@ export function BadgeSection({ token }: BadgeSectionProps) {
             )
           })}
         </ul>
+      )}
+
+      {lockedBadges.length > 0 && (
+        <div className="flex flex-col gap-2 border-t border-border pt-3">
+          <div>
+            <h3 className="text-sm font-semibold text-text">{t('badgeSection.upcomingTitle')}</h3>
+            <p className="text-muted text-xs">{t('badgeSection.upcomingDescription')}</p>
+          </div>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+            {lockedBadges.map((entry) => (
+              <LockedBadgeCard key={entry.type} type={entry.type} categoryHintKey={entry.categoryHintKey} Icon={entry.icon} />
+            ))}
+          </div>
+        </div>
       )}
     </div>
   )

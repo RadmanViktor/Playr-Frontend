@@ -218,6 +218,8 @@
     "creatorLevel": "Specialmärke",
     "founderLevel": "Grundarmärke",
     "adminLevel": "Adminmärke",
+    "upcomingTitle": "Kommande märken",
+    "upcomingDescription": "Märken du inte låst upp än. Fortsätt utforska communityn för att lista ut hur du tjänar dem.",
     "types": {
       "FirstHundredUsers": "Grundare",
       "Poster": "Posterare",
@@ -225,12 +227,38 @@
       "Commentator": "Kommentator",
       "Inviter": "Inbjudare",
       "Creator": "Skapare",
-      "Admin": "Admin"
+      "Admin": "Admin",
+      "Supporter": "Supporter",
+      "Popular": "Populär",
+      "Socialite": "Sällskaplig",
+      "Chatterbox": "Pratkvarn",
+      "Collector": "Samlare",
+      "Reactor": "Reagerare",
+      "Trailblazer": "Pionjär",
+      "NightOwl": "Nattuggla",
+      "Veteran": "Veteran"
     },
     "levels": {
       "Bronze": "Brons",
       "Silver": "Silver",
       "Gold": "Guld"
+    },
+    "categoryHints": {
+      "foundingCommunity": "Kopplat till när communityn grundades",
+      "posting": "Har med att posta i communityn att göra",
+      "ratingGames": "Kopplat till att betygsätta spel du spelat",
+      "commenting": "Har med att kommentera inlägg att göra",
+      "invitingFriends": "Kopplat till att bjuda in vänner till Playr",
+      "specialRecognition": "Ett specialmärke som delas ut av Playr-teamet",
+      "likingPosts": "Har med att gilla andras inlägg att göra",
+      "postEngagement": "Kopplat till hur andra engagerar sig i dina inlägg",
+      "socialConnections": "Har med dina sociala kontakter att göra",
+      "chatting": "Kopplat till att chatta med andra spelare",
+      "gameLibrary": "Har med ditt spelbibliotek att göra",
+      "commentReactions": "Kopplat till att reagera på kommentarer",
+      "gettingStarted": "Kopplat till att komma igång på Playr",
+      "timeOfDay": "Har något med tiden på dygnet att göra",
+      "longevity": "Kopplat till hur länge du varit medlem"
     }
   }
 }
