@@ -218,9 +218,6 @@
     "updateError": "Det gick inte att uppdatera ditt visade märke.",
     "active": "Visas",
     "select": "Välj",
-    "creatorLevel": "Specialmärke",
-    "founderLevel": "Grundarmärke",
-    "adminLevel": "Adminmärke",
     "upcomingTitle": "Kommande märken",
     "upcomingDescription": "Märken du inte låst upp än. Fortsätt utforska communityn för att lista ut hur du tjänar dem.",
     "types": {
@@ -240,11 +237,6 @@
       "Trailblazer": "Pionjär",
       "NightOwl": "Nattuggla",
       "Veteran": "Veteran"
-    },
-    "levels": {
-      "Bronze": "Brons",
-      "Silver": "Silver",
-      "Gold": "Guld"
     },
     "categoryHints": {
       "foundingCommunity": "Kopplat till när communityn grundades",

@@ -220,9 +220,6 @@
     "updateError": "Failed to update your active badge.",
       "active": "Displayed",
       "select": "Select",
-      "creatorLevel": "Special badge",
-      "founderLevel": "Founding member badge",
-      "adminLevel": "Admin badge",
       "upcomingTitle": "Upcoming badges",
       "upcomingDescription": "Badges you haven't unlocked yet. Keep exploring the community to find out how to earn them.",
       "types": {
@@ -242,11 +239,6 @@
         "Trailblazer": "Trailblazer",
         "NightOwl": "Night Owl",
         "Veteran": "Veteran"
-      },
-      "levels": {
-        "Bronze": "Bronze",
-        "Silver": "Silver",
-        "Gold": "Gold"
       },
       "categoryHints": {
         "foundingCommunity": "Tied to when the community was founded",

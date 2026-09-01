@@ -27,16 +27,19 @@ function BadgeTierDot({ type, level }: { type: string; level: string }) {
 }
 
 /** Grayed-out, blurred preview card for a badge the user hasn't unlocked yet. */
-function LockedBadgeCard({ type, categoryHintKey, Icon }: { type: string; categoryHintKey: string; Icon: typeof Lock }) {
+function LockedBadgeCard({ type, Icon }: { type: string; Icon: typeof Lock }) {
   const { t } = useTranslation('componentsB')
   return (
-    <div className="flex flex-col items-center gap-2 rounded-lg border border-border bg-surface p-3 text-center">
+    <div className="group relative flex flex-col items-center gap-2 overflow-hidden rounded-lg border border-border bg-surface p-3 text-center transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10">
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/0 via-primary/0 to-primary/0 opacity-0 transition-opacity duration-300 group-hover:from-primary/10 group-hover:via-transparent group-hover:to-cyan-400/10 group-hover:opacity-100"
+      />
       <span className="relative flex h-10 w-10 items-center justify-center">
-        <Icon className="badge-icon-locked h-8 w-8 text-text" aria-hidden="true" />
+        <Icon className="badge-icon-locked h-8 w-8 text-text transition-transform duration-300 group-hover:scale-110" aria-hidden="true" />
         <Lock className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-surface-raised p-0.5 text-muted" aria-hidden="true" />
       </span>
-      <span className="text-xs font-medium text-text">{t(`badgeSection.types.${type}`, type)}</span>
-      <span className="text-[11px] text-muted">{t(`badgeSection.categoryHints.${categoryHintKey}`)}</span>
+      <span className="relative text-xs font-medium text-text">{t(`badgeSection.types.${type}`, type)}</span>
     </div>
   )
 }
@@ -107,19 +110,8 @@ export function BadgeSection({ token }: BadgeSectionProps) {
                 >
                   <span className="flex items-center gap-3">
                     <BadgeTierDot type={badge.type} level={badge.level} />
-                    <span>
-                      <span className="block text-sm font-medium text-text">
-                        {t(`badgeSection.types.${badge.type}`, badge.type)}
-                      </span>
-                      <span className="block text-xs text-muted">
-                        {badge.type === 'Creator'
-                          ? t('badgeSection.creatorLevel')
-                          : badge.type === 'Admin'
-                            ? t('badgeSection.adminLevel')
-                            : badge.type === 'FirstHundredUsers'
-                              ? t('badgeSection.founderLevel')
-                              : t(`badgeSection.levels.${badge.level}`, badge.level)}
-                      </span>
+                    <span className="block text-sm font-medium text-text">
+                      {t(`badgeSection.types.${badge.type}`, badge.type)}
                     </span>
                   </span>
                   <span className="text-xs text-muted">
@@ -140,7 +132,7 @@ export function BadgeSection({ token }: BadgeSectionProps) {
           </div>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
             {lockedBadges.map((entry) => (
-              <LockedBadgeCard key={entry.type} type={entry.type} categoryHintKey={entry.categoryHintKey} Icon={entry.icon} />
+              <LockedBadgeCard key={entry.type} type={entry.type} Icon={entry.icon} />
             ))}
           </div>
         </div>
