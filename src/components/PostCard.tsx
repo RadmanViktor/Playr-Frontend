@@ -159,7 +159,7 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate, defaultComme
   }
 
   return (
-    <div className="rounded-xl border border-border bg-surface p-4 flex flex-col gap-3">
+    <div className="w-full max-w-2xl mx-auto rounded-xl border border-border bg-surface p-4 flex flex-col gap-3">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
