@@ -330,7 +330,7 @@ export default function ProfilePage() {
 
       <div key={activeTab} className="animate-tab-content flex flex-col gap-4">
         {activeTab === 'overview' && (
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 pb-20 md:pb-0">
             <PlayingNowSection username={profile.username} isOwner={isOwner} />
 
             <FavoriteGamesSection username={profile.username} isOwner={isOwner} />
@@ -338,7 +338,7 @@ export default function ProfilePage() {
         )}
 
         {activeTab === 'posts' && (
-          <>
+          <div className="flex flex-col gap-4 pb-20 md:pb-0">
             {isOwner && (
               <div className="hidden justify-end md:flex">
                 <Button onClick={() => openCreatePost('Profile')}>
@@ -360,7 +360,7 @@ export default function ProfilePage() {
                 />
               ))
             )}
-          </>
+          </div>
         )}
 
         {activeTab === 'games' && <MyGamesLibrary username={profile.username} isOwner={isOwner} />}
