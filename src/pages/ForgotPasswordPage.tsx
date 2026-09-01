@@ -41,7 +41,7 @@ export default function ForgotPasswordPage() {
     <div className="flex min-h-dvh items-center justify-center bg-bg px-4">
       <AuthPanel title={t('forgotPassword.title')}>
         {sent ? (
-          <p role="status" className="text-sm text-enjoying">
+          <p role="status" className="text-center text-sm text-enjoying">
             {t('forgotPassword.sent')}
           </p>
         ) : (
@@ -68,7 +68,7 @@ export default function ForgotPasswordPage() {
             </Button>
           </form>
         )}
-        <p className="mt-6 text-sm text-muted">
+        <p className="mt-6 text-center text-sm text-muted">
           <Link to="/login" className="text-primary hover:underline">
             {t('forgotPassword.goToLogin')}
           </Link>

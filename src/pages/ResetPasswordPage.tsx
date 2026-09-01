@@ -92,10 +92,10 @@ export default function ResetPasswordPage() {
     return (
       <div className="flex min-h-dvh items-center justify-center bg-bg px-4">
         <AuthPanel title={t('resetPassword.title')}>
-          <p role="status" className="text-sm text-enjoying">
+          <p role="status" className="text-center text-sm text-enjoying">
             {t('resetPassword.success')}
           </p>
-          <p className="mt-6 text-sm text-muted">
+          <p className="mt-6 text-center text-sm text-muted">
             <Link to="/login" className="text-primary hover:underline">
               {t('resetPassword.goToLogin')}
             </Link>
