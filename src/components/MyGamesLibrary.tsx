@@ -80,9 +80,9 @@ export function MyGamesLibrary({ username, isOwner }: MyGamesLibraryProps) {
   if (error && entries === null) return <p className="text-frustrated">{error}</p>
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-3 pb-20 md:pb-0">
       {isOwner && (
-        <div className="flex items-center justify-end">
+        <div className="hidden justify-end md:flex">
           <Button variant="secondary" size="sm" onClick={() => setShowAddGameModal(true)}>
             <Plus className="h-4 w-4" aria-hidden="true" />
             {t('myGamesLibrary.addGame')}
@@ -151,6 +151,17 @@ export function MyGamesLibrary({ username, isOwner }: MyGamesLibraryProps) {
 
       {showAddGameModal && (
         <AddGameModal onClose={() => setShowAddGameModal(false)} onGameAdded={handleGameAdded} />
+      )}
+
+      {isOwner && (
+        <button
+          type="button"
+          aria-label={t('myGamesLibrary.addGame')}
+          onClick={() => setShowAddGameModal(true)}
+          className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg transition-transform hover:scale-105 active:scale-95 md:hidden"
+        >
+          <Plus className="h-6 w-6" aria-hidden="true" />
+        </button>
       )}
     </div>
   )
