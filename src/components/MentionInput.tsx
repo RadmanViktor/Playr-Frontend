@@ -3,6 +3,10 @@ import { useAuth } from '../context/AuthContext'
 import { getFriends, type Friend } from '../api/friendsApi'
 import { Avatar } from './ui/Avatar'
 
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 export interface MentionDraft {
   userId: string
   username: string
@@ -80,7 +84,12 @@ export function MentionInput({
     const nextValue = e.target.value
     // Drop mentions whose @username token no longer appears verbatim in the text
     // (e.g. the user deleted/edited it), so stale entries can't sneak into the request.
-    const stillPresent = mentions.filter((m) => nextValue.includes(`@${m.username}`))
+    // Match the full token (not a substring of a longer username) using a word
+    // boundary, since \w in a regex already matches the same characters usernames
+    // are restricted to.
+    const stillPresent = mentions.filter((m) =>
+      new RegExp(`@${escapeRegExp(m.username)}\\b`).test(nextValue),
+    )
     onChange(nextValue, stillPresent)
     updateQueryFromCaret(nextValue, e.target.selectionStart ?? nextValue.length)
   }

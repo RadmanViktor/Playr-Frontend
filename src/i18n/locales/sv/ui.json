@@ -18,17 +18,16 @@
     "starLabel_other": "{{count}} stjärnor"
   },
   "inviteModal": {
-    "title": "Skicka inbjudan",
-    "promptText": "Bjud in",
-    "promptSuffix": " att spela",
+    "title": "Skicka förfrågan",
+    "sendPromptTo": "Skicka förfrågan till {{name}}",
     "placeholderText": "Säg hej och berätta varför du vill spela tillsammans...",
-    "actionLabel": "Skicka inbjudan",
+    "actionLabel": "Skicka förfrågan",
     "presentationLabel": "Presentation",
     "cancel": "Avbryt",
     "sending": "Skickar...",
     "errorEmptyMessage": "Skriv en kort presentation av dig själv.",
-    "errorNotLoggedIn": "Du måste vara inloggad för att skicka inbjudningar.",
-    "errorGeneric": "Det gick inte att skicka inbjudan. Försök igen."
+    "errorNotLoggedIn": "Du måste vara inloggad för att skicka förfrågningar.",
+    "errorGeneric": "Det gick inte att skicka förfrågan. Försök igen."
   },
   "followListModal": {
     "followersTitle": "Följare",

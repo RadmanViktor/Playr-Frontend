@@ -16,8 +16,6 @@ interface InviteModalProps {
   onClose: () => void
   onSent: () => void
   title?: string
-  promptText?: string
-  promptSuffix?: string
   placeholderText?: string
   actionLabel?: string
 }
@@ -29,8 +27,6 @@ export function InviteModal({
   onClose,
   onSent,
   title,
-  promptText,
-  promptSuffix,
   placeholderText,
   actionLabel,
 }: InviteModalProps) {
@@ -41,8 +37,6 @@ export function InviteModal({
   const [error, setError] = useState<string | null>(null)
 
   const resolvedTitle = title ?? t('inviteModal.title')
-  const resolvedPromptText = promptText ?? t('inviteModal.promptText')
-  const resolvedPromptSuffix = promptSuffix ?? t('inviteModal.promptSuffix')
   const resolvedPlaceholderText = placeholderText ?? t('inviteModal.placeholderText')
   const resolvedActionLabel = actionLabel ?? t('inviteModal.actionLabel')
 
@@ -75,10 +69,12 @@ export function InviteModal({
     <Modal title={resolvedTitle} onClose={onClose}>
         <div className="mb-4 flex items-center gap-3">
           <Avatar src={recipientAvatarUrl ?? undefined} alt={recipientDisplayName} size="md" />
-          <p className="text-sm text-text">
-            {resolvedPromptText} <span className="font-medium">{recipientDisplayName}</span>{resolvedPromptSuffix}
-          </p>
+          <p className="text-sm font-medium text-text">{recipientDisplayName}</p>
         </div>
+
+        <p className="mb-4 text-sm text-text">
+          {t('inviteModal.sendPromptTo', { name: recipientDisplayName })}
+        </p>
 
         <label htmlFor="invite-message" className="mb-1 block text-xs font-medium text-muted">
           {t('inviteModal.presentationLabel')}

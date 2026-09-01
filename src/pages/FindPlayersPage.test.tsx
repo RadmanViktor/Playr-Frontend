@@ -64,11 +64,11 @@ describe('FindPlayersPage', () => {
     renderPage()
 
     await waitFor(() => expect(screen.getByText('Nexus Nova')).toBeInTheDocument())
-    await user.click(screen.getByRole('button', { name: /invite/i }))
+    await user.click(screen.getByRole('button', { name: /send request/i }))
     await user.click(screen.getByRole('button', { name: /mock send invitation/i }))
 
-    expect(screen.getByText('Invitation sent to Nexus Nova.')).toBeInTheDocument()
-    expect(screen.getByText('Invited')).toBeInTheDocument()
+    expect(screen.getByText('Request sent to Nexus Nova.')).toBeInTheDocument()
+    expect(screen.getByText('Request sent')).toBeInTheDocument()
   })
 
   it('shows the looking-for-game note on a player card', async () => {

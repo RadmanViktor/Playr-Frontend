@@ -18,17 +18,16 @@
     "starLabel_other": "{{count}} stars"
   },
   "inviteModal": {
-    "title": "Send invitation",
-    "promptText": "Invite",
-    "promptSuffix": " to play",
+    "title": "Send request",
+    "sendPromptTo": "Send request to {{name}}",
     "placeholderText": "Say hi and tell them why you'd like to play together...",
-    "actionLabel": "Send invitation",
+    "actionLabel": "Send request",
     "presentationLabel": "Presentation",
     "cancel": "Cancel",
     "sending": "Sending...",
     "errorEmptyMessage": "Write a short presentation of yourself.",
-    "errorNotLoggedIn": "You must be logged in to send invitations.",
-    "errorGeneric": "Failed to send invitation. Please try again."
+    "errorNotLoggedIn": "You must be logged in to send requests.",
+    "errorGeneric": "Failed to send request. Please try again."
   },
   "followListModal": {
     "followersTitle": "Followers",
