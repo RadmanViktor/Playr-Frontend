@@ -52,7 +52,7 @@ export default function LoginPage() {
     setIsSubmitting(true)
     try {
       await login(usernameOrEmail, password)
-      navigate('/')
+      navigate('/feed')
     } catch (err) {
       // 403 means the credentials were correct but the email is still unconfirmed.
       if (err instanceof ApiError && err.status === 403) {
