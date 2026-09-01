@@ -139,7 +139,8 @@
   },
   "coverImageUploadInput": {
     "change": "Byt omslagsbild",
-    "uploadCoverImageAriaLabel": "Ladda upp omslagsbild"
+    "uploadCoverImageAriaLabel": "Ladda upp omslagsbild",
+    "dragHint": "Dra i bilden för att justera hur den visas"
   },
   "passwordStrengthMeter": {
     "requirementLength": "minst 8 tecken",

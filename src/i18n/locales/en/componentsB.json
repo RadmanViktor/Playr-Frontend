@@ -141,7 +141,8 @@
   },
   "coverImageUploadInput": {
     "change": "Change cover image",
-    "uploadCoverImageAriaLabel": "Upload cover image"
+    "uploadCoverImageAriaLabel": "Upload cover image",
+    "dragHint": "Drag the image to adjust how it's displayed"
   },
   "passwordStrengthMeter": {
     "requirementLength": "at least 8 characters",

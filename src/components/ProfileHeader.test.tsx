@@ -5,7 +5,7 @@ import type { ProfileData } from '../api/profilesApi'
 
 const profile: ProfileData = {
   userId: 'u1', username: 'nexusnova', displayName: 'Nexus Nova', bio: 'Gaming is life',
-  avatarUrl: null, coverImageUrl: null, region: 'EU', languages: ['English', 'Swedish'],
+  avatarUrl: null, coverImageUrl: null, coverImagePositionX: 50, coverImagePositionY: 50, region: 'EU', languages: ['English', 'Swedish'],
   platforms: ['PC', 'PlayStation'], genres: [], externalLinks: { Steam: 'https://steamcommunity.com/id/nexusnova' },
   status: 'Online' as const, lookingForGameId: null, lookingForGameName: null, lookingForPlayStyle: null, lookingForGameNote: null,
   typicalPlayTimes: [], hasCompletedOnboarding: true,

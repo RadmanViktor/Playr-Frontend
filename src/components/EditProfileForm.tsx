@@ -7,6 +7,7 @@ import {
   updateProfile,
   uploadAvatar,
   uploadCoverImage,
+  updateCoverImagePosition,
   type ProfileData,
   type TypicalPlayTime,
 } from '../api/profilesApi'
@@ -34,6 +35,8 @@ export function EditProfileForm({ profile, token, onSave, onCancel }: EditProfil
   const [avatarError, setAvatarError] = useState<string | null>(null)
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null)
   const [coverImageError, setCoverImageError] = useState<string | null>(null)
+  const [coverPositionX, setCoverPositionX] = useState(profile.coverImagePositionX)
+  const [coverPositionY, setCoverPositionY] = useState(profile.coverImagePositionY)
   const [region, setRegion] = useState(profile.region ?? '')
   const [platforms, setPlatforms] = useState<string[]>(profile.platforms)
   const [genres, setGenres] = useState<string[]>(profile.genres)
@@ -89,6 +92,8 @@ export function EditProfileForm({ profile, token, onSave, onCancel }: EditProfil
       }
       if (coverImageFile) {
         await uploadCoverImage(token, coverImageFile)
+      } else if (coverPositionX !== profile.coverImagePositionX || coverPositionY !== profile.coverImagePositionY) {
+        await updateCoverImagePosition(token, coverPositionX, coverPositionY)
       }
       const updated = await updateProfile(token, {
         displayName: displayName.trim(),
@@ -147,9 +152,21 @@ export function EditProfileForm({ profile, token, onSave, onCancel }: EditProfil
         <CoverImageUploadInput
           currentCoverImageUrl={profile.coverImageUrl}
           file={coverImageFile}
-          onFileChange={setCoverImageFile}
+          onFileChange={(selected) => {
+            setCoverImageFile(selected)
+            if (selected) {
+              setCoverPositionX(50)
+              setCoverPositionY(50)
+            }
+          }}
           error={coverImageError}
           onError={setCoverImageError}
+          positionX={coverPositionX}
+          positionY={coverPositionY}
+          onPositionChange={(x, y) => {
+            setCoverPositionX(x)
+            setCoverPositionY(y)
+          }}
         />
       </label>
 

@@ -63,8 +63,15 @@ export function ProfileHeader({
     <div className="overflow-hidden rounded-xl border border-border bg-surface">
       {/* Cover image / gradient banner */}
       <div
-        className="relative h-56 bg-gradient-to-br from-primary/60 via-primary/25 to-surface bg-cover bg-center sm:h-72"
-        style={profile.coverImageUrl ? { backgroundImage: `url(${resolveMediaUrl(profile.coverImageUrl)})` } : undefined}
+        className="relative h-56 bg-gradient-to-br from-primary/60 via-primary/25 to-surface bg-cover sm:h-72"
+        style={
+          profile.coverImageUrl
+            ? {
+                backgroundImage: `url(${resolveMediaUrl(profile.coverImageUrl)})`,
+                backgroundPosition: `${profile.coverImagePositionX}% ${profile.coverImagePositionY}%`,
+              }
+            : undefined
+        }
       >
         {profile.coverImageUrl && (
           <>

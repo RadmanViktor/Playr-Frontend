@@ -13,6 +13,8 @@ export interface ProfileData {
   bio: string | null
   avatarUrl: string | null
   coverImageUrl: string | null
+  coverImagePositionX: number
+  coverImagePositionY: number
   region: string | null
   languages: string[]
   platforms: string[]
@@ -132,6 +134,22 @@ export async function uploadCoverImage(token: string, file: File): Promise<Profi
   })
   if (!response.ok) {
     const message = await parseErrorMessage(response, 'Failed to upload cover image.')
+    throw new ApiError(response.status, message)
+  }
+  return response.json()
+}
+
+export async function updateCoverImagePosition(token: string, positionX: number, positionY: number): Promise<ProfileData> {
+  const response = await fetch(`${API_BASE_URL}/api/profiles/me/cover-image-position`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ positionX, positionY }),
+  })
+  if (!response.ok) {
+    const message = await parseErrorMessage(response, 'Failed to update cover image position.')
     throw new ApiError(response.status, message)
   }
   return response.json()

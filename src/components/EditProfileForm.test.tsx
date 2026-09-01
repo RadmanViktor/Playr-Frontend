@@ -9,7 +9,7 @@ vi.mock('../api/profilesApi')
 
 const profile: ProfileData = {
   userId: 'u1', username: 'player', displayName: 'Player One', bio: 'Hello',
-  avatarUrl: null, coverImageUrl: null, region: 'EU', languages: ['English'], platforms: ['PC'],
+  avatarUrl: null, coverImageUrl: null, coverImagePositionX: 50, coverImagePositionY: 50, region: 'EU', languages: ['English'], platforms: ['PC'],
   genres: [], externalLinks: { Steam: 'https://steam.com' },
   status: 'Online' as const, lookingForGameId: null, lookingForGameName: null, lookingForPlayStyle: null, lookingForGameNote: null,
   typicalPlayTimes: [], hasCompletedOnboarding: true,

@@ -17,6 +17,8 @@ function profile(overrides: Partial<ProfileData> = {}): ProfileData {
     bio: null,
     avatarUrl: null,
     coverImageUrl: null,
+    coverImagePositionX: 50,
+    coverImagePositionY: 50,
     region: null,
     languages: [],
     platforms: [],
