@@ -53,10 +53,6 @@ export default function FeedPage() {
 
   return (
     <div className="flex flex-col gap-4 pb-20 md:pb-0">
-      <div className="mb-2 border-l-4 border-primary pl-4">
-        <h1 className="text-3xl font-bold tracking-tight text-text">{t('feed.title')}</h1>
-      </div>
-
       {gamesInFeed.length > 0 && (
         <div className="flex items-center justify-end">
           <Select

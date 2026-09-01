@@ -238,10 +238,6 @@ export default function FindPlayersPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="mb-2 border-l-4 border-primary pl-4">
-        <h1 className="text-2xl font-bold tracking-tight text-text sm:text-3xl">{t('findPlayers.title')}</h1>
-      </div>
-
       {myOpenGroup ? (
         <Card className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>

@@ -133,10 +133,6 @@ export default function FriendsPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="mb-2 border-l-4 border-primary pl-4">
-        <h1 className="text-3xl font-bold tracking-tight text-text">{t('friends.title')}</h1>
-      </div>
-
       {!isLoadingRequests && incomingRequests.length > 0 && (
         <div className="flex flex-col gap-2">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">{t('friends.friendRequests')}</h2>
