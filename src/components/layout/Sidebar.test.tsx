@@ -24,14 +24,6 @@ vi.mock('../../context/StatusContext', () => ({
   }),
 }))
 
-vi.mock('../../context/CreatePostModalContext', () => ({
-  useCreatePostModal: () => ({
-    openCreatePost: vi.fn(),
-    closeCreatePost: vi.fn(),
-    subscribePostCreated: vi.fn(() => vi.fn()),
-  }),
-}))
-
 // hoisted so the mock factory (which vitest lifts above imports) can read it
 const chatState = vi.hoisted(() => ({ hasUnread: false }))
 
@@ -65,6 +57,11 @@ describe('Sidebar', () => {
     expect(screen.getByRole('link', { name: /find players/i })).toHaveAttribute('href', '/find-players')
     expect(screen.getByRole('link', { name: /chats/i })).toHaveAttribute('href', '/chats')
     expect(screen.getByRole('link', { name: /friends/i })).toHaveAttribute('href', '/friends')
+  })
+
+  it('does not render the create-post action', () => {
+    renderSidebar()
+    expect(screen.queryByRole('button', { name: /create post/i })).not.toBeInTheDocument()
   })
 
   it('shows the current username', () => {

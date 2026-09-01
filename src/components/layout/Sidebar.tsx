@@ -1,14 +1,12 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Rss, Users, MessageSquare, Plus, UserRoundCheck } from 'lucide-react'
-import { Button } from '../ui/Button'
+import { Rss, Users, MessageSquare, UserRoundCheck } from 'lucide-react'
 import { Avatar, type AvatarStatus } from '../ui/Avatar'
 import { StatusModal } from '../ui/StatusModal'
 import { useAuth } from '../../context/AuthContext'
 import { useStatus } from '../../context/StatusContext'
 import { useChat } from '../../context/ChatContext'
-import { useCreatePostModal } from '../../context/CreatePostModalContext'
 import type { ProfileStatus } from '../../api/profilesApi'
 
 const navItems = [
@@ -52,7 +50,6 @@ export function Sidebar({ className = '', onNavigate }: SidebarProps) {
   const { user } = useAuth()
   const { status, avatarUrl, lookingForGameName } = useStatus()
   const { hasUnread } = useChat()
-  const { openCreatePost } = useCreatePostModal()
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false)
 
   return (
@@ -102,13 +99,6 @@ export function Sidebar({ className = '', onNavigate }: SidebarProps) {
           </NavLink>
         ))}
       </nav>
-
-      {user && (
-        <Button className="hidden w-full md:flex" onClick={() => { onNavigate?.(); openCreatePost() }}>
-          <Plus className="h-4 w-4" aria-hidden="true" />
-          {t('sidebar.createPost')}
-        </Button>
-      )}
 
       {isStatusModalOpen && <StatusModal onClose={() => setIsStatusModalOpen(false)} />}
     </aside>

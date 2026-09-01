@@ -7,6 +7,7 @@ import { getGames, type Game } from '../api/gamesApi'
 import { useAuth } from '../context/AuthContext'
 import { useCreatePostModal } from '../context/CreatePostModalContext'
 import { Select } from '../components/ui/Select'
+import { Button } from '../components/ui/Button'
 
 export default function FeedPage() {
   const { t } = useTranslation('pagesA')
@@ -53,8 +54,12 @@ export default function FeedPage() {
 
   return (
     <div className="flex flex-col gap-4 pb-20 md:pb-0">
-      {gamesInFeed.length > 0 && (
-        <div className="flex items-center justify-end">
+      <div className="flex items-center justify-end gap-2">
+        <Button className="hidden md:inline-flex" onClick={() => openCreatePost('Feed')}>
+          <Plus className="h-4 w-4" aria-hidden="true" />
+          {t('feed.createPost')}
+        </Button>
+        {gamesInFeed.length > 0 && (
           <Select
             aria-label={t('feed.filterByGame')}
             value={selectedGameId}
@@ -65,8 +70,8 @@ export default function FeedPage() {
               ...gamesInFeed.map((g) => ({ value: g.id, label: g.name })),
             ]}
           />
-        </div>
-      )}
+        )}
+      </div>
 
       {isLoading && <p className="text-muted">{t('feed.loading')}</p>}
       {error && <p className="text-frustrated">{error}</p>}
