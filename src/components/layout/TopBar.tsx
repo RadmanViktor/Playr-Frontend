@@ -48,7 +48,15 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
   const { user, token, logout } = useAuth()
   const { avatarUrl } = useStatus()
   const { openChatWithUser } = useChat()
-  const { notifications, unreadCount, isLoading: notificationsLoading, markRead, markAllRead } = useNotifications()
+  const {
+    notifications,
+    unreadCount,
+    isLoading: notificationsLoading,
+    markRead,
+    markAllRead,
+    deleteNotification,
+    clearAllNotifications,
+  } = useNotifications()
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<ProfileSearchResult[]>([])
@@ -348,6 +356,11 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
     }
   }
 
+  function handleDeleteNotification(e: ReactMouseEvent, notificationId: string) {
+    e.stopPropagation()
+    void deleteNotification(notificationId)
+  }
+
   function formatNotificationTime(createdAt: string): string {
     const diffMs = Date.now() - new Date(createdAt).getTime()
     const diffMin = Math.floor(diffMs / 60_000)
@@ -516,15 +529,26 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
             <div className="absolute right-0 top-full z-50 mt-1 w-[min(20rem,calc(100vw-1.5rem))] rounded-lg border border-border bg-surface shadow-lg overflow-hidden">
               <div className="flex items-center justify-between border-b border-border px-4 py-2">
                 <p className="text-sm font-semibold text-text">{t('topBar.notifications.title')}</p>
-                {unreadCount > 0 && (
-                  <button
-                    type="button"
-                    onClick={markAllRead}
-                    className="text-xs font-medium text-muted hover:text-text cursor-pointer"
-                  >
-                    {t('topBar.notifications.markAllRead')}
-                  </button>
-                )}
+                <div className="flex items-center gap-3">
+                  {unreadCount > 0 && (
+                    <button
+                      type="button"
+                      onClick={markAllRead}
+                      className="text-xs font-medium text-muted hover:text-text cursor-pointer"
+                    >
+                      {t('topBar.notifications.markAllRead')}
+                    </button>
+                  )}
+                  {notifications.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => void clearAllNotifications()}
+                      className="text-xs font-medium text-muted hover:text-text cursor-pointer"
+                    >
+                      {t('topBar.notifications.clearAll')}
+                    </button>
+                  )}
+                </div>
               </div>
               {notificationsLoading && notifications.length === 0 ? (
                 <p className="px-4 py-3 text-sm text-muted">{t('topBar.loading')}</p>
@@ -533,33 +557,45 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
               ) : (
                 <div className="max-h-96 overflow-y-auto">
                   {notifications.map((notification) => (
-                    <button
+                    <div
                       key={notification.id}
-                      type="button"
-                      onClick={() => handleNotificationClick(notification)}
-                      className={`flex w-full items-start gap-3 border-b border-border px-4 py-3 text-left last:border-b-0 hover:bg-surface-raised cursor-pointer ${
+                      className={`group relative flex w-full items-start gap-3 border-b border-border last:border-b-0 hover:bg-surface-raised ${
                         notification.isRead ? '' : 'bg-surface-raised/60'
                       }`}
                     >
-                      <Avatar
-                        src={notification.actor.avatarUrl ?? undefined}
-                        alt={notification.actor.displayName}
-                        size="sm"
-                      />
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm text-text">
-                          <span className="font-medium">{notification.actor.displayName}</span>{' '}
-                          {notification.type === 'NewFollower'
-                            ? t('topBar.notifications.newFollower')
-                            : notification.type === 'CommentMention'
-                              ? t('topBar.notifications.taggedInComment')
-                              : notification.type === 'LfgApplicationReceived'
-                                ? t('topBar.notifications.lfgApplicationReceived')
-                                : t('topBar.notifications.taggedInPost')}
-                        </p>
-                        <p className="mt-0.5 text-xs text-muted">{formatNotificationTime(notification.createdAt)}</p>
-                      </div>
-                    </button>
+                      <button
+                        type="button"
+                        onClick={() => handleNotificationClick(notification)}
+                        className="flex flex-1 items-start gap-3 px-4 py-3 pr-9 text-left cursor-pointer"
+                      >
+                        <Avatar
+                          src={notification.actor.avatarUrl ?? undefined}
+                          alt={notification.actor.displayName}
+                          size="sm"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm text-text">
+                            <span className="font-medium">{notification.actor.displayName}</span>{' '}
+                            {notification.type === 'NewFollower'
+                              ? t('topBar.notifications.newFollower')
+                              : notification.type === 'CommentMention'
+                                ? t('topBar.notifications.taggedInComment')
+                                : notification.type === 'LfgApplicationReceived'
+                                  ? t('topBar.notifications.lfgApplicationReceived')
+                                  : t('topBar.notifications.taggedInPost')}
+                          </p>
+                          <p className="mt-0.5 text-xs text-muted">{formatNotificationTime(notification.createdAt)}</p>
+                        </div>
+                      </button>
+                      <button
+                        type="button"
+                        aria-label={t('topBar.notifications.remove')}
+                        onClick={(e) => handleDeleteNotification(e, notification.id)}
+                        className="absolute right-2 top-3 rounded p-1 text-muted opacity-0 group-hover:opacity-100 hover:bg-border hover:text-text cursor-pointer"
+                      >
+                        <X className="h-3.5 w-3.5" aria-hidden="true" />
+                      </button>
+                    </div>
                   ))}
                 </div>
               )}

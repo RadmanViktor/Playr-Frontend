@@ -39,6 +39,8 @@
       "ariaLabel": "Notifications",
       "title": "Notifications",
       "markAllRead": "Mark all as read",
+      "clearAll": "Clear all",
+      "remove": "Remove notification",
       "empty": "No notifications yet",
       "taggedInComment": "tagged you in a comment",
       "taggedInPost": "tagged you in a post",

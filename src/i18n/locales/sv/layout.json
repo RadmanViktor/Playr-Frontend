@@ -39,6 +39,8 @@
       "ariaLabel": "Aviseringar",
       "title": "Aviseringar",
       "markAllRead": "Markera alla som lästa",
+      "clearAll": "Rensa alla",
+      "remove": "Ta bort avisering",
       "empty": "Inga aviseringar än",
       "taggedInComment": "taggade dig i en kommentar",
       "taggedInPost": "taggade dig i ett inlägg",

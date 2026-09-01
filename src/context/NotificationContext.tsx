@@ -4,6 +4,8 @@ import {
   getNotifications,
   markNotificationRead,
   markAllNotificationsRead,
+  deleteNotification as deleteNotificationApi,
+  clearAllNotifications as clearAllNotificationsApi,
   type NotificationItem,
 } from '../api/notificationsApi'
 import { onNotificationReceived } from '../lib/chatHubConnection'
@@ -20,6 +22,8 @@ interface NotificationContextValue {
   isLoading: boolean
   markRead: (notificationId: string) => Promise<void>
   markAllRead: () => Promise<void>
+  deleteNotification: (notificationId: string) => Promise<void>
+  clearAllNotifications: () => Promise<void>
 }
 
 const NotificationContext = createContext<NotificationContextValue | null>(null)
@@ -116,9 +120,45 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
     }
   }, [token])
 
+  const deleteNotification = useCallback(
+    async (notificationId: string) => {
+      if (!token) return
+      const removed = notifications.find((n) => n.id === notificationId)
+      setNotifications((prev) => prev.filter((n) => n.id !== notificationId))
+      if (removed && !removed.isRead) {
+        setUnreadCount((count) => Math.max(0, count - 1))
+      }
+      try {
+        await deleteNotificationApi(token, notificationId)
+      } catch {
+        /* optimistic update stands; a reload will resync if this failed */
+      }
+    },
+    [token, notifications],
+  )
+
+  const clearAllNotifications = useCallback(async () => {
+    if (!token) return
+    setNotifications([])
+    setUnreadCount(0)
+    try {
+      await clearAllNotificationsApi(token)
+    } catch {
+      /* optimistic update stands; a reload will resync if this failed */
+    }
+  }, [token])
+
   return (
     <NotificationContext.Provider
-      value={{ notifications, unreadCount, isLoading, markRead, markAllRead }}
+      value={{
+        notifications,
+        unreadCount,
+        isLoading,
+        markRead,
+        markAllRead,
+        deleteNotification,
+        clearAllNotifications,
+      }}
     >
       {children}
     </NotificationContext.Provider>

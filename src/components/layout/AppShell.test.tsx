@@ -70,6 +70,8 @@ vi.mock('../../context/NotificationContext', () => ({
     loadMore: vi.fn(),
     markRead: vi.fn(),
     markAllRead: vi.fn(),
+    deleteNotification: vi.fn(),
+    clearAllNotifications: vi.fn(),
   }),
 }))
 

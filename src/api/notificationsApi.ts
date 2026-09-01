@@ -97,3 +97,26 @@ export async function markAllNotificationsRead(token: string): Promise<void> {
     throw new ApiError(response.status, message)
   }
 }
+
+export async function deleteNotification(token: string, notificationId: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/notifications/${notificationId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (!response.ok) {
+    const message = await parseErrorMessage(response, 'Failed to delete notification.')
+    throw new ApiError(response.status, message)
+  }
+}
+
+export async function clearAllNotifications(token: string): Promise<void> {
+  const response = await fetch(`${API_BASE_URL}/api/notifications`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (!response.ok) {
+    const message = await parseErrorMessage(response, 'Failed to clear notifications.')
+    throw new ApiError(response.status, message)
+  }
+}
+

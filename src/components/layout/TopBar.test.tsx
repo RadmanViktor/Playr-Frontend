@@ -35,18 +35,31 @@ vi.mock('../../context/ChatContext', () => ({
 }))
 
 vi.mock('../../context/NotificationContext', () => ({
-  useNotifications: () => ({
-    notifications: [],
-    unreadCount: 0,
-    isLoading: false,
-    markRead: vi.fn(),
-    markAllRead: vi.fn(),
-  }),
+  useNotifications: () => mockUseNotifications(),
+}))
+
+const mockUseNotifications = vi.fn(() => ({
+  notifications: [] as unknown[],
+  unreadCount: 0,
+  isLoading: false,
+  markRead: vi.fn(),
+  markAllRead: vi.fn(),
+  deleteNotification: vi.fn(),
+  clearAllNotifications: vi.fn(),
 }))
 
 describe('TopBar', () => {
   beforeEach(() => {
     localStorage.clear()
+    mockUseNotifications.mockReturnValue({
+      notifications: [],
+      unreadCount: 0,
+      isLoading: false,
+      markRead: vi.fn(),
+      markAllRead: vi.fn(),
+      deleteNotification: vi.fn(),
+      clearAllNotifications: vi.fn(),
+    })
   })
 
   it('renders search and action buttons', () => {
@@ -112,5 +125,61 @@ describe('TopBar', () => {
     expect(screen.getByRole('button', { name: /view profile/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /settings/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument()
+  })
+
+  it('deletes a single notification without navigating when its remove button is clicked', () => {
+    const deleteNotification = vi.fn()
+    mockUseNotifications.mockReturnValue({
+      notifications: [
+        {
+          id: 'n1',
+          type: 'NewFollower',
+          isRead: false,
+          createdAt: new Date().toISOString(),
+          actor: { userId: 'u2', username: 'bob', displayName: 'Bob Smith', avatarUrl: null },
+          postId: null,
+          commentId: null,
+          lfgGroupId: null,
+        },
+      ],
+      unreadCount: 1,
+      isLoading: false,
+      markRead: vi.fn(),
+      markAllRead: vi.fn(),
+      deleteNotification,
+      clearAllNotifications: vi.fn(),
+    })
+    render(<TopBar />, { wrapper: MemoryRouter })
+    fireEvent.click(screen.getByRole('button', { name: 'Notifications' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Remove notification' }))
+    expect(deleteNotification).toHaveBeenCalledWith('n1')
+  })
+
+  it('clears all notifications when "Clear all" is clicked in the notifications dropdown', () => {
+    const clearAllNotifications = vi.fn()
+    mockUseNotifications.mockReturnValue({
+      notifications: [
+        {
+          id: 'n1',
+          type: 'NewFollower',
+          isRead: false,
+          createdAt: new Date().toISOString(),
+          actor: { userId: 'u2', username: 'bob', displayName: 'Bob Smith', avatarUrl: null },
+          postId: null,
+          commentId: null,
+          lfgGroupId: null,
+        },
+      ],
+      unreadCount: 1,
+      isLoading: false,
+      markRead: vi.fn(),
+      markAllRead: vi.fn(),
+      deleteNotification: vi.fn(),
+      clearAllNotifications,
+    })
+    render(<TopBar />, { wrapper: MemoryRouter })
+    fireEvent.click(screen.getByRole('button', { name: 'Notifications' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Clear all' }))
+    expect(clearAllNotifications).toHaveBeenCalled()
   })
 })
