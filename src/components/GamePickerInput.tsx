@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { ChevronDown, Gamepad2, Loader2 } from 'lucide-react'
+import { ChevronDown, Gamepad2, Loader2, X } from 'lucide-react'
 import { createGame, searchExternalGames, type ExternalGameSearchResult, type Game } from '../api/gamesApi'
 import { resolveMediaUrl } from '../api/http'
 import { useAuth } from '../context/AuthContext'
+import { addRecentGame, getRecentGames, removeRecentGame } from '../lib/recentGames'
 import { useIsMobile } from '../lib/useIsMobile'
 
 interface GamePickerInputProps {
@@ -22,13 +23,21 @@ export function GamePickerInput({ selectedGame, onSelect, disabled }: GamePicker
   const [searching, setSearching] = useState(false)
   const [searchError, setSearchError] = useState<string | null>(null)
   const [addingRawgId, setAddingRawgId] = useState<number | null>(null)
+  const [recentGames, setRecentGames] = useState<Game[]>([])
   const containerRef = useRef<HTMLDivElement>(null)
   const isMobile = useIsMobile()
 
-  // Always search RAWG's catalog: an empty query returns a default/popular
-  // selection so the dropdown has something useful to show before typing.
+  const showRecent = open && query.trim() === '' && recentGames.length > 0
+
   useEffect(() => {
-    if (!open || !token) return
+    if (open) setRecentGames(getRecentGames())
+  }, [open])
+
+  // Always search RAWG's catalog: an empty query returns a default/popular
+  // selection so the dropdown has something useful to show before typing,
+  // unless we already have recently used games to show instead.
+  useEffect(() => {
+    if (!open || !token || showRecent) return
     let cancelled = false
     setSearching(true)
     setSearchError(null)
@@ -49,7 +58,7 @@ export function GamePickerInput({ selectedGame, onSelect, disabled }: GamePicker
       cancelled = true
       clearTimeout(timeoutId)
     }
-  }, [query, token, open, t])
+  }, [query, token, open, t, showRecent])
 
   useEffect(() => {
     setHighlightedIndex(0)
@@ -72,6 +81,7 @@ export function GamePickerInput({ selectedGame, onSelect, disabled }: GamePicker
     setAddingRawgId(result.rawgId)
     try {
       const game = await createGame(token, result)
+      addRecentGame(game)
       onSelect(game)
       setOpen(false)
       setQuery('')
@@ -82,6 +92,19 @@ export function GamePickerInput({ selectedGame, onSelect, disabled }: GamePicker
     }
   }
 
+  function selectRecentGame(game: Game) {
+    addRecentGame(game)
+    onSelect(game)
+    setOpen(false)
+    setQuery('')
+  }
+
+  function handleRemoveRecentGame(e: React.MouseEvent, gameId: string) {
+    e.stopPropagation()
+    removeRecentGame(gameId)
+    setRecentGames((prev) => prev.filter((g) => g.id !== gameId))
+  }
+
   function handleKeyDown(e: React.KeyboardEvent) {
     if (!open) {
       if (e.key === 'ArrowDown' || e.key === 'Enter') {
@@ -90,16 +113,22 @@ export function GamePickerInput({ selectedGame, onSelect, disabled }: GamePicker
       }
       return
     }
+    const listLength = showRecent ? recentGames.length : results.length
     if (e.key === 'ArrowDown') {
       e.preventDefault()
-      setHighlightedIndex((i) => Math.min(i + 1, results.length - 1))
+      setHighlightedIndex((i) => Math.min(i + 1, listLength - 1))
     } else if (e.key === 'ArrowUp') {
       e.preventDefault()
       setHighlightedIndex((i) => Math.max(i - 1, 0))
     } else if (e.key === 'Enter') {
       e.preventDefault()
-      const result = results[highlightedIndex]
-      if (result) void selectResult(result)
+      if (showRecent) {
+        const game = recentGames[highlightedIndex]
+        if (game) selectRecentGame(game)
+      } else {
+        const result = results[highlightedIndex]
+        if (result) void selectResult(result)
+      }
     } else if (e.key === 'Escape') {
       setOpen(false)
       setQuery('')
@@ -143,41 +172,92 @@ export function GamePickerInput({ selectedGame, onSelect, disabled }: GamePicker
             className="w-full border-b border-border bg-transparent px-3 py-2 text-sm text-text outline-none placeholder:text-muted"
           />
           <div className="max-h-56 overflow-y-auto">
-            {searching && results.length === 0 && (
-              <div className="flex items-center gap-2 px-3 py-2 text-sm text-muted">
-                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
-                {t('gamePickerInput.searching')}
-              </div>
-            )}
-
-            {!searching && searchError && <p className="px-3 py-2 text-sm text-frustrated">{searchError}</p>}
-
-            {!searching && !searchError && results.length === 0 && (
-              <p className="px-3 py-2 text-sm text-muted">{t('gamePickerInput.noGamesFound')}</p>
-            )}
-
-            {results.map((result, index) => (
-              <button
-                key={result.rawgId}
-                type="button"
-                disabled={addingRawgId !== null}
-                onClick={() => void selectResult(result)}
-                onMouseEnter={() => setHighlightedIndex(index)}
-                className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm cursor-pointer disabled:opacity-50 ${
-                  index === highlightedIndex ? 'bg-surface-raised text-text' : 'text-muted hover:text-text'
-                }`}
-              >
-                {result.coverImageUrl ? (
-                  <img src={resolveMediaUrl(result.coverImageUrl)!} alt="" className="h-6 w-6 rounded object-cover" />
-                ) : (
-                  <Gamepad2 className="h-5 w-5 shrink-0" aria-hidden="true" />
+            {showRecent ? (
+              <>
+                <p className="px-3 py-1.5 text-xs font-medium uppercase tracking-wide text-muted">
+                  {t('gamePickerInput.recentlyUsedHeading')}
+                </p>
+                {recentGames.map((game, index) => (
+                  <button
+                    key={game.id}
+                    type="button"
+                    onClick={() => selectRecentGame(game)}
+                    onMouseEnter={() => setHighlightedIndex(index)}
+                    className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm cursor-pointer ${
+                      index === highlightedIndex ? 'bg-surface-raised text-text' : 'text-muted hover:text-text'
+                    }`}
+                  >
+                    {game.coverImageUrl ? (
+                      <img
+                        src={resolveMediaUrl(game.coverImageUrl)!}
+                        alt=""
+                        className="h-6 w-6 rounded object-cover"
+                      />
+                    ) : (
+                      <Gamepad2 className="h-5 w-5 shrink-0" aria-hidden="true" />
+                    )}
+                    <span className="flex-1 truncate">{game.name}</span>
+                    <span
+                      role="button"
+                      tabIndex={0}
+                      aria-label={t('gamePickerInput.removeRecentGameAriaLabel', { name: game.name })}
+                      onClick={(e) => handleRemoveRecentGame(e, game.id)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          handleRemoveRecentGame(e as unknown as React.MouseEvent, game.id)
+                        }
+                      }}
+                      className="shrink-0 rounded p-1 text-muted hover:text-text"
+                    >
+                      <X className="h-3.5 w-3.5" aria-hidden="true" />
+                    </span>
+                  </button>
+                ))}
+              </>
+            ) : (
+              <>
+                {searching && results.length === 0 && (
+                  <div className="flex items-center gap-2 px-3 py-2 text-sm text-muted">
+                    <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                    {t('gamePickerInput.searching')}
+                  </div>
                 )}
-                <span className="flex-1 truncate">{result.name}</span>
-                {addingRawgId === result.rawgId && (
-                  <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden="true" />
+
+                {!searching && searchError && <p className="px-3 py-2 text-sm text-frustrated">{searchError}</p>}
+
+                {!searching && !searchError && results.length === 0 && (
+                  <p className="px-3 py-2 text-sm text-muted">{t('gamePickerInput.noGamesFound')}</p>
                 )}
-              </button>
-            ))}
+
+                {results.map((result, index) => (
+                  <button
+                    key={result.rawgId}
+                    type="button"
+                    disabled={addingRawgId !== null}
+                    onClick={() => void selectResult(result)}
+                    onMouseEnter={() => setHighlightedIndex(index)}
+                    className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm cursor-pointer disabled:opacity-50 ${
+                      index === highlightedIndex ? 'bg-surface-raised text-text' : 'text-muted hover:text-text'
+                    }`}
+                  >
+                    {result.coverImageUrl ? (
+                      <img
+                        src={resolveMediaUrl(result.coverImageUrl)!}
+                        alt=""
+                        className="h-6 w-6 rounded object-cover"
+                      />
+                    ) : (
+                      <Gamepad2 className="h-5 w-5 shrink-0" aria-hidden="true" />
+                    )}
+                    <span className="flex-1 truncate">{result.name}</span>
+                    {addingRawgId === result.rawgId && (
+                      <Loader2 className="h-4 w-4 shrink-0 animate-spin" aria-hidden="true" />
+                    )}
+                  </button>
+                ))}
+              </>
+            )}
           </div>
         </div>
       )}

@@ -17,6 +17,8 @@
     "noGamesFound": "No games found.",
     "libraryGamesHeading": "In PLAYR's library",
     "otherGamesHeading": "More from RAWG",
+    "recentlyUsedHeading": "Recently used",
+    "removeRecentGameAriaLabel": "Remove {{name}} from recently used",
     "searching": "Searching…",
     "searchError": "Failed to search games.",
     "addError": "Failed to add game. Please try again."

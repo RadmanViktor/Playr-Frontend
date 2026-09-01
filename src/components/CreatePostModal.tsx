@@ -12,7 +12,6 @@ import type { Game } from '../api/gamesApi'
 import { createPost, type PostFeedItem, type PostScope } from '../api/postsApi'
 import { ApiError } from '../api/http'
 import { MOOD_OPTIONS, moodOptionToApi, type MoodOption } from '../lib/mood'
-import { addRecentGameId } from '../lib/recentGames'
 import { useBodyScrollLock } from '../lib/useBodyScrollLock'
 import { useOverlayDismiss } from '../lib/useOverlayDismiss'
 
@@ -109,7 +108,6 @@ export function CreatePostModal({ scope = 'Feed', onClose, onPostCreated }: Crea
         },
         mediaFiles.length > 0 ? setUploadProgress : undefined
       )
-      addRecentGameId(selectedGame.id)
       onPostCreated(post)
     } catch (err) {
       setSubmitError(err instanceof ApiError ? err.message : t('createPostModal.errors.genericError'))
