@@ -216,7 +216,7 @@ export function CreatePostModal({ scope = 'Feed', onClose, onPostCreated }: Crea
 
             {submitError && <p className="text-frustrated text-sm">{submitError}</p>}
 
-            <div className="sticky bottom-0 -mx-5 -mb-5 bg-surface px-5 pb-5 pt-3">
+            <div className="sticky bottom-0 -mx-5 -mb-5 mt-2 bg-surface px-5 pb-5 pt-5">
               <Button type="submit" disabled={isSubmitting} className="w-full">
                 {isSubmitting ? t('createPostModal.posting') : t('createPostModal.postButton')}
               </Button>

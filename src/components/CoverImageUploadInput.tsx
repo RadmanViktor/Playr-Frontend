@@ -33,7 +33,14 @@ export function CoverImageUploadInput({
   const { t } = useTranslation('componentsB')
   const inputRef = useRef<HTMLInputElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const dragState = useRef<{ lastX: number; lastY: number } | null>(null)
+  const dragState = useRef<{
+    lastX: number
+    lastY: number
+    positionX: number
+    positionY: number
+    hasMoved: boolean
+  } | null>(null)
+  const suppressNextClick = useRef(false)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [isDragging, setIsDragging] = useState(false)
 
@@ -69,8 +76,14 @@ export function CoverImageUploadInput({
   function handlePointerDown(e: React.PointerEvent<HTMLDivElement>) {
     if (!backgroundUrl || !onPositionChange) return
     e.preventDefault()
-    ;(e.target as HTMLElement).setPointerCapture(e.pointerId)
-    dragState.current = { lastX: e.clientX, lastY: e.clientY }
+    e.currentTarget.setPointerCapture(e.pointerId)
+    dragState.current = {
+      lastX: e.clientX,
+      lastY: e.clientY,
+      positionX,
+      positionY,
+      hasMoved: false,
+    }
     setIsDragging(true)
   }
 
@@ -79,26 +92,44 @@ export function CoverImageUploadInput({
     const rect = containerRef.current.getBoundingClientRect()
     const deltaX = e.clientX - dragState.current.lastX
     const deltaY = e.clientY - dragState.current.lastY
-    dragState.current = { lastX: e.clientX, lastY: e.clientY }
-    const nextX = clampPercent(positionX - (deltaX / rect.width) * 100)
-    const nextY = clampPercent(positionY - (deltaY / rect.height) * 100)
+    const nextX = clampPercent(dragState.current.positionX - (deltaX / rect.width) * 100)
+    const nextY = clampPercent(dragState.current.positionY - (deltaY / rect.height) * 100)
+    dragState.current = {
+      lastX: e.clientX,
+      lastY: e.clientY,
+      positionX: nextX,
+      positionY: nextY,
+      hasMoved: dragState.current.hasMoved || Math.abs(deltaX) + Math.abs(deltaY) > 3,
+    }
     onPositionChange(nextX, nextY)
   }
 
   function handlePointerUp(e: React.PointerEvent<HTMLDivElement>) {
     if (dragState.current) {
-      ;(e.target as HTMLElement).releasePointerCapture(e.pointerId)
+      suppressNextClick.current = dragState.current.hasMoved
+      e.currentTarget.releasePointerCapture(e.pointerId)
     }
     dragState.current = null
     setIsDragging(false)
+  }
+
+  function handleChangeClick(e: React.MouseEvent<HTMLButtonElement>) {
+    if (suppressNextClick.current) {
+      suppressNextClick.current = false
+      e.preventDefault()
+      return
+    }
+    inputRef.current?.click()
   }
 
   return (
     <div className="flex flex-col gap-2">
       <div
         ref={containerRef}
-        className={`group relative block h-28 w-full overflow-hidden rounded-xl border border-border bg-gradient-to-br from-primary/60 via-primary/25 to-surface bg-cover ${
-          backgroundUrl && onPositionChange ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : ''
+        className={`group relative block h-44 w-full overflow-hidden rounded-xl border border-border bg-gradient-to-br from-primary/60 via-primary/25 to-surface bg-cover sm:h-32 ${
+          backgroundUrl && onPositionChange
+            ? `touch-none select-none ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`
+            : ''
         }`}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
@@ -116,8 +147,9 @@ export function CoverImageUploadInput({
         />
         <button
           type="button"
-          onClick={() => inputRef.current?.click()}
-          className="absolute inset-0 flex items-center justify-center gap-2 bg-black/40 text-xs font-medium text-white opacity-0 transition-opacity group-hover:opacity-100"
+          aria-label={t('coverImageUploadInput.change')}
+          onClick={handleChangeClick}
+          className="absolute inset-0 flex items-center justify-center gap-2 bg-black/25 text-xs font-medium text-white opacity-100 transition-opacity sm:bg-black/40 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100"
         >
           <Camera className="h-5 w-5" aria-hidden="true" />
           {t('coverImageUploadInput.change')}

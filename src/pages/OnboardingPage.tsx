@@ -1,13 +1,14 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Gamepad2, Loader2, X } from 'lucide-react'
 import { Button } from '../components/ui/Button'
 import { AvatarUploadInput } from '../components/AvatarUploadInput'
+import { CoverImageUploadInput } from '../components/CoverImageUploadInput'
 import { useAuth } from '../context/AuthContext'
 import { ApiError, resolveMediaUrl } from '../api/http'
 import { createGame, type ExternalGameSearchResult, type Game } from '../api/gamesApi'
-import { uploadAvatar, uploadCoverImage } from '../api/profilesApi'
+import { updateCoverImagePosition, uploadAvatar, uploadCoverImage } from '../api/profilesApi'
 import { completeOnboarding, type TypicalPlayTime } from '../api/onboardingApi'
 import { useGameSearch } from '../lib/useGameSearch'
 
@@ -38,6 +39,9 @@ export default function OnboardingPage() {
   const [avatarFile, setAvatarFile] = useState<File | null>(null)
   const [avatarError, setAvatarError] = useState<string | null>(null)
   const [coverFile, setCoverFile] = useState<File | null>(null)
+  const [coverError, setCoverError] = useState<string | null>(null)
+  const [coverPositionX, setCoverPositionX] = useState(50)
+  const [coverPositionY, setCoverPositionY] = useState(50)
 
   const [query, setQuery] = useState('')
   const {
@@ -51,8 +55,6 @@ export default function OnboardingPage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
-
-  const coverPreviewUrl = useMemo(() => (coverFile ? URL.createObjectURL(coverFile) : null), [coverFile])
 
   function togglePlatform(platform: string) {
     setPlatforms((prev) => (prev.includes(platform) ? prev.filter((p) => p !== platform) : [...prev, platform]))
@@ -105,7 +107,13 @@ export default function OnboardingPage() {
         await uploadAvatar(token, avatarFile)
       }
       if (coverFile) {
-        await uploadCoverImage(token, coverFile)
+        const uploadedCover = await uploadCoverImage(token, coverFile)
+        if (
+          coverPositionX !== uploadedCover.coverImagePositionX ||
+          coverPositionY !== uploadedCover.coverImagePositionY
+        ) {
+          await updateCoverImagePosition(token, coverPositionX, coverPositionY)
+        }
       }
 
       await completeOnboarding(token, {
@@ -304,18 +312,25 @@ export default function OnboardingPage() {
 
             <label className="flex flex-col gap-1 text-sm text-muted">
               {t('onboarding.customization.coverLabel')}
-              <div className="flex flex-col gap-2">
-                {coverPreviewUrl && (
-                  <img src={coverPreviewUrl} alt="" className="h-24 w-full rounded-lg object-cover" />
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  aria-label={t('onboarding.customization.coverLabel')}
-                  onChange={(e) => setCoverFile(e.target.files?.[0] ?? null)}
-                  className="text-sm text-muted"
-                />
-              </div>
+              <CoverImageUploadInput
+                currentCoverImageUrl={null}
+                file={coverFile}
+                onFileChange={(selected) => {
+                  setCoverFile(selected)
+                  if (selected) {
+                    setCoverPositionX(50)
+                    setCoverPositionY(50)
+                  }
+                }}
+                error={coverError}
+                onError={setCoverError}
+                positionX={coverPositionX}
+                positionY={coverPositionY}
+                onPositionChange={(x, y) => {
+                  setCoverPositionX(x)
+                  setCoverPositionY(y)
+                }}
+              />
             </label>
 
             <label className="flex flex-col gap-1 text-sm text-muted">

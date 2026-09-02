@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { EditProfileForm } from './EditProfileForm'
 import type { ProfileData } from '../api/profilesApi'
@@ -20,6 +20,7 @@ const profile: ProfileData = {
 const updated: ProfileData = { ...profile, displayName: 'Updated Name' }
 
 beforeEach(() => {
+  vi.resetAllMocks()
   vi.mocked(profilesApi.updateProfile).mockResolvedValue(updated)
 })
 
@@ -45,6 +46,45 @@ describe('EditProfileForm', () => {
     await user.click(screen.getByRole('button', { name: /save/i }))
     await waitFor(() => expect(onSave).toHaveBeenCalledWith(updated))
     expect(profilesApi.updateProfile).toHaveBeenCalledWith('tok', expect.objectContaining({ displayName: 'Player One' }))
+  })
+
+  it('persists a repositioned newly uploaded cover image', async () => {
+    const uploaded = { ...profile, coverImageUrl: '/uploads/cover.jpg' }
+    vi.mocked(profilesApi.uploadCoverImage).mockResolvedValue(uploaded)
+    vi.mocked(profilesApi.updateCoverImagePosition).mockResolvedValue({
+      ...uploaded,
+      coverImagePositionX: 40,
+      coverImagePositionY: 35,
+    })
+    const user = userEvent.setup()
+    render(<EditProfileForm profile={profile} token="tok" onSave={vi.fn()} onCancel={vi.fn()} />)
+
+    const coverFile = new File(['cover'], 'cover.jpg', { type: 'image/jpeg' })
+    await user.upload(screen.getByLabelText(/upload cover image/i), coverFile)
+
+    const dragSurface = screen.getByRole('button', { name: /change cover image/i }).parentElement!
+    dragSurface.setPointerCapture = vi.fn()
+    dragSurface.releasePointerCapture = vi.fn()
+    vi.spyOn(dragSurface, 'getBoundingClientRect').mockReturnValue({
+      width: 200,
+      height: 200,
+      top: 0,
+      right: 200,
+      bottom: 200,
+      left: 0,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    })
+    fireEvent.pointerDown(dragSurface, { pointerId: 1, clientX: 100, clientY: 100 })
+    fireEvent.pointerMove(dragSurface, { pointerId: 1, clientX: 120, clientY: 130 })
+
+    await user.click(screen.getByRole('button', { name: /save/i }))
+
+    await waitFor(() => {
+      expect(profilesApi.uploadCoverImage).toHaveBeenCalledWith('tok', coverFile)
+      expect(profilesApi.updateCoverImagePosition).toHaveBeenCalledWith('tok', 40, 35)
+    })
   })
 
   it('selects and submits typical play times', async () => {

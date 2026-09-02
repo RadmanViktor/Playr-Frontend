@@ -163,36 +163,48 @@ export function MediaGalleryUploadInput({
       )}
 
       {canAddMore && (
-        <label
-          onDragOver={(e) => {
-            e.preventDefault()
-            setIsDragOver(true)
-          }}
-          onDragLeave={() => setIsDragOver(false)}
-          onDrop={(e) => {
-            e.preventDefault()
-            setIsDragOver(false)
-            addFiles(e.dataTransfer.files)
-          }}
-          className={`flex w-fit cursor-pointer items-center gap-2 rounded-lg border border-dashed px-3 py-2 text-sm transition-colors ${
-            isDragOver ? 'border-primary text-text bg-surface-raised' : 'border-border text-muted hover:text-text'
-          }`}
-        >
-          <Upload className="h-4 w-4" aria-hidden="true" />
-          {totalCount === 0 ? t('mediaGalleryUploadInput.addMediaLabel') : t('mediaGalleryUploadInput.addMoreLabel', { count: remainingSlots })}
+        <>
+          <button
+            type="button"
+            aria-label={t('mediaGalleryUploadInput.uploadAriaLabel')}
+            onClick={() => inputRef.current?.click()}
+            onDragOver={(e) => {
+              e.preventDefault()
+              setIsDragOver(true)
+            }}
+            onDragLeave={() => setIsDragOver(false)}
+            onDrop={(e) => {
+              e.preventDefault()
+              setIsDragOver(false)
+              addFiles(e.dataTransfer.files)
+            }}
+            className={`flex min-h-28 w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border border-dashed px-5 py-6 text-center text-sm outline-none transition-colors ${
+              isDragOver
+                ? 'border-primary bg-primary/10 text-text'
+                : 'border-border bg-surface-raised/50 text-muted hover:border-primary/60 hover:bg-surface-raised hover:text-text focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/30'
+            }`}
+          >
+            <span className="rounded-full bg-primary/15 p-3 text-primary">
+              <Upload className="h-5 w-5" aria-hidden="true" />
+            </span>
+            <span className="font-medium text-text">
+              {totalCount === 0
+                ? t('mediaGalleryUploadInput.addMediaLabel')
+                : t('mediaGalleryUploadInput.addMoreLabel', { count: remainingSlots })}
+            </span>
+          </button>
           <input
             ref={inputRef}
             type="file"
             multiple
             accept="image/*,video/*"
-            aria-label={t('mediaGalleryUploadInput.uploadAriaLabel')}
             className="hidden"
             onChange={(e) => {
               addFiles(e.target.files)
               if (inputRef.current) inputRef.current.value = ''
             }}
           />
-        </label>
+        </>
       )}
       {error && <p className="text-frustrated text-xs">{error}</p>}
     </div>

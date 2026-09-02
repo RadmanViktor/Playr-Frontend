@@ -90,9 +90,14 @@ export function EditProfileForm({ profile, token, onSave, onCancel }: EditProfil
       if (avatarFile) {
         await uploadAvatar(token, avatarFile)
       }
+      let coverPositionBaseline = profile
       if (coverImageFile) {
-        await uploadCoverImage(token, coverImageFile)
-      } else if (coverPositionX !== profile.coverImagePositionX || coverPositionY !== profile.coverImagePositionY) {
+        coverPositionBaseline = await uploadCoverImage(token, coverImageFile)
+      }
+      if (
+        coverPositionX !== coverPositionBaseline.coverImagePositionX ||
+        coverPositionY !== coverPositionBaseline.coverImagePositionY
+      ) {
         await updateCoverImagePosition(token, coverPositionX, coverPositionY)
       }
       const updated = await updateProfile(token, {
