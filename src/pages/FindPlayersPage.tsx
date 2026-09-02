@@ -8,6 +8,7 @@ import { Badge } from '../components/ui/Badge'
 import { Button } from '../components/ui/Button'
 import { InviteModal } from '../components/ui/InviteModal'
 import { LfgGroupApplyModal } from '../components/ui/LfgGroupApplyModal'
+import { Toast } from '../components/ui/Toast'
 import { LookingForGamePanel } from '../components/LookingForGamePanel'
 import { CreateGroupPanel } from '../components/CreateGroupPanel'
 import { useAuth } from '../context/AuthContext'
@@ -295,11 +296,7 @@ export default function FindPlayersPage() {
         </>
       )}
 
-      {successMessage && (
-        <div className="rounded-xl border border-enjoying/40 bg-enjoying/10 px-4 py-3 text-sm text-enjoying">
-          {successMessage}
-        </div>
-      )}
+      {successMessage && <Toast message={successMessage} onDismiss={() => setSuccessMessage(null)} />}
 
       {cancelError && (
         <div className="rounded-xl border border-frustrated/40 bg-frustrated/10 px-4 py-3 text-sm text-frustrated">

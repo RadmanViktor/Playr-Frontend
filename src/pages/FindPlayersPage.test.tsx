@@ -1,5 +1,5 @@
-import { describe, expect, it, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import FindPlayersPage from './FindPlayersPage'
@@ -50,6 +50,10 @@ describe('FindPlayersPage', () => {
     vi.mocked(gamesApi.getGames).mockResolvedValue([])
   })
 
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   function renderPage() {
     // The page navigates to profiles, so it needs router context.
     return render(
@@ -59,15 +63,21 @@ describe('FindPlayersPage', () => {
     )
   }
 
-  it('shows success feedback after sending an invitation', async () => {
+  it('shows invitation success temporarily while keeping the request badge', async () => {
     const user = userEvent.setup()
     renderPage()
 
     await waitFor(() => expect(screen.getByText('Nexus Nova')).toBeInTheDocument())
     await user.click(screen.getByRole('button', { name: /send request/i }))
-    await user.click(screen.getByRole('button', { name: /mock send invitation/i }))
+    vi.useFakeTimers()
+    fireEvent.click(screen.getByRole('button', { name: /mock send invitation/i }))
 
     expect(screen.getByText('Request sent to Nexus Nova.')).toBeInTheDocument()
+    expect(screen.getByText('Request sent')).toBeInTheDocument()
+
+    act(() => vi.advanceTimersByTime(3000))
+
+    expect(screen.queryByText('Request sent to Nexus Nova.')).not.toBeInTheDocument()
     expect(screen.getByText('Request sent')).toBeInTheDocument()
   })
 
