@@ -30,6 +30,7 @@ import { useCreatePostModal } from '../context/CreatePostModalContext'
 import { onFollowReceived, onFollowRemoved, onUserStatusChanged } from '../lib/chatHubConnection'
 
 type ProfileTab = 'overview' | 'posts' | 'games'
+type TabDirection = 'forward' | 'backward'
 const PROFILE_TABS: ProfileTab[] = ['overview', 'posts', 'games']
 
 export default function ProfilePage() {
@@ -45,6 +46,7 @@ export default function ProfilePage() {
   const [notFound, setNotFound] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<ProfileTab>('overview')
+  const [tabDirection, setTabDirection] = useState<TabDirection | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
   const [pendingFriendRequestId, setPendingFriendRequestId] = useState<string | null>(null)
   const [isSendingFriendRequest, setIsSendingFriendRequest] = useState(false)
@@ -245,15 +247,8 @@ export default function ProfilePage() {
 
   function handleTabChange(tab: ProfileTab) {
     if (tab === activeTab) return
-    const applyChange = () => setActiveTab(tab)
-    const doc = document as Document & {
-      startViewTransition?: (callback: () => void) => void
-    }
-    if (typeof doc.startViewTransition === 'function') {
-      doc.startViewTransition(applyChange)
-    } else {
-      applyChange()
-    }
+    setTabDirection(PROFILE_TABS.indexOf(tab) > PROFILE_TABS.indexOf(activeTab) ? 'forward' : 'backward')
+    setActiveTab(tab)
   }
 
   if (isLoading) return <p className="text-muted">{t('profile.loading')}</p>
@@ -318,6 +313,7 @@ export default function ProfilePage() {
         {PROFILE_TABS.map((tab) => (
           <button
             key={tab}
+            type="button"
             className={`relative z-10 rounded-md px-2 py-2 text-sm font-semibold transition-colors duration-300 sm:text-base ${
               activeTab === tab ? 'text-white' : 'text-muted hover:text-text'
             }`}
@@ -328,7 +324,10 @@ export default function ProfilePage() {
         ))}
       </div>
 
-      <div key={activeTab} className="animate-tab-content flex flex-col gap-4">
+      <div
+        key={activeTab}
+        className={`flex flex-col gap-4 ${tabDirection ? `profile-tab-content-${tabDirection}` : ''}`}
+      >
         {activeTab === 'overview' && (
           <div className="flex flex-col gap-4 pb-20 md:pb-0">
             <PlayingNowSection username={profile.username} isOwner={isOwner} />
