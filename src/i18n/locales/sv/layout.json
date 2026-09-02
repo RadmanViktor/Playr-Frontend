@@ -23,6 +23,10 @@
     "searchPlaceholder": "Sök PLAYR",
     "loading": "Laddar...",
     "myProfile": "Min profil",
+    "guest": {
+      "login": "Logga in",
+      "register": "Skapa konto"
+    },
     "profileMenu": {
       "viewProfile": "Visa profil",
       "settings": "Inställningar",

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, type MouseEvent as ReactMouseEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Mail, Menu, Bell, Settings, LogOut, UserRound } from 'lucide-react'
 import { IconButton } from '../ui/IconButton'
@@ -425,7 +425,10 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
       <IconButton aria-label={t('topBar.openMenu')} onClick={onMenuClick} className="md:hidden">
         <Menu className="h-5 w-5" aria-hidden="true" />
       </IconButton>
-      <div className="relative w-full min-w-0 flex-1 sm:max-w-md" ref={containerRef}>
+      <div
+        className={`relative w-full min-w-0 flex-1 sm:max-w-md ${user ? '' : 'hidden sm:block'}`}
+        ref={containerRef}
+      >
         <div className="flex items-center gap-2 rounded-lg border border-border bg-surface-raised px-3 py-2">
           <Search className="h-4 w-4 text-muted" aria-hidden="true" />
           <input
@@ -508,6 +511,22 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
       </div>
 
       <div className="relative ml-auto flex items-center gap-2">
+        {!user && (
+          <>
+            <Link
+              to="/login"
+              className="whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-surface-raised hover:text-text"
+            >
+              {t('topBar.guest.login')}
+            </Link>
+            <Link
+              to="/register"
+              className="whitespace-nowrap rounded-lg bg-primary px-3 py-2 text-sm font-medium text-white shadow-[0_0_16px_-4px_var(--color-primary)] transition-colors hover:bg-primary-hover"
+            >
+              {t('topBar.guest.register')}
+            </Link>
+          </>
+        )}
         {user && (
           <div className="static sm:relative" ref={notificationsRef}>
             <div className="relative">

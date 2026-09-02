@@ -23,6 +23,10 @@
     "searchPlaceholder": "Search PLAYR",
     "loading": "Loading...",
     "myProfile": "My profile",
+    "guest": {
+      "login": "Log in",
+      "register": "Create account"
+    },
     "profileMenu": {
       "viewProfile": "View profile",
       "settings": "Settings",
