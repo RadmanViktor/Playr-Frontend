@@ -33,6 +33,7 @@ export function CommentsSection({ postId, currentUserId, onCountChange, highligh
   const [scrolledToHighlight, setScrolledToHighlight] = useState(false)
   const [isHighlightFlashing, setIsHighlightFlashing] = useState(false)
   const commentRefs = useRef(new Map<string, HTMLDivElement>())
+  const canInteract = currentUserId != null && token != null
 
   useEffect(() => {
     let cancelled = false
@@ -90,13 +91,14 @@ export function CommentsSection({ postId, currentUserId, onCountChange, highligh
 
   async function handlePost(e: React.FormEvent) {
     e.preventDefault()
+    if (!canInteract || !token) return
     const trimmed = newText.trim()
     if (!trimmed) return
     setPostError(null)
     setIsPosting(true)
     try {
       const created = await createComment(
-        token ?? '',
+        token,
         postId,
         trimmed,
         newMentions.map((m) => m.userId),
@@ -113,23 +115,27 @@ export function CommentsSection({ postId, currentUserId, onCountChange, highligh
   }
 
   async function handleSave(commentId: string, textContent: string) {
-    const updated = await updateComment(token ?? '', postId, commentId, textContent)
+    if (!canInteract || !token) return
+    const updated = await updateComment(token, postId, commentId, textContent)
     setComments((prev) => prev.map((c) => (c.id === commentId ? updated : c)))
   }
 
   async function handleDelete(commentId: string) {
-    await deleteComment(token ?? '', postId, commentId)
+    if (!canInteract || !token) return
+    await deleteComment(token, postId, commentId)
     setComments((prev) => prev.filter((c) => c.id !== commentId))
     onCountChange(-1)
   }
 
   async function handleReact(commentId: string, type: ReactionType) {
-    const reactions = await setCommentReaction(token ?? '', postId, commentId, type)
+    if (!canInteract || !token) return
+    const reactions = await setCommentReaction(token, postId, commentId, type)
     setComments((prev) => prev.map((c) => (c.id === commentId ? { ...c, reactions } : c)))
   }
 
   async function handleRemoveReaction(commentId: string) {
-    const reactions = await removeCommentReaction(token ?? '', postId, commentId)
+    if (!canInteract || !token) return
+    const reactions = await removeCommentReaction(token, postId, commentId)
     setComments((prev) => prev.map((c) => (c.id === commentId ? { ...c, reactions } : c)))
   }
 
@@ -155,7 +161,7 @@ export function CommentsSection({ postId, currentUserId, onCountChange, highligh
         >
           <CommentItem
             comment={comment}
-            currentUserId={currentUserId}
+            currentUserId={canInteract ? currentUserId : undefined}
             onSave={handleSave}
             onDelete={handleDelete}
             onReact={handleReact}
@@ -170,7 +176,7 @@ export function CommentsSection({ postId, currentUserId, onCountChange, highligh
         </Button>
       )}
 
-      {currentUserId != null && (
+      {canInteract && (
         <form onSubmit={handlePost} className="flex flex-col gap-2">
           <MentionInput
             ariaLabel={t('commentsSection.writeCommentAriaLabel')}

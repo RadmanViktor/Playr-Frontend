@@ -94,17 +94,24 @@ export function CommentReactions({ reactions, canReact, onReact, onRemoveReactio
       )}
       {activeCounts.map(({ type, count }) => {
         const isMine = reactions.currentUserReaction === type
+        if (!canReact) {
+          return (
+            <span key={type} className="flex items-center gap-1 rounded-full px-1.5 py-0.5 text-xs text-muted">
+              <span aria-hidden="true">{REACTION_EMOJI[type]}</span>
+              {count}
+            </span>
+          )
+        }
         return (
           <button
             key={type}
             type="button"
-            disabled={!canReact}
             aria-pressed={isMine}
             aria-label={isMine ? t('commentReactions.removeReactionAriaLabel', { type }) : undefined}
             onClick={() => isMine && onRemoveReaction()}
             className={`flex items-center gap-1 rounded-full px-1.5 py-0.5 text-xs transition-colors ${
               isMine ? 'bg-surface-raised text-primary cursor-pointer hover:bg-surface' : 'text-muted'
-            } ${canReact && !isMine ? 'cursor-default' : ''}`}
+            } ${!isMine ? 'cursor-default' : ''}`}
           >
             <span aria-hidden="true">{REACTION_EMOJI[type]}</span>
             {count}

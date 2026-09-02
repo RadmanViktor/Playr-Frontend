@@ -8,8 +8,10 @@ import type { CommentItem, PagedComments } from '../api/commentsApi'
 
 vi.mock('../api/commentsApi')
 
+const authState = vi.hoisted(() => ({ token: 'test-token' as string | null }))
+
 vi.mock('../context/AuthContext', () => ({
-  useAuth: () => ({ token: 'test-token' }),
+  useAuth: () => ({ token: authState.token }),
 }))
 
 vi.mock('../api/friendsApi', () => ({
@@ -35,6 +37,7 @@ const sampleComment: CommentItem = {
 const pagedComments: PagedComments = { items: [sampleComment], totalCount: 1, hasMore: false }
 
 beforeEach(() => {
+  authState.token = 'test-token'
   vi.resetAllMocks()
   vi.mocked(commentsApi.getComments).mockResolvedValue(pagedComments)
 })
@@ -50,6 +53,15 @@ function renderSection(currentUserId?: string) {
 }
 
 describe('CommentsSection — reactions', () => {
+  it('hides comment and reaction actions without an authenticated session', async () => {
+    authState.token = null
+    renderSection('a2')
+
+    await screen.findByText('Nice post!')
+    expect(screen.queryByRole('textbox', { name: /write a comment/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /react to comment/i })).not.toBeInTheDocument()
+  })
+
   it('reacting to a comment calls setCommentReaction and updates displayed reactions', async () => {
     const updatedReactions = { counts: { like: 1, haha: 0, wow: 0, sad: 0, angry: 0 }, currentUserReaction: 'Like' as const }
     vi.mocked(commentsApi.setCommentReaction).mockResolvedValueOnce(updatedReactions)

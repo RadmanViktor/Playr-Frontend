@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import { ChatWindow } from '../components/ChatWindow'
 import { Toast } from '../components/ui/Toast'
@@ -33,6 +33,9 @@ const ChatContext = createContext<ChatContextValue | null>(null)
 
 export function ChatProvider({ children }: { children: ReactNode }) {
   const { user, token } = useAuth()
+  const activeUserId = user && token ? user.id : null
+  const activeUserIdRef = useRef(activeUserId)
+  activeUserIdRef.current = activeUserId
   const { preferences } = useNotificationPreferences()
   const [openChats, setOpenChats] = useState<OpenChat[]>([])
   const [error, setError] = useState<string | null>(null)
@@ -46,9 +49,17 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   // only the most recently opened chat; the rest stay in state (so closing the
   // top one reveals the previous) but unmount, which also stops their polling.
   const visibleChats = useMemo(
-    () => (isMobile ? openChats.slice(-1) : openChats),
-    [isMobile, openChats],
+    () => (!activeUserId ? [] : isMobile ? openChats.slice(-1) : openChats),
+    [activeUserId, isMobile, openChats],
   )
+
+  useEffect(() => {
+    setOpenChats([])
+    setUnreadConversationIds(new Set())
+    setError(null)
+    setNotificationToast(null)
+    setFilledGroupCelebration(null)
+  }, [activeUserId])
 
   useEffect(() => {
     if (!token) {
@@ -62,6 +73,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   }, [token])
 
   const showConversation = useCallback((conversation: Conversation) => {
+    if (!activeUserId || activeUserIdRef.current !== activeUserId) return
     setOpenChats((prev) => {
       const existingIndex = prev.findIndex((chat) => chat.conversation.id === conversation.id)
       const withoutExisting = existingIndex >= 0 ? prev.filter((chat) => chat.conversation.id !== conversation.id) : prev
@@ -74,7 +86,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       next.delete(conversation.id)
       return next
     })
-  }, [])
+  }, [activeUserId])
 
   useEffect(() => {
     if (!user) return
@@ -223,10 +235,11 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
   const openConversation = useCallback(
     (conversation: Conversation) => {
+      if (!activeUserId) return
       setError(null)
       showConversation(conversation)
     },
-    [showConversation],
+    [activeUserId, showConversation],
   )
 
   const closeChat = useCallback((conversationId: string) => {
@@ -255,7 +268,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         closeChat,
         error,
         unreadConversationIds,
-        hasUnread: unreadConversationIds.size > 0,
+        hasUnread: activeUserId != null && unreadConversationIds.size > 0,
       }}
     >
       {children}

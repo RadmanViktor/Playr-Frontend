@@ -103,6 +103,15 @@ describe('CommentItem — reactions', () => {
     expect(screen.getByText('1')).toBeInTheDocument()
   })
 
+  it('renders guest reaction counts as non-interactive text', () => {
+    renderComment({
+      comment: { ...baseComment, reactions: { counts: { like: 3, haha: 0, wow: 0, sad: 0, angry: 0 }, currentUserReaction: null } },
+    })
+
+    expect(screen.getByText('3')).toBeInTheDocument()
+    expect(screen.queryByRole('button')).not.toBeInTheDocument()
+  })
+
   it('shows an error message when onReact rejects', async () => {
     const user = userEvent.setup()
     const onReact = vi.fn().mockRejectedValueOnce(new Error('Failed to update reaction.'))

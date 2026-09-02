@@ -79,7 +79,8 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate, defaultComme
   const [commentsOpen, setCommentsOpen] = useState(defaultCommentsOpen)
   const menuRef = useRef<HTMLDivElement>(null)
 
-  const isOwner = currentUserId != null && currentUserId === post.authorId
+  const canInteract = currentUserId != null && token != null
+  const isOwner = canInteract && currentUserId === post.authorId
   const badge = moodBadge(post.mood, t)
 
   // Close menu on outside click
@@ -95,11 +96,12 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate, defaultComme
   }, [state])
 
   async function handleSave() {
+    if (!token || !isOwner) return
     setActionError(null)
     setIsSaving(true)
     try {
       const updated = await updatePost(
-        token ?? '',
+        token,
         post.id,
         {
           textContent: editText.trim(),
@@ -118,10 +120,11 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate, defaultComme
   }
 
   async function handleDelete() {
+    if (!token || !isOwner) return
     setActionError(null)
     setIsDeleting(true)
     try {
-      await deletePost(token ?? '', post.id)
+      await deletePost(token, post.id)
       onDelete?.(post.id)
     } catch (err) {
       setActionError(err instanceof ApiError ? err.message : t('postCard.errors.deleteFailed'))
@@ -140,14 +143,14 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate, defaultComme
   }
 
   async function handleToggleLike() {
-    if (currentUserId == null || isLiking) return
+    if (!canInteract || !token || isLiking) return
     setIsLiking(true)
     const previousLiked = liked
     const previousCount = likesCount
     setLiked(!previousLiked)
     setLikesCount(previousLiked ? previousCount - 1 : previousCount + 1)
     try {
-      const result = await toggleLike(token ?? '', post.id)
+      const result = await toggleLike(token, post.id)
       setLiked(result.liked)
       setLikesCount(result.likesCount)
     } catch {
@@ -307,25 +310,31 @@ export function PostCard({ post, currentUserId, onDelete, onUpdate, defaultComme
             <MessageCircle className="h-4 w-4" aria-hidden="true" />
             {commentsCount > 0 && commentsCount}
           </button>
-          <button
-            onClick={handleToggleLike}
-            disabled={currentUserId == null}
-            aria-label={liked ? t('postCard.unlikePostAriaLabel') : t('postCard.likePostAriaLabel')}
-            aria-pressed={liked}
-            className={`flex items-center gap-1.5 text-xs font-medium transition-colors cursor-pointer disabled:cursor-default ${
-              liked ? 'text-frustrated' : 'text-muted hover:text-frustrated'
-            }`}
-          >
-            <Heart className="h-4 w-4" fill={liked ? 'currentColor' : 'none'} aria-hidden="true" />
-            {likesCount > 0 && likesCount}
-          </button>
+          {canInteract ? (
+            <button
+              onClick={handleToggleLike}
+              aria-label={liked ? t('postCard.unlikePostAriaLabel') : t('postCard.likePostAriaLabel')}
+              aria-pressed={liked}
+              className={`flex items-center gap-1.5 text-xs font-medium transition-colors cursor-pointer ${
+                liked ? 'text-frustrated' : 'text-muted hover:text-frustrated'
+              }`}
+            >
+              <Heart className="h-4 w-4" fill={liked ? 'currentColor' : 'none'} aria-hidden="true" />
+              {likesCount > 0 && likesCount}
+            </button>
+          ) : likesCount > 0 ? (
+            <span className="flex items-center gap-1.5 text-xs font-medium text-muted">
+              <Heart className="h-4 w-4" aria-hidden="true" />
+              {likesCount}
+            </span>
+          ) : null}
         </div>
       </div>
 
       {commentsOpen && (
         <CommentsSection
           postId={post.id}
-          currentUserId={currentUserId}
+          currentUserId={canInteract ? currentUserId : undefined}
           onCountChange={(delta) => setCommentsCount((count) => count + delta)}
           highlightCommentId={highlightCommentId}
         />

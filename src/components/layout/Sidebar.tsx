@@ -76,29 +76,31 @@ export function Sidebar({ className = '', onNavigate }: SidebarProps) {
         </button>
       )}
 
-      <nav className="flex flex-col gap-1">
-        {navItems.map(({ to, labelKey, icon: Icon, end }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={end}
-            onClick={onNavigate}
-            className={({ isActive }) =>
-              `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                isActive
-                  ? 'bg-primary text-white'
-                  : 'text-muted hover:bg-surface-raised hover:text-text'
-              }`
-            }
-          >
-            <Icon className="h-5 w-5" aria-hidden="true" />
-            {t(labelKey)}
-            {to === '/chats' && hasUnread && (
-              <span className="ml-auto h-2 w-2 shrink-0 rounded-full bg-frustrated" aria-label={t('sidebar.unreadMessages')} />
-            )}
-          </NavLink>
-        ))}
-      </nav>
+      {user && (
+        <nav className="flex flex-col gap-1">
+          {navItems.map(({ to, labelKey, icon: Icon, end }) => (
+            <NavLink
+              key={to}
+              to={to}
+              end={end}
+              onClick={onNavigate}
+              className={({ isActive }) =>
+                `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                  isActive
+                    ? 'bg-primary text-white'
+                    : 'text-muted hover:bg-surface-raised hover:text-text'
+                }`
+              }
+            >
+              <Icon className="h-5 w-5" aria-hidden="true" />
+              {t(labelKey)}
+              {to === '/chats' && hasUnread && (
+                <span className="ml-auto h-2 w-2 shrink-0 rounded-full bg-frustrated" aria-label={t('sidebar.unreadMessages')} />
+              )}
+            </NavLink>
+          ))}
+        </nav>
+      )}
 
       {isStatusModalOpen && <StatusModal onClose={() => setIsStatusModalOpen(false)} />}
     </aside>

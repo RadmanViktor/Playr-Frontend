@@ -8,8 +8,13 @@ import { ChatProvider, useChat } from './ChatContext'
 import { MOBILE_MEDIA_QUERY } from '../lib/useIsMobile'
 import { setMatchMedia, resetMatchMedia } from '../test-setup'
 
+const authState = vi.hoisted(() => ({
+  user: { id: 'me' } as { id: string } | null,
+  token: 'token' as string | null,
+}))
+
 vi.mock('./AuthContext', () => ({
-  useAuth: () => ({ user: { id: 'me' }, token: 'token' }),
+  useAuth: () => ({ user: authState.user, token: authState.token }),
 }))
 
 vi.mock('./NotificationPreferencesContext', () => ({
@@ -117,6 +122,8 @@ function renderProvider() {
 }
 
 beforeEach(() => {
+  authState.user = { id: 'me' }
+  authState.token = 'token'
   resetMatchMedia()
   vi.mocked(chatApi.getOrCreateConversation).mockReset()
 })
@@ -126,6 +133,24 @@ afterEach(() => {
 })
 
 describe('ChatProvider window stacking', () => {
+  it('closes private chat windows when the user logs out', async () => {
+    const view = renderProvider()
+    await userEvent.click(screen.getByRole('button', { name: 'Open three' }))
+    await waitFor(() => expect(screen.getAllByTestId('chat-window')).toHaveLength(3))
+
+    authState.user = null
+    authState.token = null
+    view.rerender(
+      <MemoryRouter>
+        <ChatProvider>
+          <Opener />
+        </ChatProvider>
+      </MemoryRouter>,
+    )
+
+    expect(screen.queryByTestId('chat-window')).not.toBeInTheDocument()
+  })
+
   it('renders every open chat side by side on desktop', async () => {
     setMatchMedia(MOBILE_MEDIA_QUERY, false)
     renderProvider()

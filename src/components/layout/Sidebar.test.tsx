@@ -4,9 +4,18 @@ import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 
+const authState = vi.hoisted(() => ({
+  user: { id: '1', email: 'a@b.c', username: 'PlayerOne', displayName: null } as {
+    id: string
+    email: string
+    username: string
+    displayName: string | null
+  } | null,
+}))
+
 vi.mock('../../context/AuthContext', () => ({
   useAuth: () => ({
-    user: { id: '1', email: 'a@b.c', username: 'PlayerOne', displayName: null },
+    user: authState.user,
     logout: vi.fn(),
   }),
 }))
@@ -47,6 +56,7 @@ function renderSidebar(props: { onNavigate?: () => void } = {}) {
 }
 
 beforeEach(() => {
+  authState.user = { id: '1', email: 'a@b.c', username: 'PlayerOne', displayName: null }
   chatState.hasUnread = false
 })
 
@@ -57,6 +67,16 @@ describe('Sidebar', () => {
     expect(screen.getByRole('link', { name: /find players/i })).toHaveAttribute('href', '/find-players')
     expect(screen.getByRole('link', { name: /chats/i })).toHaveAttribute('href', '/chats')
     expect(screen.getByRole('link', { name: /friends/i })).toHaveAttribute('href', '/friends')
+  })
+
+  it('hides protected navigation from guests', () => {
+    authState.user = null
+    renderSidebar()
+
+    expect(screen.queryByRole('link', { name: /feed/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /find players/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /chats/i })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /friends/i })).not.toBeInTheDocument()
   })
 
   it('does not render the create-post action', () => {

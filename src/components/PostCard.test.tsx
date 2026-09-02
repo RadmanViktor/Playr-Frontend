@@ -80,6 +80,13 @@ describe('PostCard — read mode', () => {
     renderCard(<PostCard post={base} />)
     expect(screen.getByText(/ago/i)).toBeInTheDocument()
   })
+
+  it('does not show a like action to guests', () => {
+    renderCard(<PostCard post={{ ...base, likesCount: 2 }} />)
+
+    expect(screen.queryByRole('button', { name: /like post/i })).not.toBeInTheDocument()
+    expect(screen.getByText('2')).toBeInTheDocument()
+  })
 })
 
 describe('PostCard — ... menu', () => {
