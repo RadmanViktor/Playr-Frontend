@@ -49,8 +49,14 @@
   "chats": {
     "title": "Chattar"
   },
+  "authShell": {
+    "tagline": "Hitta spelare · Bygg din squad",
+    "footer": "PLAYR · Upptäck · Hitta vänner · Spela"
+  },
   "login": {
-    "title": "Logga in på PLAYR",
+    "eyebrow": "Din nästa squad väntar",
+    "title": "Välkommen tillbaka.",
+    "description": "Logga in och hitta människor som spelar som du.",
     "usernameOrEmailLabel": "Användarnamn eller e-post",
     "usernameOrEmailAriaLabel": "användarnamn eller e-post",
     "passwordLabel": "Lösenord",
@@ -59,8 +65,27 @@
     "resendConfirmationEmail": "Skicka bekräftelsemejl igen",
     "enterEmailToResend": "Fyll i din e-post ovan för att skicka igen",
     "submit": "Logga in",
-    "registerInstead": "Registrera dig istället",
+    "registerPrompt": "Ny på PLAYR?",
+    "registerInstead": "Skapa ett konto",
     "forgotPassword": "Glömt lösenordet?",
+    "liveLobby": {
+      "title": "Live lobby",
+      "loading": "Laddar live lobbyn",
+      "count_one": "{{count}} söker spel",
+      "count_other": "{{count}} söker spel",
+      "featured": "Populärt just nu",
+      "featuredCount_one": "{{count}} spelare söker det här spelet",
+      "featuredCount_other": "{{count}} spelare söker det här spelet",
+      "mobileHint": "{{count}} spelare söker spel just nu",
+      "emptyTitle": "Lobbyn är lugn just nu",
+      "emptyDescription": "Bli först med att leta efter din nästa squad.",
+      "unavailableTitle": "Hitta din nästa squad",
+      "unavailableDescription": "Logga in för att upptäcka spelare, spel och nya sessioner.",
+      "playStyles": {
+        "Competitive": "Tävlingsinriktat",
+        "Chill": "Avslappnat"
+      }
+    },
     "errors": {
       "usernameOrEmailRequired": "användarnamn eller e-post krävs",
       "passwordRequired": "lösenord krävs",

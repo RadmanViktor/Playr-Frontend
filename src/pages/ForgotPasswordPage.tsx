@@ -3,12 +3,13 @@ import type { FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { AuthPanel } from '../components/AuthPanel'
+import { AuthShell } from '../components/AuthShell'
 import { Button } from '../components/ui/Button'
 import { forgotPassword } from '../api/authApi'
 import { validateEmail } from '../utils/validation'
 
 const inputClass =
-  'rounded-lg border border-border bg-surface-raised px-3 py-2 text-text outline-none focus:border-primary'
+  'auth-input'
 
 export default function ForgotPasswordPage() {
   const { t } = useTranslation('pagesB')
@@ -38,7 +39,7 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-bg px-4">
+    <AuthShell>
       <AuthPanel title={t('forgotPassword.title')}>
         {sent ? (
           <p role="status" className="text-center text-sm text-enjoying">
@@ -74,6 +75,6 @@ export default function ForgotPasswordPage() {
           </Link>
         </p>
       </AuthPanel>
-    </div>
+    </AuthShell>
   )
 }

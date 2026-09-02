@@ -5,6 +5,7 @@ import { MemoryRouter } from 'react-router-dom'
 import LoginPage from './LoginPage'
 import { AuthProvider } from '../context/AuthContext'
 import * as authApi from '../api/authApi'
+import * as publicLobbyApi from '../api/publicLobbyApi'
 
 function renderLoginPage() {
   return render(
@@ -20,6 +21,9 @@ describe('LoginPage', () => {
   beforeEach(() => {
     localStorage.clear()
     vi.restoreAllMocks()
+    vi.spyOn(publicLobbyApi, 'getPublicLookingForGameSummary').mockImplementation(
+      () => new Promise(() => {}),
+    )
   })
 
   it('shows a terminal-style error message on invalid credentials', async () => {
@@ -62,7 +66,7 @@ describe('LoginPage', () => {
 
   it('has a link to the register page', () => {
     renderLoginPage()
-    expect(screen.getByRole('link', { name: /register instead/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /create an account/i })).toHaveAttribute(
       'href',
       '/register'
     )
@@ -74,6 +78,14 @@ describe('LoginPage', () => {
       'href',
       '/forgot-password'
     )
+  })
+
+  it('places forgot password after the password field', () => {
+    renderLoginPage()
+    const password = screen.getByLabelText(/password/i)
+    const forgotPassword = screen.getByRole('link', { name: /forgot password/i })
+    expect(password.compareDocumentPosition(forgotPassword) & Node.DOCUMENT_POSITION_FOLLOWING)
+      .toBeTruthy()
   })
 
   it('shows client-side validation errors and does not call login when fields are empty', async () => {

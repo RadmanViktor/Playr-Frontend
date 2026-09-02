@@ -49,8 +49,14 @@
   "chats": {
     "title": "Chats"
   },
+  "authShell": {
+    "tagline": "Find players · Build your squad",
+    "footer": "PLAYR · Discover · Connect · Play"
+  },
   "login": {
-    "title": "Log in to PLAYR",
+    "eyebrow": "Your next squad is waiting",
+    "title": "Welcome back.",
+    "description": "Log in and find people who play the way you do.",
     "usernameOrEmailLabel": "Username or email",
     "usernameOrEmailAriaLabel": "username or email",
     "passwordLabel": "Password",
@@ -59,8 +65,27 @@
     "resendConfirmationEmail": "Resend confirmation email",
     "enterEmailToResend": "Enter your email above to resend",
     "submit": "Log In",
-    "registerInstead": "Register instead",
+    "registerPrompt": "New to PLAYR?",
+    "registerInstead": "Create an account",
     "forgotPassword": "Forgot password?",
+    "liveLobby": {
+      "title": "Live lobby",
+      "loading": "Loading the live lobby",
+      "count_one": "{{count}} player looking",
+      "count_other": "{{count}} players looking",
+      "featured": "Popular right now",
+      "featuredCount_one": "{{count}} player is looking for this game",
+      "featuredCount_other": "{{count}} players are looking for this game",
+      "mobileHint": "{{count}} players are looking for a game right now",
+      "emptyTitle": "The lobby is quiet right now",
+      "emptyDescription": "Be the first to start looking for your next squad.",
+      "unavailableTitle": "Find your next squad",
+      "unavailableDescription": "Log in to discover players, games, and new sessions.",
+      "playStyles": {
+        "Competitive": "Competitive",
+        "Chill": "Chill"
+      }
+    },
     "errors": {
       "usernameOrEmailRequired": "username or email is required",
       "passwordRequired": "password is required",

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { Eye, EyeOff } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { AuthPanel } from '../components/AuthPanel'
+import { AuthShell } from '../components/AuthShell'
 import { PasswordStrengthMeter } from '../components/PasswordStrengthMeter'
 import { Button } from '../components/ui/Button'
 import { useAuth } from '../context/AuthContext'
@@ -25,7 +26,7 @@ interface FieldErrors {
 }
 
 const inputClass =
-  'rounded-lg border border-border bg-surface-raised px-3 py-2 text-text outline-none focus:border-primary'
+  'auth-input'
 
 const RESEND_COOLDOWN_SECONDS = 30
 
@@ -121,7 +122,7 @@ export default function RegisterPage() {
 
   if (registeredEmail) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-bg px-4">
+      <AuthShell>
         <AuthPanel title={t('register.checkYourEmail.title')}>
           <p className="text-sm text-muted">
             {t('register.checkYourEmail.sentTo')}{' '}
@@ -152,12 +153,12 @@ export default function RegisterPage() {
             </Link>
           </p>
         </AuthPanel>
-      </div>
+      </AuthShell>
     )
   }
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-bg px-4">
+    <AuthShell>
       <AuthPanel title={t('register.title')}>
         <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
           <label className="flex flex-col gap-1 text-sm text-muted">
@@ -270,6 +271,6 @@ export default function RegisterPage() {
           </Link>
         </p>
       </AuthPanel>
-    </div>
+    </AuthShell>
   )
 }

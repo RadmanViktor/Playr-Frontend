@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { AuthPanel } from '../components/AuthPanel'
+import { AuthShell } from '../components/AuthShell'
 import { Button } from '../components/ui/Button'
 import { ApiError, confirmEmail, resendConfirmation } from '../api/authApi'
 
@@ -65,7 +66,7 @@ export default function ConfirmEmailPage() {
   }
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-bg px-4">
+    <AuthShell>
       <AuthPanel title={t('confirmEmail.title')}>
         {status === 'confirming' && (
           <p role="status" className="text-sm text-muted">
@@ -103,7 +104,7 @@ export default function ConfirmEmailPage() {
                     aria-label={t('confirmEmail.emailAriaLabel')}
                     type="email"
                     autoComplete="email"
-                    className="rounded-lg border border-border bg-surface-raised px-3 py-2 text-text outline-none focus:border-primary"
+                    className="auth-input"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
@@ -127,6 +128,6 @@ export default function ConfirmEmailPage() {
           </>
         )}
       </AuthPanel>
-    </div>
+    </AuthShell>
   )
 }

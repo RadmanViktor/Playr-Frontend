@@ -3,6 +3,8 @@ import type { FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { AuthPanel } from '../components/AuthPanel'
+import { AuthShell } from '../components/AuthShell'
+import { LoginLiveLobby } from '../components/LoginLiveLobby'
 import { Button } from '../components/ui/Button'
 import { useAuth } from '../context/AuthContext'
 import { ApiError, resendConfirmation } from '../api/authApi'
@@ -13,7 +15,7 @@ interface FieldErrors {
 }
 
 const inputClass =
-  'rounded-lg border border-border bg-surface-raised px-3 py-2 text-text outline-none focus:border-primary'
+  'auth-input'
 
 export default function LoginPage() {
   const { t } = useTranslation('pagesB')
@@ -79,14 +81,19 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-bg px-4">
-      <AuthPanel title={t('login.title')}>
+    <AuthShell showcase={<LoginLiveLobby />}>
+      <AuthPanel
+        eyebrow={t('login.eyebrow')}
+        title={t('login.title')}
+        description={t('login.description')}
+      >
         <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
           <label className="flex flex-col gap-1 text-sm text-muted">
             {t('login.usernameOrEmailLabel')}
             <input
               id="usernameOrEmail"
               aria-label={t('login.usernameOrEmailAriaLabel')}
+              autoComplete="username"
               className={inputClass}
               value={usernameOrEmail}
               onChange={(e) => setUsernameOrEmail(e.target.value)}
@@ -101,6 +108,7 @@ export default function LoginPage() {
               id="password"
               aria-label={t('login.passwordAriaLabel')}
               type="password"
+              autoComplete="current-password"
               className={inputClass}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -137,12 +145,13 @@ export default function LoginPage() {
             {t('login.submit')}
           </Button>
         </form>
-        <p className="mt-6 text-sm text-muted">
+        <p className="mt-6 text-center text-sm text-muted">
+          {t('login.registerPrompt')}{' '}
           <Link to="/register" className="text-primary hover:underline">
             {t('login.registerInstead')}
           </Link>
         </p>
       </AuthPanel>
-    </div>
+    </AuthShell>
   )
 }

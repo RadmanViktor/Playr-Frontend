@@ -4,6 +4,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { Eye, EyeOff } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { AuthPanel } from '../components/AuthPanel'
+import { AuthShell } from '../components/AuthShell'
 import { PasswordStrengthMeter } from '../components/PasswordStrengthMeter'
 import { Button } from '../components/ui/Button'
 import { ApiError, resetPassword } from '../api/authApi'
@@ -20,7 +21,7 @@ interface FieldErrors {
 }
 
 const inputClass =
-  'rounded-lg border border-border bg-surface-raised px-3 py-2 text-text outline-none focus:border-primary'
+  'auth-input'
 
 export default function ResetPasswordPage() {
   const { t } = useTranslation('pagesB')
@@ -90,7 +91,7 @@ export default function ResetPasswordPage() {
 
   if (isReset) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-bg px-4">
+      <AuthShell>
         <AuthPanel title={t('resetPassword.title')}>
           <p role="status" className="text-center text-sm text-enjoying">
             {t('resetPassword.success')}
@@ -101,12 +102,12 @@ export default function ResetPasswordPage() {
             </Link>
           </p>
         </AuthPanel>
-      </div>
+      </AuthShell>
     )
   }
 
   return (
-    <div className="flex min-h-dvh items-center justify-center bg-bg px-4">
+    <AuthShell>
       <AuthPanel title={t('resetPassword.title')}>
         {!userId || !token ? (
           <p role="status" className="text-sm text-frustrated">
@@ -178,6 +179,6 @@ export default function ResetPasswordPage() {
           </Link>
         </p>
       </AuthPanel>
-    </div>
+    </AuthShell>
   )
 }
