@@ -41,6 +41,7 @@ import {
   onFriendRequestReceived,
   onFriendRequestUpdated,
 } from '../../lib/chatHubConnection'
+import { getNotificationPresentation, getNotificationTarget } from '../../lib/notificationPresentation'
 
 
 export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
@@ -343,16 +344,9 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
   async function handleNotificationClick(notification: NotificationItem) {
     setIsNotificationsOpen(false)
     await markRead(notification.id)
-    if (notification.type === 'NewFollower') {
-      navigate(`/profile/${notification.actor.username}`)
-    } else if (notification.type === 'LfgApplicationReceived') {
-      navigate('/find-players')
-    } else if (notification.postId) {
-      navigate(
-        notification.commentId
-          ? `/posts/${notification.postId}?commentId=${notification.commentId}`
-          : `/posts/${notification.postId}`,
-      )
+    const target = getNotificationTarget(notification)
+    if (target) {
+      navigate(target)
     }
   }
 
@@ -515,17 +509,19 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
         )}
       </div>
 
-      <div className="ml-auto flex items-center gap-2">
+      <div className="relative ml-auto flex items-center gap-2">
         {user && (
-          <div className="relative" ref={notificationsRef}>
-            <IconButton aria-label={t('topBar.notifications.ariaLabel')} onClick={() => setIsNotificationsOpen((open) => !open)}>
-              <Bell className="h-5 w-5" aria-hidden="true" />
-            </IconButton>
-          {unreadCount > 0 && (
-            <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-frustrated px-1 text-[10px] font-bold leading-none text-white">
-              {unreadCount > 9 ? '9+' : unreadCount}
-            </span>
-          )}
+          <div className="static sm:relative" ref={notificationsRef}>
+            <div className="relative">
+              <IconButton aria-label={t('topBar.notifications.ariaLabel')} onClick={() => setIsNotificationsOpen((open) => !open)}>
+                <Bell className="h-5 w-5" aria-hidden="true" />
+              </IconButton>
+              {unreadCount > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-frustrated px-1 text-[10px] font-bold leading-none text-white">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </div>
           {isNotificationsOpen && (
             <div className="absolute right-0 top-full z-50 mt-1 w-[min(20rem,calc(100vw-1.5rem))] rounded-lg border border-border bg-surface shadow-lg overflow-hidden">
               <div className="flex items-center justify-between border-b border-border px-4 py-2">
@@ -557,47 +553,46 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
                 <p className="px-4 py-3 text-sm text-muted">{t('topBar.notifications.empty')}</p>
               ) : (
                 <div className="max-h-96 overflow-y-auto">
-                  {notifications.map((notification) => (
-                    <div
-                      key={notification.id}
-                      className={`group relative flex w-full items-start gap-3 border-b border-border last:border-b-0 hover:bg-surface-raised ${
-                        notification.isRead ? '' : 'bg-surface-raised/60'
-                      }`}
-                    >
-                      <button
-                        type="button"
-                        onClick={() => handleNotificationClick(notification)}
-                        className="flex flex-1 items-start gap-3 px-4 py-3 pr-9 text-left cursor-pointer"
+                  {notifications.map((notification) => {
+                    const presentation = getNotificationPresentation(notification.type)
+                    return (
+                      <div
+                        key={notification.id}
+                        className={`group relative flex w-full items-start gap-3 border-b border-border last:border-b-0 hover:bg-surface-raised ${
+                          notification.isRead ? '' : 'bg-surface-raised/60'
+                        }`}
                       >
-                        <Avatar
-                          src={notification.actor.avatarUrl ?? undefined}
-                          alt={notification.actor.displayName}
-                          size="sm"
-                        />
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm text-text">
-                            <span className="font-medium">{notification.actor.displayName}</span>{' '}
-                            {notification.type === 'NewFollower'
-                              ? t('topBar.notifications.newFollower')
-                              : notification.type === 'CommentMention'
-                                ? t('topBar.notifications.taggedInComment')
-                                : notification.type === 'LfgApplicationReceived'
-                                  ? t('topBar.notifications.lfgApplicationReceived')
-                                  : t('topBar.notifications.taggedInPost')}
-                          </p>
-                          <p className="mt-0.5 text-xs text-muted">{formatNotificationTime(notification.createdAt)}</p>
-                        </div>
-                      </button>
-                      <button
-                        type="button"
-                        aria-label={t('topBar.notifications.remove')}
-                        onClick={(e) => handleDeleteNotification(e, notification.id)}
-                        className="absolute right-2 top-3 rounded p-1 text-muted opacity-0 group-hover:opacity-100 hover:bg-border hover:text-text cursor-pointer"
-                      >
-                        <X className="h-3.5 w-3.5" aria-hidden="true" />
-                      </button>
-                    </div>
-                  ))}
+                        <button
+                          type="button"
+                          onClick={() => handleNotificationClick(notification)}
+                          className="flex flex-1 items-start gap-3 px-4 py-3 pr-9 text-left cursor-pointer"
+                        >
+                          <Avatar
+                            src={notification.actor.avatarUrl ?? undefined}
+                            alt={notification.actor.displayName}
+                            size="sm"
+                          />
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm text-text">
+                              {presentation.showActor && (
+                                <><span className="font-medium">{notification.actor.displayName}</span>{' '}</>
+                              )}
+                              {t(`topBar.notifications.${presentation.messageKey}`)}
+                            </p>
+                            <p className="mt-0.5 text-xs text-muted">{formatNotificationTime(notification.createdAt)}</p>
+                          </div>
+                        </button>
+                        <button
+                          type="button"
+                          aria-label={t('topBar.notifications.remove')}
+                          onClick={(e) => handleDeleteNotification(e, notification.id)}
+                          className="absolute right-2 top-3 rounded p-1 text-muted opacity-0 group-hover:opacity-100 hover:bg-border hover:text-text cursor-pointer"
+                        >
+                          <X className="h-3.5 w-3.5" aria-hidden="true" />
+                        </button>
+                      </div>
+                    )
+                  })}
                 </div>
               )}
             </div>

@@ -1,5 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useNavigate } from 'react-router-dom'
 import {
   getNotifications,
   markNotificationRead,
@@ -13,6 +15,7 @@ import { useAuth } from './AuthContext'
 import { useNotificationPreferences } from './NotificationPreferencesContext'
 import { playNotificationSound } from '../lib/sound'
 import { showBrowserNotification } from '../lib/browserNotifications'
+import { getNotificationPresentation, getNotificationTarget } from '../lib/notificationPresentation'
 
 const MAX_NOTIFICATIONS = 10
 
@@ -29,6 +32,8 @@ interface NotificationContextValue {
 const NotificationContext = createContext<NotificationContextValue | null>(null)
 
 export function NotificationProvider({ children }: { children: ReactNode }) {
+  const { t } = useTranslation('layout')
+  const navigate = useNavigate()
   const { user, token } = useAuth()
   const { preferences } = useNotificationPreferences()
   const [notifications, setNotifications] = useState<NotificationItem[]>([])
@@ -71,27 +76,21 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       )
       setUnreadCount((count) => count + 1)
 
-      const title =
-        notification.type === 'NewFollower'
-          ? `${notification.actor.displayName} started following you`
-          : notification.type === 'LfgApplicationReceived'
-            ? `${notification.actor.displayName} applied to join your group`
-            : `${notification.actor.displayName} tagged you`
-      const body =
-        notification.type === 'NewFollower' || notification.type === 'LfgApplicationReceived'
-          ? ''
-          : notification.type === 'CommentMention'
-            ? 'in a comment'
-            : 'in a post'
+      const presentation = getNotificationPresentation(notification.type)
+      const message = t(`topBar.notifications.${presentation.messageKey}`)
+      const title = presentation.showActor
+        ? `${notification.actor.displayName} ${message}`
+        : message
+      const target = getNotificationTarget(notification)
 
       if (preferences.chatSoundEnabled) {
         playNotificationSound()
       }
       if (preferences.chatBrowserNotificationsEnabled) {
-        showBrowserNotification(title, body)
+        showBrowserNotification(title, '', target ? () => navigate(target) : undefined)
       }
     })
-  }, [user, preferences])
+  }, [user, preferences, navigate, t])
 
   const markRead = useCallback(
     async (notificationId: string) => {

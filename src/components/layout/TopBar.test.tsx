@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, useLocation } from 'react-router-dom'
 import { TopBar } from './TopBar'
 import { addRecentSearch, getRecentSearches } from '../../lib/recentSearches'
 
@@ -47,6 +47,11 @@ const mockUseNotifications = vi.fn(() => ({
   deleteNotification: vi.fn(),
   clearAllNotifications: vi.fn(),
 }))
+
+function LocationDisplay() {
+  const location = useLocation()
+  return <div data-testid="location">{location.pathname}{location.search}</div>
+}
 
 describe('TopBar', () => {
   beforeEach(() => {
@@ -181,5 +186,51 @@ describe('TopBar', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Notifications' }))
     fireEvent.click(screen.getByRole('button', { name: 'Clear all' }))
     expect(clearAllNotifications).toHaveBeenCalled()
+  })
+
+  it('anchors the notifications dropdown to the action group on mobile', () => {
+    render(<TopBar />, { wrapper: MemoryRouter })
+    const notificationsButton = screen.getByRole('button', { name: 'Notifications' })
+
+    fireEvent.click(notificationsButton)
+
+    const notificationsContainer = notificationsButton.parentElement?.parentElement
+    expect(notificationsButton.parentElement).toHaveClass('relative')
+    expect(notificationsContainer).toHaveClass('static', 'sm:relative')
+    expect(notificationsContainer?.parentElement).toHaveClass('relative')
+  })
+
+  it('opens the post from a followed-user post notification', async () => {
+    mockUseNotifications.mockReturnValue({
+      notifications: [
+        {
+          id: 'n1',
+          type: 'FollowedUserPosted',
+          isRead: false,
+          createdAt: new Date().toISOString(),
+          actor: { userId: 'u2', username: 'bob', displayName: 'Bob Smith', avatarUrl: null },
+          postId: 'post-1',
+          commentId: null,
+          lfgGroupId: null,
+        },
+      ],
+      unreadCount: 1,
+      isLoading: false,
+      markRead: vi.fn().mockResolvedValue(undefined),
+      markAllRead: vi.fn(),
+      deleteNotification: vi.fn(),
+      clearAllNotifications: vi.fn(),
+    })
+
+    render(
+      <MemoryRouter initialEntries={['/feed']}>
+        <TopBar />
+        <LocationDisplay />
+      </MemoryRouter>,
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Notifications' }))
+    fireEvent.click(screen.getByRole('button', { name: /Bob Smith published a new post/i }))
+
+    await waitFor(() => expect(screen.getByTestId('location')).toHaveTextContent('/posts/post-1'))
   })
 })
