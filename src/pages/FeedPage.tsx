@@ -55,10 +55,12 @@ export default function FeedPage() {
   return (
     <div className="flex flex-col gap-4 pb-20 md:pb-0">
       <div className="flex items-center justify-end gap-2">
-        <Button className="hidden md:inline-flex" onClick={() => openCreatePost('Feed')}>
-          <Plus className="h-4 w-4" aria-hidden="true" />
-          {t('feed.createPost')}
-        </Button>
+        <div className="hidden md:block">
+          <Button onClick={() => openCreatePost('Feed')}>
+            <Plus className="h-4 w-4" aria-hidden="true" />
+            {t('feed.createPost')}
+          </Button>
+        </div>
         {gamesInFeed.length > 0 && (
           <Select
             aria-label={t('feed.filterByGame')}

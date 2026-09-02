@@ -38,7 +38,7 @@ describe('FeedPage', () => {
 
     await waitFor(() => expect(screen.getByText(/no posts yet/i)).toBeInTheDocument())
     const createPostButton = screen.getByText(/^create post$/i).closest('button')
-    expect(createPostButton).toHaveClass('hidden', 'md:inline-flex')
+    expect(createPostButton?.parentElement).toHaveClass('hidden', 'md:block')
 
     await userEvent.click(createPostButton!)
 
