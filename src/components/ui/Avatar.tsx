@@ -41,6 +41,7 @@ function getBadgeRingClass(badgeType?: string | null, badgeLevel?: string | null
   if (!badgeType) return null
   if (badgeType === 'Creator' || badgeType === 'Admin') return 'badge-ring-creator'
   if (badgeType === 'FirstHundredUsers') return 'badge-ring-founder'
+  if (badgeType === 'Voidtouched') return 'badge-ring-voidtouched'
   switch (badgeLevel) {
     case 'Bronze':
       return 'badge-ring-bronze'
@@ -103,7 +104,7 @@ export function Avatar({ src, alt, size = 'md', status, badgeType, badgeLevel }:
       data-testid="avatar-badge-ring"
       data-badge-type={badgeType}
       data-badge-level={badgeLevel ?? undefined}
-      title={badgeType === 'Creator' ? 'Creator' : `${badgeType} (${badgeLevel})`}
+      title={badgeType ? (badgeLevel ? `${badgeType} (${badgeLevel})` : badgeType) : undefined}
       className={`badge-ring ${ringClass}`}
     >
       {avatar}

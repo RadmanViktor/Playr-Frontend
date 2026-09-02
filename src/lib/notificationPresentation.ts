@@ -7,6 +7,8 @@ type NotificationMessageKey =
   | 'followedUserPosted'
   | 'badgeUnlocked'
   | 'lfgApplicationReceived'
+  | 'postLiked'
+  | 'postCommented'
   | 'unknown'
 
 export interface NotificationPresentation {
@@ -28,6 +30,10 @@ export function getNotificationPresentation(type: string): NotificationPresentat
       return { messageKey: 'badgeUnlocked', showActor: false }
     case 'LfgApplicationReceived':
       return { messageKey: 'lfgApplicationReceived', showActor: true }
+    case 'PostLiked':
+      return { messageKey: 'postLiked', showActor: true }
+    case 'PostCommented':
+      return { messageKey: 'postCommented', showActor: true }
     default:
       return { messageKey: 'unknown', showActor: false }
   }

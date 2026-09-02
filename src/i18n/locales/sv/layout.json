@@ -47,6 +47,8 @@
       "lfgApplicationReceived": "ansökte till din grupp",
       "newFollower": "började följa dig",
       "followedUserPosted": "publicerade ett nytt inlägg",
+      "postLiked": "gillade ditt inlägg",
+      "postCommented": "kommenterade ditt inlägg",
       "badgeUnlocked": "Du låste upp ett nytt märke",
       "unknown": "Du har en ny avisering",
       "loadMore": "Ladda fler",

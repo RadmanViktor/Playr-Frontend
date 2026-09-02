@@ -238,7 +238,8 @@
         "Reactor": "Reactor",
         "Trailblazer": "Trailblazer",
         "NightOwl": "Night Owl",
-        "Veteran": "Veteran"
+        "Veteran": "Veteran",
+        "Voidtouched": "Voidtouched"
       },
       "categoryHints": {
         "foundingCommunity": "Tied to when the community was founded",
@@ -255,7 +256,19 @@
         "commentReactions": "Related to reacting to comments",
         "gettingStarted": "Tied to getting started on Playr",
         "timeOfDay": "Has something to do with the time of day",
-        "longevity": "Tied to how long you've been a member"
+        "longevity": "Tied to how long you've been a member",
+        "hiddenGameTribute": "A hidden tribute to an exceptional journey"
       }
+    },
+  "badgeUnlockCelebration": {
+    "title": "Congratulations!",
+    "eyebrow": "New badge unlocked",
+    "continue": "Continue",
+    "keepOpen": "Keep open",
+    "closeAriaLabel": "Close celebration",
+    "defaultDescription": "Your journey through Playr has earned you a new badge.",
+    "descriptions": {
+      "Voidtouched": "You embraced the depths of Hallownest and gave Hollow Knight five stars."
     }
+  }
 }

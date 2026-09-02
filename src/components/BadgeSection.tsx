@@ -16,6 +16,8 @@ function BadgeTierDot({ type, level }: { type: string; level: string }) {
       ? 'bg-gradient-to-tr from-fuchsia-500 via-primary to-cyan-400'
       : type === 'FirstHundredUsers'
         ? 'bg-gradient-to-tr from-amber-200 via-yellow-400 to-amber-200'
+        : type === 'Voidtouched'
+          ? 'bg-gradient-to-tr from-black via-gray-600 to-gray-200 shadow-[0_0_8px_rgba(220,215,228,0.45)]'
         : level === 'Bronze'
           ? 'bg-amber-700'
           : level === 'Silver'

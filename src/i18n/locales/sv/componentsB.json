@@ -236,7 +236,8 @@
       "Reactor": "Reagerare",
       "Trailblazer": "Pionjär",
       "NightOwl": "Nattuggla",
-      "Veteran": "Veteran"
+      "Veteran": "Veteran",
+      "Voidtouched": "Voidtouched"
     },
     "categoryHints": {
       "foundingCommunity": "Kopplat till när communityn grundades",
@@ -253,7 +254,19 @@
       "commentReactions": "Kopplat till att reagera på kommentarer",
       "gettingStarted": "Kopplat till att komma igång på Playr",
       "timeOfDay": "Har något med tiden på dygnet att göra",
-      "longevity": "Kopplat till hur länge du varit medlem"
+      "longevity": "Kopplat till hur länge du varit medlem",
+      "hiddenGameTribute": "En dold hyllning till en enastående resa"
+    }
+  },
+  "badgeUnlockCelebration": {
+    "title": "GRATTIS!",
+    "eyebrow": "Nytt märke upplåst",
+    "continue": "Fortsätt",
+    "keepOpen": "Behåll öppen",
+    "closeAriaLabel": "Stäng firandet",
+    "defaultDescription": "Din resa genom Playr har gett dig ett nytt märke.",
+    "descriptions": {
+      "Voidtouched": "Du omfamnade Hallownests djup och gav Hollow Knight fem stjärnor."
     }
   }
 }

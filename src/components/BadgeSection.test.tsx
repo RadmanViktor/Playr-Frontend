@@ -50,6 +50,7 @@ describe('BadgeSection', () => {
     expect(screen.getByText('Trailblazer')).toBeInTheDocument()
     expect(screen.getByText('Supporter')).toBeInTheDocument()
     expect(screen.getByText('Game Critic')).toBeInTheDocument()
+    expect(screen.getByText('Voidtouched')).toBeInTheDocument()
 
     // Category hints are vague, not exact thresholds.
     expect(screen.queryByText(/\d+ posts/i)).not.toBeInTheDocument()

@@ -82,4 +82,12 @@ describe('Avatar', () => {
     expect(ring.className).toContain('badge-ring-founder')
     expect(ring).not.toHaveClass('badge-ring-gold')
   })
+
+  it('renders the animated void ring for the Voidtouched badge', () => {
+    render(<Avatar alt="Ada" badgeType="Voidtouched" badgeLevel="Gold" />)
+
+    const ring = screen.getByTestId('avatar-badge-ring')
+    expect(ring.className).toContain('badge-ring-voidtouched')
+    expect(ring).not.toHaveClass('badge-ring-gold')
+  })
 })

@@ -46,6 +46,8 @@ export type NotificationType =
   | 'FollowedUserPosted'
   | 'BadgeUnlocked'
   | 'LfgApplicationReceived'
+  | 'PostLiked'
+  | 'PostCommented'
 
 export interface NotificationActor {
   userId: string
@@ -62,6 +64,8 @@ export interface NotificationItem {
   actor: NotificationActor
   postId: string | null
   commentId: string | null
+  badgeType: string | null
+  badgeLevel: string | null
   lfgGroupId: string | null
 }
 

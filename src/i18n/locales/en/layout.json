@@ -47,6 +47,8 @@
       "lfgApplicationReceived": "applied to join your group",
       "newFollower": "started following you",
       "followedUserPosted": "published a new post",
+      "postLiked": "liked your post",
+      "postCommented": "commented on your post",
       "badgeUnlocked": "You unlocked a new badge",
       "unknown": "You have a new notification",
       "loadMore": "Load more",
