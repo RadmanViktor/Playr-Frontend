@@ -200,6 +200,52 @@
   animation: badge-ring-founder-glitter 1.6s ease-in-out infinite;
 }
 
+/* Voidtouched: an original void-and-soul treatment for the Hollow Knight tribute badge. */
+.badge-ring-voidtouched {
+  position: relative;
+  isolation: isolate;
+  background: conic-gradient(
+    from var(--badge-angle),
+    #020104,
+    #433b50,
+    #09070d,
+    #d9d5df,
+    #030205,
+    #17111f,
+    #020104
+  );
+  animation:
+    badge-ring-rotate 5s linear infinite,
+    badge-ring-void-pulse 2.8s ease-in-out infinite;
+}
+
+.badge-ring-voidtouched::before {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(circle, rgba(218, 213, 226, 0.22), rgba(0, 0, 0, 0) 66%);
+  filter: blur(3px);
+  animation: badge-ring-void-breathe 2.8s ease-in-out infinite;
+}
+
+@keyframes badge-ring-void-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 7px 2px rgba(3, 2, 5, 0.95), 0 0 14px rgba(130, 119, 145, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 14px 4px rgba(0, 0, 0, 1), 0 0 24px rgba(218, 213, 226, 0.34);
+  }
+}
+
+@keyframes badge-ring-void-breathe {
+  0%,
+  100% { opacity: 0.35; transform: scale(0.94); }
+  50% { opacity: 0.8; transform: scale(1.08); }
+}
+
 @keyframes badge-ring-founder-pulse {
   0%,
   100% {
@@ -233,6 +279,107 @@
   .badge-ring-founder::after {
     animation: none;
     opacity: 0.5;
+  }
+}
+
+.badge-celebration-voidtouched {
+  background:
+    radial-gradient(circle at 50% 42%, rgba(78, 68, 91, 0.34), transparent 30%),
+    radial-gradient(circle at 15% 90%, rgba(41, 34, 50, 0.45), transparent 42%),
+    linear-gradient(160deg, rgba(1, 1, 2, 0.98), rgba(8, 6, 11, 0.96));
+}
+
+.badge-celebration-card {
+  animation: badge-celebration-card-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.badge-celebration-card-voidtouched {
+  border: 1px solid rgba(184, 177, 196, 0.24);
+  background: linear-gradient(150deg, rgba(20, 17, 25, 0.94), rgba(5, 4, 7, 0.96));
+  box-shadow: 0 28px 90px rgba(0, 0, 0, 0.85), inset 0 0 45px rgba(120, 109, 137, 0.08);
+}
+
+.badge-celebration-emblem {
+  animation: badge-celebration-spin-in 1.2s cubic-bezier(0.18, 0.88, 0.32, 1.18) both;
+}
+
+.badge-celebration-emblem-voidtouched {
+  position: relative;
+  color: #e6e2ea;
+  border: 1px solid rgba(230, 226, 234, 0.35);
+  background:
+    radial-gradient(circle at 50% 44%, #28222f 0 15%, #08060b 45%, #010102 72%),
+    #030205;
+  box-shadow:
+    0 0 0 7px rgba(4, 3, 6, 0.7),
+    0 0 28px rgba(211, 205, 220, 0.28),
+    0 0 65px rgba(0, 0, 0, 0.95),
+    inset 0 0 22px rgba(231, 227, 236, 0.12);
+}
+
+.badge-celebration-emblem-voidtouched::after {
+  content: '';
+  position: absolute;
+  inset: -11px;
+  border-radius: inherit;
+  border: 1px solid rgba(198, 191, 209, 0.18);
+  animation: badge-void-ripple 2.5s ease-in-out infinite;
+}
+
+.badge-void-particle,
+.badge-soul-particle {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 9999px;
+  background: rgba(225, 220, 232, 0.58);
+  box-shadow: 0 0 9px rgba(225, 220, 232, 0.65);
+  animation: badge-particle-drift ease-in-out infinite alternate;
+}
+
+.badge-void-particle:nth-child(3n) {
+  width: 18px;
+  height: 18px;
+  background: rgba(0, 0, 0, 0.9);
+  box-shadow: 0 0 22px 5px rgba(0, 0, 0, 0.9);
+  filter: blur(3px);
+}
+
+.badge-soul-particle {
+  background: rgba(139, 61, 255, 0.7);
+  box-shadow: 0 0 10px rgba(139, 61, 255, 0.75);
+}
+
+@keyframes badge-celebration-card-in {
+  from { opacity: 0; transform: translateY(18px) scale(0.92); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes badge-celebration-spin-in {
+  0% { opacity: 0; transform: perspective(600px) rotateY(-360deg) scale(0.35); }
+  70% { opacity: 1; transform: perspective(600px) rotateY(18deg) scale(1.08); }
+  100% { opacity: 1; transform: perspective(600px) rotateY(0) scale(1); }
+}
+
+@keyframes badge-particle-drift {
+  from { opacity: 0.08; transform: translate3d(-8px, 18px, 0) scale(0.65); }
+  to { opacity: 0.72; transform: translate3d(14px, -22px, 0) scale(1.2); }
+}
+
+@keyframes badge-void-ripple {
+  0%, 100% { opacity: 0.18; transform: scale(0.92); }
+  50% { opacity: 0.55; transform: scale(1.08); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .badge-ring-voidtouched,
+  .badge-ring-voidtouched::before,
+  .badge-celebration-card,
+  .badge-celebration-emblem,
+  .badge-celebration-emblem-voidtouched::after,
+  .badge-void-particle,
+  .badge-soul-particle {
+    animation: none;
   }
 }
 

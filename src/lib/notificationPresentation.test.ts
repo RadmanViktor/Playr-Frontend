@@ -11,6 +11,8 @@ function notification(overrides: Partial<NotificationItem> = {}): NotificationIt
     actor: { userId: 'user-1', username: 'anna', displayName: 'Anna', avatarUrl: null },
     postId: 'post-1',
     commentId: null,
+    badgeType: null,
+    badgeLevel: null,
     lfgGroupId: null,
     ...overrides,
   }
@@ -31,6 +33,17 @@ describe('notificationPresentation', () => {
     })
   })
 
+  it('presents post engagement notifications with the actor', () => {
+    expect(getNotificationPresentation('PostLiked')).toEqual({
+      messageKey: 'postLiked',
+      showActor: true,
+    })
+    expect(getNotificationPresentation('PostCommented')).toEqual({
+      messageKey: 'postCommented',
+      showActor: true,
+    })
+  })
+
   it('uses neutral presentation for an unknown server value', () => {
     expect(getNotificationPresentation('FutureNotification')).toEqual({
       messageKey: 'unknown',
@@ -40,6 +53,13 @@ describe('notificationPresentation', () => {
 
   it('targets the existing post detail route', () => {
     expect(getNotificationTarget(notification())).toBe('/posts/post-1')
+  })
+
+  it('targets and highlights a comment from a post-comment notification', () => {
+    expect(getNotificationTarget(notification({
+      type: 'PostCommented',
+      commentId: 'comment-1',
+    }))).toBe('/posts/post-1?commentId=comment-1')
   })
 
   it('targets badge settings for badge notifications', () => {

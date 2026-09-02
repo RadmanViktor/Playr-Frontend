@@ -1,6 +1,7 @@
 import {
   Award,
   Crown,
+  Eclipse,
   Gamepad2,
   Heart,
   Library,
@@ -50,4 +51,5 @@ export const BADGE_CATALOG: readonly BadgeCatalogEntry[] = [
   { type: 'Trailblazer', icon: Rocket, categoryHintKey: 'gettingStarted', isSpecial: true },
   { type: 'NightOwl', icon: Moon, categoryHintKey: 'timeOfDay', isSpecial: true },
   { type: 'Veteran', icon: Award, categoryHintKey: 'longevity', isSpecial: true },
+  { type: 'Voidtouched', icon: Eclipse, categoryHintKey: 'hiddenGameTribute', isSpecial: true },
 ]
