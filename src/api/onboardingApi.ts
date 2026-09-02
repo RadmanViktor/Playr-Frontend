@@ -1,4 +1,5 @@
 import { API_BASE_URL, ApiError, parseErrorMessage } from './http'
+import { authenticatedFetch as fetch } from './session'
 
 export type TypicalPlayTime = 'Evenings' | 'Weekends' | 'Daytime' | 'Varies'
 

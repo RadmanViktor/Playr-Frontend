@@ -1,4 +1,5 @@
 import { API_BASE_URL, ApiError, parseErrorMessage } from './http'
+import { authenticatedFetch as fetch } from './session'
 import type { PlayStyle } from './profilesApi'
 
 export type LfgGroupStatus = 'Open' | 'Filled' | 'Cancelled'

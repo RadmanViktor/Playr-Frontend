@@ -37,7 +37,6 @@ const pagedComments: PagedComments = { items: [sampleComment], totalCount: 1, ha
 beforeEach(() => {
   vi.resetAllMocks()
   vi.mocked(commentsApi.getComments).mockResolvedValue(pagedComments)
-  window.localStorage.setItem('playr_token', 'tok')
 })
 
 function renderSection(currentUserId?: string) {
@@ -62,7 +61,7 @@ describe('CommentsSection — reactions', () => {
     await user.click(screen.getByRole('button', { name: /react to comment/i }))
     await user.click(screen.getByRole('button', { name: /^like$/i }))
 
-    await waitFor(() => expect(commentsApi.setCommentReaction).toHaveBeenCalledWith('tok', 'p1', 'c1', 'Like'))
+    await waitFor(() => expect(commentsApi.setCommentReaction).toHaveBeenCalledWith('test-token', 'p1', 'c1', 'Like'))
     expect(await screen.findByText('1')).toBeInTheDocument()
   })
 
@@ -84,6 +83,6 @@ describe('CommentsSection — reactions', () => {
     await user.click(screen.getByRole('button', { name: /react to comment/i }))
     await user.click(screen.getByRole('button', { name: /^like$/i }))
 
-    await waitFor(() => expect(commentsApi.removeCommentReaction).toHaveBeenCalledWith('tok', 'p1', 'c1'))
+    await waitFor(() => expect(commentsApi.removeCommentReaction).toHaveBeenCalledWith('test-token', 'p1', 'c1'))
   })
 })

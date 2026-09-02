@@ -1,4 +1,5 @@
 import { API_BASE_URL, ApiError, parseErrorMessage } from './http'
+import { authenticatedFetch as fetch } from './session'
 import type { PostFeedItem } from './postsApi'
 
 export type ProfileStatus = 'Online' | 'LookingForGame' | 'Busy' | 'Inactive' | 'Offline'

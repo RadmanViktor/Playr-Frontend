@@ -7,6 +7,7 @@ import { MentionInput, type MentionDraft } from './MentionInput'
 import { getComments, createComment, updateComment, deleteComment, setCommentReaction, removeCommentReaction } from '../api/commentsApi'
 import type { CommentItem as CommentItemType, ReactionType } from '../api/commentsApi'
 import { ApiError } from '../api/http'
+import { useAuth } from '../context/AuthContext'
 
 const PAGE_SIZE = 20
 
@@ -19,6 +20,7 @@ interface CommentsSectionProps {
 
 export function CommentsSection({ postId, currentUserId, onCountChange, highlightCommentId }: CommentsSectionProps) {
   const { t } = useTranslation('componentsA')
+  const { token } = useAuth()
   const [comments, setComments] = useState<CommentItemType[]>([])
   const [hasMore, setHasMore] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
@@ -94,7 +96,7 @@ export function CommentsSection({ postId, currentUserId, onCountChange, highligh
     setIsPosting(true)
     try {
       const created = await createComment(
-        localStorage.getItem('playr_token') ?? '',
+        token ?? '',
         postId,
         trimmed,
         newMentions.map((m) => m.userId),
@@ -111,23 +113,23 @@ export function CommentsSection({ postId, currentUserId, onCountChange, highligh
   }
 
   async function handleSave(commentId: string, textContent: string) {
-    const updated = await updateComment(localStorage.getItem('playr_token') ?? '', postId, commentId, textContent)
+    const updated = await updateComment(token ?? '', postId, commentId, textContent)
     setComments((prev) => prev.map((c) => (c.id === commentId ? updated : c)))
   }
 
   async function handleDelete(commentId: string) {
-    await deleteComment(localStorage.getItem('playr_token') ?? '', postId, commentId)
+    await deleteComment(token ?? '', postId, commentId)
     setComments((prev) => prev.filter((c) => c.id !== commentId))
     onCountChange(-1)
   }
 
   async function handleReact(commentId: string, type: ReactionType) {
-    const reactions = await setCommentReaction(localStorage.getItem('playr_token') ?? '', postId, commentId, type)
+    const reactions = await setCommentReaction(token ?? '', postId, commentId, type)
     setComments((prev) => prev.map((c) => (c.id === commentId ? { ...c, reactions } : c)))
   }
 
   async function handleRemoveReaction(commentId: string) {
-    const reactions = await removeCommentReaction(localStorage.getItem('playr_token') ?? '', postId, commentId)
+    const reactions = await removeCommentReaction(token ?? '', postId, commentId)
     setComments((prev) => prev.map((c) => (c.id === commentId ? { ...c, reactions } : c)))
   }
 

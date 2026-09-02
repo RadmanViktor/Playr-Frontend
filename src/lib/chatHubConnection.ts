@@ -6,6 +6,7 @@ import type { FriendRequest } from '../api/friendRequestsApi'
 import type { NotificationItem } from '../api/notificationsApi'
 import type { ProfileStatus } from '../api/profilesApi'
 import type { LfgGroup, LfgGroupApplication, LfgGroupInvite } from '../api/lfgGroupsApi'
+import { getValidAccessToken } from '../api/session'
 
 export interface FollowEvent {
   followerUserId: string
@@ -36,6 +37,7 @@ type LfgGroupInviteListener = (invite: LfgGroupInvite) => void
 
 let connection: HubConnection | null = null
 let currentToken: string | null = null
+let connectionGeneration = 0
 const messageListeners = new Set<MessageListener>()
 const invitationReceivedListeners = new Set<InvitationListener>()
 const invitationUpdatedListeners = new Set<InvitationListener>()
@@ -53,7 +55,7 @@ const lfgGroupFilledListeners = new Set<LfgGroupListener>()
 function buildConnection(token: string): HubConnection {
   return new HubConnectionBuilder()
     .withUrl(`${API_BASE_URL}/hubs/chat`, {
-      accessTokenFactory: () => token,
+      accessTokenFactory: () => getValidAccessToken(token),
     })
     .withAutomaticReconnect()
     .configureLogging(LogLevel.Warning)
@@ -68,8 +70,10 @@ export async function connectChatHub(token: string): Promise<void> {
 
   await disconnectChatHub()
 
+  const generation = ++connectionGeneration
   currentToken = token
   const hub = buildConnection(token)
+  connection = hub
   hub.on('ReceiveMessage', (message: ChatMessage) => {
     messageListeners.forEach((listener) => listener(message))
   })
@@ -112,22 +116,24 @@ export async function connectChatHub(token: string): Promise<void> {
 
   try {
     await hub.start()
-    connection = hub
+    if (generation !== connectionGeneration) await hub.stop()
   } catch {
-    connection = null
+    if (connection === hub) connection = null
   }
 }
 
 export async function disconnectChatHub(): Promise<void> {
-  if (connection) {
+  connectionGeneration += 1
+  const hub = connection
+  connection = null
+  currentToken = null
+  if (hub) {
     try {
-      await connection.stop()
+      await hub.stop()
     } catch {
       /* ignore */
     }
   }
-  connection = null
-  currentToken = null
 }
 
 /** Subscribe to every incoming chat message pushed over the hub. Returns an unsubscribe function. */

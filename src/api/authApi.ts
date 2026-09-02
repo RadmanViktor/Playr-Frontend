@@ -1,5 +1,6 @@
 export { API_BASE_URL, ApiError } from './http'
 import { API_BASE_URL, ApiError, parseErrorMessage } from './http'
+import { authenticatedFetch, refreshAccessToken, withSessionLock } from './session'
 
 export interface UserResponse {
   id: string
@@ -34,11 +35,12 @@ export async function register(
 }
 
 export async function login(usernameOrEmail: string, password: string): Promise<LoginResponse> {
-  const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+  const response = await withSessionLock(() => fetch(`${API_BASE_URL}/api/auth/login`, {
     method: 'POST',
+    credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ usernameOrEmail, password }),
-  })
+  }))
 
   if (!response.ok) {
     const message = await parseErrorMessage(response, 'Invalid credentials.')
@@ -49,7 +51,7 @@ export async function login(usernameOrEmail: string, password: string): Promise<
 }
 
 export async function getMe(token: string): Promise<UserResponse> {
-  const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+  const response = await authenticatedFetch(`${API_BASE_URL}/api/auth/me`, {
     headers: { Authorization: `Bearer ${token}` },
   })
 
@@ -59,6 +61,23 @@ export async function getMe(token: string): Promise<UserResponse> {
   }
 
   return response.json()
+}
+
+export async function refreshSession(): Promise<LoginResponse> {
+  return refreshAccessToken()
+}
+
+export async function logoutSession(): Promise<void> {
+  const response = await withSessionLock(() => fetch(`${API_BASE_URL}/api/auth/logout`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'X-Playr-Session': '1' },
+  }))
+
+  if (!response.ok) {
+    const message = await parseErrorMessage(response, 'Could not end the session.')
+    throw new ApiError(response.status, message)
+  }
 }
 
 export async function confirmEmail(userId: string, token: string): Promise<void> {

@@ -1,4 +1,5 @@
 import { API_BASE_URL, ApiError, parseErrorMessage } from './http'
+import { authenticatedFetch as fetch } from './session'
 import type { MentionItem } from './postsApi'
 
 export type { MentionItem }

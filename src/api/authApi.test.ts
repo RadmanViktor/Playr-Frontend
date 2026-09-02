@@ -1,8 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { login, register, getMe, API_BASE_URL } from './authApi'
+import { login, register, getMe, refreshSession, logoutSession, API_BASE_URL } from './authApi'
+import { clearAccessToken } from './session'
 
 describe('authApi', () => {
   beforeEach(() => {
+    clearAccessToken()
     vi.stubGlobal('fetch', vi.fn())
   })
 
@@ -23,11 +25,41 @@ describe('authApi', () => {
       `${API_BASE_URL}/api/auth/login`,
       expect.objectContaining({
         method: 'POST',
+        credentials: 'include',
         headers: expect.objectContaining({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ usernameOrEmail: 'someone', password: 'password123' }),
       })
     )
     expect(result).toEqual(mockResponse)
+  })
+
+  it('refresh sends the protected cookie and csrf header', async () => {
+    const mockResponse = { accessToken: 'fresh', expiresAt: '2099-01-01T00:00:00Z' }
+    ;(fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockResponse,
+    })
+
+    await expect(refreshSession()).resolves.toEqual(mockResponse)
+    expect(fetch).toHaveBeenCalledWith(
+      `${API_BASE_URL}/api/auth/refresh`,
+      expect.objectContaining({
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'X-Playr-Session': '1' },
+      })
+    )
+  })
+
+  it('logout clears the server session', async () => {
+    ;(fetch as unknown as ReturnType<typeof vi.fn>).mockResolvedValueOnce({ ok: true })
+
+    await logoutSession()
+
+    expect(fetch).toHaveBeenCalledWith(
+      `${API_BASE_URL}/api/auth/logout`,
+      expect.objectContaining({ method: 'POST', credentials: 'include' })
+    )
   })
 
   it('login throws ApiError with the server message on 401', async () => {

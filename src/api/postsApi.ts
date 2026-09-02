@@ -1,4 +1,5 @@
 import { API_BASE_URL, ApiError, parseErrorMessage } from './http'
+import { authenticatedFetch as fetch, getValidAccessToken } from './session'
 
 export type Mood = 'Enjoying' | 'Frustrated' | 'Completed' | 'NeedHelp'
 
@@ -71,35 +72,37 @@ export async function createPost(
   return new Promise<PostFeedItem>((resolve, reject) => {
     const xhr = new XMLHttpRequest()
     xhr.open('POST', `${API_BASE_URL}/api/posts`)
-    xhr.setRequestHeader('Authorization', `Bearer ${token}`)
+    getValidAccessToken(token).then((activeToken) => {
+      xhr.setRequestHeader('Authorization', `Bearer ${activeToken}`)
 
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable) {
-        onProgress(Math.round((event.loaded / event.total) * 100))
-      }
-    }
-
-    xhr.onload = () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        try {
-          resolve(JSON.parse(xhr.responseText))
-        } catch {
-          reject(new ApiError(xhr.status, 'Failed to parse response.'))
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          onProgress(Math.round((event.loaded / event.total) * 100))
         }
-      } else {
-        let message = 'Failed to create post.'
-        try {
-          const body = JSON.parse(xhr.responseText)
-          if (typeof body?.error === 'string') message = body.error
-        } catch {
-          // keep fallback message
-        }
-        reject(new ApiError(xhr.status, message))
       }
-    }
 
-    xhr.onerror = () => reject(new ApiError(0, 'Failed to create post.'))
-    xhr.send(form)
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            resolve(JSON.parse(xhr.responseText))
+          } catch {
+            reject(new ApiError(xhr.status, 'Failed to parse response.'))
+          }
+        } else {
+          let message = 'Failed to create post.'
+          try {
+            const body = JSON.parse(xhr.responseText)
+            if (typeof body?.error === 'string') message = body.error
+          } catch {
+            // keep fallback message
+          }
+          reject(new ApiError(xhr.status, message))
+        }
+      }
+
+      xhr.onerror = () => reject(new ApiError(0, 'Failed to create post.'))
+      xhr.send(form)
+    }).catch(reject)
   })
 }
 

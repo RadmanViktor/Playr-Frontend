@@ -29,6 +29,7 @@ describe('ProtectedRoute', () => {
   beforeEach(() => {
     localStorage.clear()
     vi.restoreAllMocks()
+    vi.spyOn(authApi, 'refreshSession').mockRejectedValue(new authApi.ApiError(401, 'No session.'))
   })
 
   it('redirects to /login when there is no stored token', async () => {
