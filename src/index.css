@@ -25,17 +25,41 @@
   color-scheme: dark;
 }
 
-@keyframes tab-content-in {
+@keyframes profile-tab-content-forward {
   from {
-    opacity: 0;
+    opacity: 0.35;
+    transform: translate3d(12px, 0, 0);
   }
   to {
     opacity: 1;
+    transform: translate3d(0, 0, 0);
   }
 }
 
-.animate-tab-content {
-  animation: tab-content-in 0.15s ease-out;
+@keyframes profile-tab-content-backward {
+  from {
+    opacity: 0.35;
+    transform: translate3d(-12px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.profile-tab-content-forward {
+  animation: profile-tab-content-forward 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.profile-tab-content-backward {
+  animation: profile-tab-content-backward 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-tab-content-forward,
+  .profile-tab-content-backward {
+    animation: none;
+  }
 }
 
 @keyframes confetti-fall {
