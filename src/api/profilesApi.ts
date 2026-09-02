@@ -16,6 +16,7 @@ export interface ProfileData {
   coverImagePositionX: number
   coverImagePositionY: number
   region: string | null
+  discordUsername: string | null
   languages: string[]
   platforms: string[]
   genres: string[]
@@ -25,6 +26,9 @@ export interface ProfileData {
   lookingForGameName: string | null
   lookingForPlayStyle: PlayStyle | null
   lookingForGameNote: string | null
+  lookingForPreferredMinAge: number | null
+  lookingForPreferredMaxAge: number | null
+  lookingForVoiceChatEnabled: boolean
   typicalPlayTimes: TypicalPlayTime[]
   hasCompletedOnboarding: boolean
   createdAt: string
@@ -44,6 +48,7 @@ export interface UpdateProfileData {
   genres: string[]
   externalLinks: Record<string, string>
   typicalPlayTimes?: TypicalPlayTime[]
+  discordUsername?: string | null
 }
 
 export interface UpdateStatusData {
@@ -51,6 +56,9 @@ export interface UpdateStatusData {
   lookingForGameId?: string | null
   lookingForPlayStyle?: PlayStyle | null
   lookingForGameNote?: string | null
+  lookingForPreferredMinAge?: number | null
+  lookingForPreferredMaxAge?: number | null
+  lookingForVoiceChatEnabled?: boolean
 }
 
 export async function getProfile(username: string, token?: string | null): Promise<ProfileData> {
@@ -180,6 +188,9 @@ export interface LookingForGamePlayer {
   lookingForGameName: string | null
   lookingForPlayStyle: PlayStyle | null
   lookingForGameNote: string | null
+  preferredMinAge: number | null
+  preferredMaxAge: number | null
+  voiceChatEnabled: boolean
   relationshipStatus: RelationshipStatus
   pendingInvitationId: string | null
 }

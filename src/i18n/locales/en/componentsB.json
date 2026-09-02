@@ -82,7 +82,9 @@
     "playStyleLabel": "Play style",
     "noteLabel": "Note",
     "notePlaceholder": "Anything specific?",
-    "saving": "Saving..."
+    "saving": "Saving...",
+    "voiceChatLabel": "I have a mic and want to talk",
+    "voiceChatBadge": "Mic and voice chat"
   },
   "createGroupPanel": {
     "playersWantedLabel": "Number of players you're looking for",
@@ -91,7 +93,16 @@
     "chooseGame": "Choose a game first.",
     "createError": "Failed to create group. Please try again.",
     "creating": "Creating...",
-    "createGroup": "Create group"
+    "createGroup": "Create group",
+    "microphoneRequiredLabel": "A microphone is required for the group"
+  },
+  "agePreference": {
+    "label": "Preferred age (optional)",
+    "description": "Shown as a preference and does not restrict who can respond.",
+    "minAge": "From",
+    "maxAge": "To",
+    "invalid": "Enter ages from 13 to 99, with the lowest age first.",
+    "summary": "Age {{min}}–{{max}}"
   },
   "profileHeader": {
     "settings": "Settings",
@@ -113,7 +124,10 @@
       "friendsCount_other": "Friends",
     "posts_one": "post",
     "posts_other": "posts",
-    "joined": "Joined {{date}}"
+    "joined": "Joined {{date}}",
+    "copyDiscordUsername": "Copy Discord username {{username}}",
+    "discordCopied": "Discord username copied.",
+    "discordCopyFailed": "Discord username could not be copied."
   },
   "editProfileForm": {
     "saveError": "Something went wrong.",
@@ -125,6 +139,9 @@
     "coverImageLabel": "Cover image",
     "regionLabel": "Region",
     "regionPlaceholder": "e.g. EU, NA, AS",
+    "discordUsernameLabel": "Discord username",
+    "discordUsernamePlaceholder": "your Discord username",
+    "discordUsernameHint": "Shown publicly on your profile so others can copy it.",
     "platformsLabel": "Platforms",
     "genresLabel": "Genres",
     "externalLinksLabel": "External links",

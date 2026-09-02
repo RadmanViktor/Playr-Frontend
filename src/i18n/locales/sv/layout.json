@@ -74,8 +74,7 @@
       "loadError": "Det gick inte att läsa in inbjudningar.",
       "acceptError": "Det gick inte att acceptera inbjudan.",
       "declineError": "Det gick inte att avböja inbjudan.",
-      "cancelError": "Det gick inte att avbryta inbjudan.",
-      "acceptedChatMessage": "Du chattar nu med {{name}}. Ha kul med spelandet! :D"
+      "cancelError": "Det gick inte att avbryta inbjudan."
     }
   }
 }

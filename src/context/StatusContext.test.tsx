@@ -20,6 +20,7 @@ function profile(overrides: Partial<ProfileData> = {}): ProfileData {
     coverImagePositionX: 50,
     coverImagePositionY: 50,
     region: null,
+    discordUsername: null,
     languages: [],
     platforms: [],
     genres: [],
@@ -29,6 +30,9 @@ function profile(overrides: Partial<ProfileData> = {}): ProfileData {
     lookingForGameName: null,
     lookingForPlayStyle: null,
     lookingForGameNote: null,
+    lookingForPreferredMinAge: null,
+    lookingForPreferredMaxAge: null,
+    lookingForVoiceChatEnabled: false,
     typicalPlayTimes: [],
     hasCompletedOnboarding: true,
     createdAt: '2024-01-01T00:00:00Z',
@@ -106,6 +110,9 @@ describe('StatusContext idle detection', () => {
         lookingForGameId: null,
         lookingForPlayStyle: null,
         lookingForGameNote: null,
+        lookingForPreferredMinAge: null,
+        lookingForPreferredMaxAge: null,
+        lookingForVoiceChatEnabled: false,
       }),
     )
     await waitFor(() => expect(screen.getByTestId('status')).toHaveTextContent('Inactive'))
@@ -132,6 +139,9 @@ describe('StatusContext idle detection', () => {
         lookingForGameId: null,
         lookingForPlayStyle: null,
         lookingForGameNote: null,
+        lookingForPreferredMinAge: null,
+        lookingForPreferredMaxAge: null,
+        lookingForVoiceChatEnabled: false,
       }),
     )
     await waitFor(() => expect(screen.getByTestId('status')).toHaveTextContent('Online'))

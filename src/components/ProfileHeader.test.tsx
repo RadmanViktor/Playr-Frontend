@@ -1,13 +1,15 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { ProfileHeader } from './ProfileHeader'
 import type { ProfileData } from '../api/profilesApi'
 
 const profile: ProfileData = {
   userId: 'u1', username: 'nexusnova', displayName: 'Nexus Nova', bio: 'Gaming is life',
-  avatarUrl: null, coverImageUrl: null, coverImagePositionX: 50, coverImagePositionY: 50, region: 'EU', languages: ['English', 'Swedish'],
+  avatarUrl: null, coverImageUrl: null, coverImagePositionX: 50, coverImagePositionY: 50, region: 'EU', discordUsername: 'nexus.nova', languages: ['English', 'Swedish'],
   platforms: ['PC', 'PlayStation'], genres: [], externalLinks: { Steam: 'https://steamcommunity.com/id/nexusnova' },
   status: 'Online' as const, lookingForGameId: null, lookingForGameName: null, lookingForPlayStyle: null, lookingForGameNote: null,
+  lookingForPreferredMinAge: null, lookingForPreferredMaxAge: null, lookingForVoiceChatEnabled: false,
   typicalPlayTimes: [], hasCompletedOnboarding: true,
   createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
   relationshipStatus: null, pendingInvitationId: null, activeBadgeType: null, activeBadgeLevel: null,
@@ -47,6 +49,18 @@ describe('ProfileHeader', () => {
     const link = screen.getByRole('link', { name: /steam/i })
     expect(link).toHaveAttribute('href', 'https://steamcommunity.com/id/nexusnova')
     expect(link).toHaveAttribute('target', '_blank')
+  })
+
+  it('copies the public Discord username', async () => {
+    const user = userEvent.setup()
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText } })
+    render(<ProfileHeader profile={profile} isOwner={false} />)
+
+    await user.click(screen.getByRole('button', { name: 'Copy Discord username nexus.nova' }))
+
+    expect(writeText).toHaveBeenCalledWith('nexus.nova')
+    expect(screen.getByRole('status')).toHaveTextContent('Discord username copied.')
   })
 
   it('does not show Settings or Sign out buttons, even when isOwner', () => {

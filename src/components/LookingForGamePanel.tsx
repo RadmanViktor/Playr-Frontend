@@ -7,6 +7,8 @@ import { GamePickerInput } from './GamePickerInput'
 import type { Game } from '../api/gamesApi'
 import type { PlayStyle } from '../api/profilesApi'
 import { useStatus } from '../context/StatusContext'
+import { AgePreferenceFields } from './AgePreferenceFields'
+import { isValidAgePreference } from '../utils/agePreference'
 
 interface LookingForGamePanelProps {
   onChanged: () => void
@@ -26,12 +28,19 @@ export function LookingForGamePanel({ onChanged }: LookingForGamePanelProps) {
     lookingForGameName,
     lookingForPlayStyle,
     lookingForGameNote,
+    lookingForPreferredMinAge,
+    lookingForPreferredMaxAge,
+    lookingForVoiceChatEnabled,
     updateStatus,
   } = useStatus()
 
   const [selectedGame, setSelectedGame] = useState<Game | null>(null)
   const [selectedPlayStyle, setSelectedPlayStyle] = useState<PlayStyle | null>(null)
   const [note, setNote] = useState('')
+  const [minAge, setMinAge] = useState('')
+  const [maxAge, setMaxAge] = useState('')
+  const [voiceChatEnabled, setVoiceChatEnabled] = useState(false)
+  const [ageError, setAgeError] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isExpanded, setIsExpanded] = useState(false)
@@ -40,17 +49,36 @@ export function LookingForGamePanel({ onChanged }: LookingForGamePanelProps) {
 
   async function handleStart() {
     setError(null)
+    setAgeError(null)
     if (!selectedGame || !selectedPlayStyle) {
       setError(t('lookingForGamePanel.chooseGameAndStyle'))
       return
     }
 
+    const preferredMinAge = minAge === '' ? null : Number(minAge)
+    const preferredMaxAge = maxAge === '' ? null : Number(maxAge)
+    if (!isValidAgePreference(preferredMinAge, preferredMaxAge)) {
+      setAgeError(t('agePreference.invalid'))
+      return
+    }
+
     setIsSaving(true)
     try {
-      await updateStatus('LookingForGame', selectedGame.id, selectedPlayStyle, note.trim() || null)
+      await updateStatus(
+        'LookingForGame',
+        selectedGame.id,
+        selectedPlayStyle,
+        note.trim() || null,
+        preferredMinAge,
+        preferredMaxAge,
+        voiceChatEnabled,
+      )
       setSelectedGame(null)
       setSelectedPlayStyle(null)
       setNote('')
+      setMinAge('')
+      setMaxAge('')
+      setVoiceChatEnabled(false)
       setIsExpanded(false)
       onChanged()
     } catch {
@@ -85,6 +113,15 @@ export function LookingForGamePanel({ onChanged }: LookingForGamePanelProps) {
                 {lookingForPlayStyle}
               </Badge>
             )}
+            {(lookingForPreferredMinAge != null || lookingForPreferredMaxAge != null) && (
+              <Badge variant="tag">
+                {t('agePreference.summary', {
+                  min: lookingForPreferredMinAge ?? 13,
+                  max: lookingForPreferredMaxAge ?? 99,
+                })}
+              </Badge>
+            )}
+            {lookingForVoiceChatEnabled && <Badge variant="completed">{t('lookingForGamePanel.voiceChatBadge')}</Badge>}
           </div>
           {lookingForGameNote && <p className="mt-2 text-sm text-muted">{lookingForGameNote}</p>}
         </div>
@@ -134,6 +171,31 @@ export function LookingForGamePanel({ onChanged }: LookingForGamePanelProps) {
               </label>
               <GamePickerInput selectedGame={selectedGame} onSelect={setSelectedGame} />
             </div>
+
+            <AgePreferenceFields
+              idPrefix="lfg"
+              minAge={minAge}
+              maxAge={maxAge}
+              onMinAgeChange={(value) => {
+                setMinAge(value)
+                setAgeError(null)
+              }}
+              onMaxAgeChange={(value) => {
+                setMaxAge(value)
+                setAgeError(null)
+              }}
+              error={ageError}
+            />
+
+            <label className="flex cursor-pointer items-center gap-2 text-sm text-text">
+              <input
+                type="checkbox"
+                checked={voiceChatEnabled}
+                onChange={(event) => setVoiceChatEnabled(event.target.checked)}
+                className="h-4 w-4 accent-primary"
+              />
+              {t('lookingForGamePanel.voiceChatLabel')}
+            </label>
 
             <div>
               <span className="mb-1 block text-xs font-medium text-muted">{t('lookingForGamePanel.playStyleLabel')}</span>

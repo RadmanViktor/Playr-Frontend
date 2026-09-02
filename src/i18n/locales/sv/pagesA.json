@@ -115,6 +115,9 @@
     "applyToGroup": "Ansök",
     "reviewApplications": "Ansökningar ({{count}})",
     "accept": "Acceptera",
-    "decline": "Neka"
+    "decline": "Neka",
+    "agePreference": "Ålder {{min}}–{{max}}",
+    "voiceChat": "Mic och röstchatt",
+    "microphoneRequired": "Mic krävs"
   }
 }

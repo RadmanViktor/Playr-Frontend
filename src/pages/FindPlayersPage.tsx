@@ -338,6 +338,17 @@ export default function FindPlayersPage() {
                             {group.playStyle}
                           </Badge>
                         )}
+                        {(group.preferredMinAge != null || group.preferredMaxAge != null) && (
+                          <Badge variant="tag">
+                            {t('findPlayers.agePreference', {
+                              min: group.preferredMinAge ?? 13,
+                              max: group.preferredMaxAge ?? 99,
+                            })}
+                          </Badge>
+                        )}
+                        {group.microphoneRequired && (
+                          <Badge variant="completed">{t('findPlayers.microphoneRequired')}</Badge>
+                        )}
                         <Badge variant="completed">
                           <Users className="mr-1 h-3 w-3" aria-hidden="true" />
                           {t('findPlayers.groupCounter', { accepted: group.acceptedCount, wanted: group.playersWanted })}
@@ -488,6 +499,17 @@ export default function FindPlayersPage() {
                       <Badge variant={player.lookingForPlayStyle === 'Competitive' ? 'need-help' : 'enjoying'}>
                         {player.lookingForPlayStyle}
                       </Badge>
+                    )}
+                    {(player.preferredMinAge != null || player.preferredMaxAge != null) && (
+                      <Badge variant="tag">
+                        {t('findPlayers.agePreference', {
+                          min: player.preferredMinAge ?? 13,
+                          max: player.preferredMaxAge ?? 99,
+                        })}
+                      </Badge>
+                    )}
+                    {player.voiceChatEnabled && (
+                      <Badge variant="completed">{t('findPlayers.voiceChat')}</Badge>
                     )}
                   </div>
                   {player.lookingForGameNote && (

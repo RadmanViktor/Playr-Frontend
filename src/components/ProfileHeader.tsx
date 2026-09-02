@@ -1,4 +1,5 @@
-import { Globe, Link as LinkIcon, FileText, Calendar, UserPlus, UserCheck, UserRoundPlus, MessageCircle } from 'lucide-react'
+import { useState } from 'react'
+import { Globe, Link as LinkIcon, FileText, Calendar, UserPlus, UserCheck, UserRoundPlus, MessageCircle, Copy, Check } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Avatar, type AvatarStatus } from './ui/Avatar'
 import { Badge } from './ui/Badge'
@@ -59,6 +60,37 @@ export function ProfileHeader({
 }: ProfileHeaderProps) {
   const { t } = useTranslation('componentsB')
   const { t: tOnboarding } = useTranslation('pagesB')
+  const [discordCopyStatus, setDiscordCopyStatus] = useState<'idle' | 'copied' | 'failed'>('idle')
+
+  function copyDiscordUsernameFallback(username: string): boolean {
+    if (typeof document.execCommand !== 'function') return false
+    const input = document.createElement('textarea')
+    input.value = username
+    input.style.position = 'fixed'
+    input.style.opacity = '0'
+    document.body.appendChild(input)
+    input.select()
+    try {
+      return document.execCommand('copy')
+    } finally {
+      input.remove()
+    }
+  }
+
+  async function copyDiscordUsername() {
+    if (!profile.discordUsername) return
+    try {
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(profile.discordUsername)
+      } else if (!copyDiscordUsernameFallback(profile.discordUsername)) {
+        throw new Error('Copy failed')
+      }
+      setDiscordCopyStatus('copied')
+    } catch {
+      setDiscordCopyStatus(copyDiscordUsernameFallback(profile.discordUsername) ? 'copied' : 'failed')
+    }
+    window.setTimeout(() => setDiscordCopyStatus('idle'), 2000)
+  }
   return (
     <div className="overflow-hidden rounded-xl border border-border bg-surface">
       {/* Cover image / gradient banner */}
@@ -225,8 +257,23 @@ export function ProfileHeader({
           </div>
         )}
 
-        {Object.entries(profile.externalLinks).length > 0 && (
+        {(profile.discordUsername || Object.entries(profile.externalLinks).length > 0) && (
           <div className="flex flex-wrap gap-4 border-t border-border pt-4">
+            {profile.discordUsername && (
+              <button
+                type="button"
+                onClick={copyDiscordUsername}
+                className="flex items-center gap-1.5 text-sm text-primary hover:underline cursor-pointer"
+                aria-label={t('profileHeader.copyDiscordUsername', { username: profile.discordUsername })}
+              >
+                {discordCopyStatus === 'copied' ? <Check className="h-3.5 w-3.5" aria-hidden="true" /> : <Copy className="h-3.5 w-3.5" aria-hidden="true" />}
+                Discord: {profile.discordUsername}
+              </button>
+            )}
+            <span className="sr-only" role="status" aria-live="polite">
+              {discordCopyStatus === 'copied' && t('profileHeader.discordCopied')}
+              {discordCopyStatus === 'failed' && t('profileHeader.discordCopyFailed')}
+            </span>
             {Object.entries(profile.externalLinks).map(([key, value]) => (
               <a
                 key={key}

@@ -74,8 +74,7 @@
       "loadError": "Failed to load invitations.",
       "acceptError": "Failed to accept invitation.",
       "declineError": "Failed to decline invitation.",
-      "cancelError": "Failed to cancel invitation.",
-      "acceptedChatMessage": "You're now chatting with {{name}}. Happy gaming! :D"
+      "cancelError": "Failed to cancel invitation."
     }
   }
 }

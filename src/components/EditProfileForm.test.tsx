@@ -9,9 +9,10 @@ vi.mock('../api/profilesApi')
 
 const profile: ProfileData = {
   userId: 'u1', username: 'player', displayName: 'Player One', bio: 'Hello',
-  avatarUrl: null, coverImageUrl: null, coverImagePositionX: 50, coverImagePositionY: 50, region: 'EU', languages: ['English'], platforms: ['PC'],
+  avatarUrl: null, coverImageUrl: null, coverImagePositionX: 50, coverImagePositionY: 50, region: 'EU', discordUsername: 'player.name', languages: ['English'], platforms: ['PC'],
   genres: [], externalLinks: { Steam: 'https://steam.com' },
   status: 'Online' as const, lookingForGameId: null, lookingForGameName: null, lookingForPlayStyle: null, lookingForGameNote: null,
+  lookingForPreferredMinAge: null, lookingForPreferredMaxAge: null, lookingForVoiceChatEnabled: false,
   typicalPlayTimes: [], hasCompletedOnboarding: true,
   createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
   relationshipStatus: null, pendingInvitationId: null, activeBadgeType: null, activeBadgeLevel: null,
@@ -46,6 +47,22 @@ describe('EditProfileForm', () => {
     await user.click(screen.getByRole('button', { name: /save/i }))
     await waitFor(() => expect(onSave).toHaveBeenCalledWith(updated))
     expect(profilesApi.updateProfile).toHaveBeenCalledWith('tok', expect.objectContaining({ displayName: 'Player One' }))
+  })
+
+  it('submits a trimmed Discord username', async () => {
+    const user = userEvent.setup()
+    render(<EditProfileForm profile={profile} token="tok" onSave={vi.fn()} onCancel={vi.fn()} />)
+    const input = screen.getByRole('textbox', { name: /discord username/i })
+    await user.clear(input)
+    await user.type(input, '  new.player  ')
+    await user.click(screen.getByRole('button', { name: /save/i }))
+
+    await waitFor(() =>
+      expect(profilesApi.updateProfile).toHaveBeenCalledWith(
+        'tok',
+        expect.objectContaining({ discordUsername: 'new.player' }),
+      ),
+    )
   })
 
   it('persists a repositioned newly uploaded cover image', async () => {

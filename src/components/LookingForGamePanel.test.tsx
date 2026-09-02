@@ -18,6 +18,9 @@ const statusState = vi.hoisted(() => ({
   lookingForGameName: null as string | null,
   lookingForPlayStyle: null as string | null,
   lookingForGameNote: null as string | null,
+  lookingForPreferredMinAge: null as number | null,
+  lookingForPreferredMaxAge: null as number | null,
+  lookingForVoiceChatEnabled: false,
 }))
 
 vi.mock('../context/StatusContext', () => ({
@@ -39,6 +42,9 @@ beforeEach(() => {
   statusState.lookingForGameName = null
   statusState.lookingForPlayStyle = null
   statusState.lookingForGameNote = null
+  statusState.lookingForPreferredMinAge = null
+  statusState.lookingForPreferredMaxAge = null
+  statusState.lookingForVoiceChatEnabled = false
 })
 
 afterEach(() => {
@@ -57,11 +63,14 @@ describe('LookingForGamePanel', () => {
     await user.click(screen.getByText('Select a game'))
     await user.click(await screen.findByRole('button', { name: 'Apex Legends' }))
     await user.click(screen.getByRole('button', { name: 'Competitive' }))
+    await user.type(screen.getByLabelText('From'), '20')
+    await user.type(screen.getByLabelText('To'), '35')
+    await user.click(screen.getByRole('checkbox', { name: 'I have a mic and want to talk' }))
     await user.type(screen.getByPlaceholderText('Anything specific?'), 'need a 4th')
     await user.click(screen.getByRole('button', { name: 'Make me available!' }))
 
     await waitFor(() =>
-      expect(updateStatus).toHaveBeenCalledWith('LookingForGame', 'game-1', 'Competitive', 'need a 4th'),
+      expect(updateStatus).toHaveBeenCalledWith('LookingForGame', 'game-1', 'Competitive', 'need a 4th', 20, 35, true),
     )
     expect(onChanged).toHaveBeenCalled()
   })

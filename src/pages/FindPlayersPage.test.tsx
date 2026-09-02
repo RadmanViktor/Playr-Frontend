@@ -18,6 +18,9 @@ vi.mock('../context/StatusContext', () => ({
     lookingForGameName: null,
     lookingForPlayStyle: null,
     lookingForGameNote: null,
+    lookingForPreferredMinAge: null,
+    lookingForPreferredMaxAge: null,
+    lookingForVoiceChatEnabled: false,
     updateStatus: vi.fn().mockResolvedValue(undefined),
   }),
 }))
@@ -39,6 +42,9 @@ const players: profilesApi.LookingForGamePlayer[] = [
     lookingForGameName: 'Apex Legends',
     lookingForPlayStyle: 'Chill',
     lookingForGameNote: 'looking for a duo partner',
+    preferredMinAge: 20,
+    preferredMaxAge: 35,
+    voiceChatEnabled: true,
     relationshipStatus: 'None',
     pendingInvitationId: null,
   },
@@ -86,5 +92,24 @@ describe('FindPlayersPage', () => {
 
     await waitFor(() => expect(screen.getByText('Nexus Nova')).toBeInTheDocument())
     expect(screen.getByText('looking for a duo partner')).toBeInTheDocument()
+    expect(screen.getByText('Age 20–35')).toBeInTheDocument()
+    expect(screen.getByText('Mic and voice chat')).toBeInTheDocument()
+  })
+
+  it('does not show an age preference for an older API response without the new fields', async () => {
+    vi.mocked(profilesApi.getLookingForGamePlayers).mockResolvedValue([
+      {
+        ...players[0],
+        preferredMinAge: undefined,
+        preferredMaxAge: undefined,
+        voiceChatEnabled: undefined,
+      } as unknown as profilesApi.LookingForGamePlayer,
+    ])
+
+    renderPage()
+
+    await waitFor(() => expect(screen.getByText('Nexus Nova')).toBeInTheDocument())
+    expect(screen.queryByText('Age 13–99')).not.toBeInTheDocument()
+    expect(screen.queryByText('Mic and voice chat')).not.toBeInTheDocument()
   })
 })

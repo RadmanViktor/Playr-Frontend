@@ -49,8 +49,9 @@ vi.mock('../components/MyGamesLibrary', () => ({
 
 const profile: profilesApi.ProfileData = {
   userId: 'u1', username: 'player', displayName: 'Player One', bio: 'My bio',
-  avatarUrl: null, coverImageUrl: null, coverImagePositionX: 50, coverImagePositionY: 50, region: 'EU', languages: [], platforms: ['PC'], genres: [],
+  avatarUrl: null, coverImageUrl: null, coverImagePositionX: 50, coverImagePositionY: 50, region: 'EU', discordUsername: null, languages: [], platforms: ['PC'], genres: [],
   externalLinks: {}, status: 'Online' as const, lookingForGameId: null, lookingForGameName: null, lookingForPlayStyle: null, lookingForGameNote: null,
+  lookingForPreferredMinAge: null, lookingForPreferredMaxAge: null, lookingForVoiceChatEnabled: false,
   typicalPlayTimes: [], hasCompletedOnboarding: true,
   createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
   relationshipStatus: null, pendingInvitationId: null, activeBadgeType: null, activeBadgeLevel: null,

@@ -18,6 +18,9 @@ export interface LfgGroup {
   gameCoverImageUrl: string | null
   playStyle: PlayStyle | null
   note: string | null
+  preferredMinAge: number | null
+  preferredMaxAge: number | null
+  microphoneRequired: boolean
   playersWanted: number
   acceptedCount: number
   status: LfgGroupStatus
@@ -62,6 +65,9 @@ export interface CreateLfgGroupData {
   playersWanted: number
   playStyle?: PlayStyle | null
   note?: string | null
+  preferredMinAge?: number | null
+  preferredMaxAge?: number | null
+  microphoneRequired?: boolean
 }
 
 function authHeaders(token: string): HeadersInit {

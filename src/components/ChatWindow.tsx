@@ -37,7 +37,6 @@ function formatMessageTime(isoDate: string): string {
 
 interface ChatWindowProps {
   conversation: Conversation
-  successMessage?: string | null
   isMinimized: boolean
   onToggleMinimize: () => void
   onClose: () => void
@@ -46,7 +45,6 @@ interface ChatWindowProps {
 
 export function ChatWindow({
   conversation,
-  successMessage,
   isMinimized,
   onToggleMinimize,
   onClose,
@@ -271,12 +269,6 @@ export function ChatWindow({
 
       {!isMinimized && (
         <>
-          {successMessage && (
-            <div className="border-b border-enjoying/30 bg-enjoying/10 px-4 py-2 text-xs font-medium text-enjoying">
-              {successMessage}
-            </div>
-          )}
-
           <div className="flex-1 overflow-y-auto px-4 py-3">
             {isLoading ? (
               <p className="text-sm text-muted">{t('chatWindow.loadingMessages')}</p>

@@ -3,10 +3,23 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { MemoryRouter, useLocation } from 'react-router-dom'
 import { TopBar } from './TopBar'
 import { addRecentSearch, getRecentSearches } from '../../lib/recentSearches'
+import * as invitationsApi from '../../api/invitationsApi'
+
+vi.mock('../../api/invitationsApi')
+vi.mock('../../api/friendRequestsApi', () => ({
+  getIncomingFriendRequests: vi.fn().mockResolvedValue([]),
+  getSentFriendRequests: vi.fn().mockResolvedValue([]),
+  acceptFriendRequest: vi.fn(),
+  declineFriendRequest: vi.fn(),
+  cancelFriendRequest: vi.fn(),
+}))
+
+const openChatWithUser = vi.fn().mockResolvedValue(undefined)
 
 vi.mock('../../context/AuthContext', () => ({
   useAuth: () => ({
     user: { id: '1', email: 'a@b.c', username: 'PlayerOne', displayName: null },
+    token: 'token',
     logout: vi.fn(),
   }),
 }))
@@ -30,7 +43,7 @@ vi.mock('../../api/profilesApi', () => ({
 
 vi.mock('../../context/ChatContext', () => ({
   useChat: () => ({
-    openChatWithUser: vi.fn(),
+    openChatWithUser,
   }),
 }))
 
@@ -56,6 +69,9 @@ function LocationDisplay() {
 describe('TopBar', () => {
   beforeEach(() => {
     localStorage.clear()
+    openChatWithUser.mockClear()
+    vi.mocked(invitationsApi.getIncomingInvitations).mockResolvedValue([])
+    vi.mocked(invitationsApi.getSentInvitations).mockResolvedValue([])
     mockUseNotifications.mockReturnValue({
       notifications: [],
       unreadCount: 0,
@@ -198,6 +214,33 @@ describe('TopBar', () => {
     expect(notificationsButton.parentElement).toHaveClass('relative')
     expect(notificationsContainer).toHaveClass('static', 'sm:relative')
     expect(notificationsContainer?.parentElement).toHaveClass('relative')
+  })
+
+  it('opens chat without a generated banner after accepting an invitation', async () => {
+    const invitation: invitationsApi.Invitation = {
+      id: 'invite-1',
+      senderUserId: 'u2',
+      senderUsername: 'bob',
+      senderDisplayName: 'Bob Smith',
+      senderAvatarUrl: null,
+      recipientUserId: '1',
+      recipientUsername: 'PlayerOne',
+      recipientDisplayName: 'Player One',
+      recipientAvatarUrl: null,
+      message: 'Play tonight?',
+      status: 'Pending',
+      createdAt: new Date().toISOString(),
+      respondedAt: null,
+    }
+    vi.mocked(invitationsApi.getIncomingInvitations).mockResolvedValue([invitation])
+    vi.mocked(invitationsApi.acceptInvitation).mockResolvedValue({ ...invitation, status: 'Accepted' })
+    render(<TopBar />, { wrapper: MemoryRouter })
+
+    await waitFor(() => expect(screen.getByText('1')).toBeInTheDocument())
+    fireEvent.click(screen.getByRole('button', { name: 'Messages' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Accept' }))
+
+    await waitFor(() => expect(openChatWithUser).toHaveBeenCalledWith('u2'))
   })
 
   it('opens the post from a followed-user post notification', async () => {

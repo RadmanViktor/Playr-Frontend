@@ -371,9 +371,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
       if (item.kind === 'invitation') {
         const invitation = await acceptInvitation(token, item.id)
         setInvitations((prev) => prev.filter((i) => i.id !== item.id))
-        await openChatWithUser(invitation.senderUserId, {
-          successMessage: t('topBar.invitations.acceptedChatMessage', { name: invitation.senderDisplayName }),
-        })
+        await openChatWithUser(invitation.senderUserId)
       } else {
         await acceptFriendRequest(token, item.id)
         setIncomingFriendRequests((prev) => prev.filter((r) => r.id !== item.id))

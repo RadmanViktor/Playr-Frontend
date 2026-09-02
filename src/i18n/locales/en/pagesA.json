@@ -115,6 +115,9 @@
     "applyToGroup": "Apply",
     "reviewApplications": "Applications ({{count}})",
     "accept": "Accept",
-    "decline": "Decline"
+    "decline": "Decline",
+    "agePreference": "Age {{min}}–{{max}}",
+    "voiceChat": "Mic and voice chat",
+    "microphoneRequired": "Mic required"
   }
 }

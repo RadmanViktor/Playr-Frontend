@@ -38,6 +38,7 @@ export function EditProfileForm({ profile, token, onSave, onCancel }: EditProfil
   const [coverPositionX, setCoverPositionX] = useState(profile.coverImagePositionX)
   const [coverPositionY, setCoverPositionY] = useState(profile.coverImagePositionY)
   const [region, setRegion] = useState(profile.region ?? '')
+  const [discordUsername, setDiscordUsername] = useState(profile.discordUsername ?? '')
   const [platforms, setPlatforms] = useState<string[]>(profile.platforms)
   const [genres, setGenres] = useState<string[]>(profile.genres)
   const [typicalPlayTimes, setTypicalPlayTimes] = useState<TypicalPlayTime[]>(profile.typicalPlayTimes)
@@ -104,6 +105,7 @@ export function EditProfileForm({ profile, token, onSave, onCancel }: EditProfil
         displayName: displayName.trim(),
         bio: bio.trim() || null,
         region: region.trim() || null,
+        discordUsername: discordUsername.trim() || null,
         languages: profile.languages,
         platforms,
         genres,
@@ -178,6 +180,18 @@ export function EditProfileForm({ profile, token, onSave, onCancel }: EditProfil
       <label className="flex flex-col gap-1 text-sm text-muted">
         {t('editProfileForm.regionLabel')}
         <input className={inputClass} value={region} onChange={(e) => setRegion(e.target.value)} placeholder={t('editProfileForm.regionPlaceholder')} />
+      </label>
+
+      <label className="flex flex-col gap-1 text-sm text-muted">
+        {t('editProfileForm.discordUsernameLabel')}
+        <input
+          className={inputClass}
+          value={discordUsername}
+          onChange={(event) => setDiscordUsername(event.target.value.slice(0, 64))}
+          placeholder={t('editProfileForm.discordUsernamePlaceholder')}
+          autoComplete="off"
+        />
+        <span className="text-xs">{t('editProfileForm.discordUsernameHint')}</span>
       </label>
 
       <div className="flex flex-col gap-2">

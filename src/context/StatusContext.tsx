@@ -14,12 +14,18 @@ export interface StatusContextValue {
   lookingForGameName: string | null
   lookingForPlayStyle: PlayStyle | null
   lookingForGameNote: string | null
+  lookingForPreferredMinAge: number | null
+  lookingForPreferredMaxAge: number | null
+  lookingForVoiceChatEnabled: boolean
   isLoading: boolean
   updateStatus: (
     status: ProfileStatus,
     lookingForGameId?: string | null,
     lookingForPlayStyle?: PlayStyle | null,
     lookingForGameNote?: string | null,
+    lookingForPreferredMinAge?: number | null,
+    lookingForPreferredMaxAge?: number | null,
+    lookingForVoiceChatEnabled?: boolean,
   ) => Promise<void>
   setProfileSnapshot: (profile: ProfileData) => void
 }
@@ -34,6 +40,9 @@ export function StatusProvider({ children }: { children: ReactNode }) {
   const [lookingForGameName, setLookingForGameName] = useState<string | null>(null)
   const [lookingForPlayStyle, setLookingForPlayStyle] = useState<PlayStyle | null>(null)
   const [lookingForGameNote, setLookingForGameNote] = useState<string | null>(null)
+  const [lookingForPreferredMinAge, setLookingForPreferredMinAge] = useState<number | null>(null)
+  const [lookingForPreferredMaxAge, setLookingForPreferredMaxAge] = useState<number | null>(null)
+  const [lookingForVoiceChatEnabled, setLookingForVoiceChatEnabled] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -47,6 +56,9 @@ export function StatusProvider({ children }: { children: ReactNode }) {
         setLookingForGameName(null)
         setLookingForPlayStyle(null)
         setLookingForGameNote(null)
+        setLookingForPreferredMinAge(null)
+        setLookingForPreferredMaxAge(null)
+        setLookingForVoiceChatEnabled(false)
         setIsLoading(false)
         return
       }
@@ -61,6 +73,9 @@ export function StatusProvider({ children }: { children: ReactNode }) {
           setLookingForGameName(profile.lookingForGameName)
           setLookingForPlayStyle(profile.lookingForPlayStyle)
           setLookingForGameNote(profile.lookingForGameNote)
+          setLookingForPreferredMinAge(profile.lookingForPreferredMinAge)
+          setLookingForPreferredMaxAge(profile.lookingForPreferredMaxAge)
+          setLookingForVoiceChatEnabled(profile.lookingForVoiceChatEnabled)
         }
       } catch {
         // Keep defaults if the profile can't be loaded.
@@ -84,6 +99,9 @@ export function StatusProvider({ children }: { children: ReactNode }) {
       newLookingForGameId?: string | null,
       newLookingForPlayStyle?: PlayStyle | null,
       newLookingForGameNote?: string | null,
+      newLookingForPreferredMinAge?: number | null,
+      newLookingForPreferredMaxAge?: number | null,
+      newLookingForVoiceChatEnabled?: boolean,
     ) => {
       if (!token) {
         throw new Error('You must be logged in to update your status.')
@@ -94,6 +112,9 @@ export function StatusProvider({ children }: { children: ReactNode }) {
         lookingForGameId: newLookingForGameId ?? null,
         lookingForPlayStyle: newLookingForPlayStyle ?? null,
         lookingForGameNote: newLookingForGameNote ?? null,
+        lookingForPreferredMinAge: newLookingForPreferredMinAge ?? null,
+        lookingForPreferredMaxAge: newLookingForPreferredMaxAge ?? null,
+        lookingForVoiceChatEnabled: newLookingForVoiceChatEnabled ?? false,
       })
 
       setStatus(profile.status)
@@ -102,6 +123,9 @@ export function StatusProvider({ children }: { children: ReactNode }) {
       setLookingForGameName(profile.lookingForGameName)
       setLookingForPlayStyle(profile.lookingForPlayStyle)
       setLookingForGameNote(profile.lookingForGameNote)
+      setLookingForPreferredMinAge(profile.lookingForPreferredMinAge)
+      setLookingForPreferredMaxAge(profile.lookingForPreferredMaxAge)
+      setLookingForVoiceChatEnabled(profile.lookingForVoiceChatEnabled)
     },
     [token],
   )
@@ -113,6 +137,9 @@ export function StatusProvider({ children }: { children: ReactNode }) {
     setLookingForGameName(profile.lookingForGameName)
     setLookingForPlayStyle(profile.lookingForPlayStyle)
     setLookingForGameNote(profile.lookingForGameNote)
+    setLookingForPreferredMinAge(profile.lookingForPreferredMinAge)
+    setLookingForPreferredMaxAge(profile.lookingForPreferredMaxAge)
+    setLookingForVoiceChatEnabled(profile.lookingForVoiceChatEnabled)
   }, [])
 
   // Reflect status changes pushed by the server (e.g. an invitation/application/group
@@ -128,6 +155,9 @@ export function StatusProvider({ children }: { children: ReactNode }) {
         setLookingForGameName(null)
         setLookingForPlayStyle(null)
         setLookingForGameNote(null)
+        setLookingForPreferredMinAge(null)
+        setLookingForPreferredMaxAge(null)
+        setLookingForVoiceChatEnabled(false)
       }
     })
   }, [user])
@@ -167,6 +197,9 @@ export function StatusProvider({ children }: { children: ReactNode }) {
         lookingForGameName,
         lookingForPlayStyle,
         lookingForGameNote,
+        lookingForPreferredMinAge,
+        lookingForPreferredMaxAge,
+        lookingForVoiceChatEnabled,
         isLoading,
         updateStatus,
         setProfileSnapshot,

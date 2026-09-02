@@ -80,7 +80,9 @@
     "playStyleLabel": "Spelstil",
     "noteLabel": "Anteckning",
     "notePlaceholder": "Något specifikt?",
-    "saving": "Sparar..."
+    "saving": "Sparar...",
+    "voiceChatLabel": "Jag har mic och vill prata",
+    "voiceChatBadge": "Mic och röstchatt"
   },
   "createGroupPanel": {
     "playersWantedLabel": "Antal spelare du söker",
@@ -89,7 +91,16 @@
     "chooseGame": "Välj ett spel först.",
     "createError": "Det gick inte att skapa gruppen. Försök igen.",
     "creating": "Skapar...",
-    "createGroup": "Skapa grupp"
+    "createGroup": "Skapa grupp",
+    "microphoneRequiredLabel": "Mic krävs för gruppen"
+  },
+  "agePreference": {
+    "label": "Önskad ålder (valfritt)",
+    "description": "Visas som en preferens och begränsar inte vem som kan svara.",
+    "minAge": "Från",
+    "maxAge": "Till",
+    "invalid": "Ange åldrar mellan 13 och 99, med den lägsta först.",
+    "summary": "Ålder {{min}}–{{max}}"
   },
   "profileHeader": {
     "settings": "Inställningar",
@@ -111,7 +122,10 @@
     "friendsCount_other": "Vänner",
     "posts_one": "inlägg",
     "posts_other": "inlägg",
-    "joined": "Gick med {{date}}"
+    "joined": "Gick med {{date}}",
+    "copyDiscordUsername": "Kopiera Discord-användarnamnet {{username}}",
+    "discordCopied": "Discord-användarnamnet har kopierats.",
+    "discordCopyFailed": "Det gick inte att kopiera Discord-användarnamnet."
   },
   "editProfileForm": {
     "saveError": "Något gick fel.",
@@ -123,6 +137,9 @@
     "coverImageLabel": "Omslagsbild",
     "regionLabel": "Region",
     "regionPlaceholder": "t.ex. EU, NA, AS",
+    "discordUsernameLabel": "Discord-användarnamn",
+    "discordUsernamePlaceholder": "ditt Discord-användarnamn",
+    "discordUsernameHint": "Visas publikt på din profil och kan kopieras av andra.",
     "platformsLabel": "Plattformar",
     "genresLabel": "Genrer",
     "externalLinksLabel": "Externa länkar",

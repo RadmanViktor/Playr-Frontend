@@ -3,6 +3,7 @@ import { render, screen, waitFor, act } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import type { Conversation } from '../api/chatApi'
+import * as chatApi from '../api/chatApi'
 import { ChatProvider, useChat } from './ChatContext'
 import { MOBILE_MEDIA_QUERY } from '../lib/useIsMobile'
 import { setMatchMedia, resetMatchMedia } from '../test-setup'
@@ -22,10 +23,12 @@ vi.mock('../api/chatApi', async (importOriginal) => {
   return {
     ...actual,
     getConversations: vi.fn().mockResolvedValue([]),
+    getOrCreateConversation: vi.fn(),
   }
 })
 
 let chatMessageHandler: ((message: unknown) => void) | null = null
+let invitationUpdatedHandler: ((invitation: Record<string, unknown>) => void) | null = null
 
 vi.mock('../lib/chatHubConnection', () => ({
   connectChatHub: vi.fn(),
@@ -37,6 +40,12 @@ vi.mock('../lib/chatHubConnection', () => ({
     }
   }),
   onLfgGroupFilled: vi.fn(() => () => {}),
+  onInvitationUpdated: vi.fn((handler: (invitation: Record<string, unknown>) => void) => {
+    invitationUpdatedHandler = handler
+    return () => {
+      invitationUpdatedHandler = null
+    }
+  }),
 }))
 
 // Stand-in so the test asserts on mounting, not on ChatWindow internals
@@ -107,7 +116,10 @@ function renderProvider() {
   )
 }
 
-beforeEach(() => resetMatchMedia())
+beforeEach(() => {
+  resetMatchMedia()
+  vi.mocked(chatApi.getOrCreateConversation).mockReset()
+})
 afterEach(() => {
   resetMatchMedia()
   vi.clearAllMocks()
@@ -199,5 +211,24 @@ describe('ChatProvider incoming messages', () => {
         'false',
       ),
     )
+  })
+})
+
+describe('ChatProvider accepted invitations', () => {
+  it('opens the empty conversation for the sender after acceptance', async () => {
+    const acceptedConversation = conversation('accepted', 'Recipient')
+    vi.mocked(chatApi.getOrCreateConversation).mockResolvedValue(acceptedConversation)
+    renderProvider()
+
+    act(() => {
+      invitationUpdatedHandler?.({
+        status: 'Accepted',
+        senderUserId: 'me',
+        recipientUserId: 'recipient-id',
+      })
+    })
+
+    await waitFor(() => expect(screen.getByTestId('chat-window')).toHaveTextContent('Recipient'))
+    expect(chatApi.getOrCreateConversation).toHaveBeenCalledWith('token', 'recipient-id')
   })
 })

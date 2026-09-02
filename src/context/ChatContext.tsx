@@ -7,7 +7,7 @@ import { getConversations, getOrCreateConversation, type ChatMessage, type Conve
 import type { LfgGroup } from '../api/lfgGroupsApi'
 import { useAuth } from './AuthContext'
 import { useNotificationPreferences } from './NotificationPreferencesContext'
-import { connectChatHub, disconnectChatHub, onChatMessage, onLfgGroupFilled } from '../lib/chatHubConnection'
+import { connectChatHub, disconnectChatHub, onChatMessage, onInvitationUpdated, onLfgGroupFilled } from '../lib/chatHubConnection'
 import { playNotificationSound } from '../lib/sound'
 import { showBrowserNotification } from '../lib/browserNotifications'
 import { useIsMobile } from '../lib/useIsMobile'
@@ -15,18 +15,13 @@ import { useIsMobile } from '../lib/useIsMobile'
 const MAX_OPEN_CHATS = 4
 const CHAT_WINDOW_OFFSET_REM = 25 // window width (24rem) + gap (1rem)
 
-interface OpenChatOptions {
-  successMessage?: string | null
-}
-
 interface OpenChat {
   conversation: Conversation
-  successMessage: string | null
   isMinimized: boolean
 }
 
 interface ChatContextValue {
-  openChatWithUser: (userId: string, options?: OpenChatOptions) => Promise<void>
+  openChatWithUser: (userId: string) => Promise<void>
   openConversation: (conversation: Conversation) => void
   closeChat: (conversationId: string) => void
   error: string | null
@@ -66,11 +61,11 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     }
   }, [token])
 
-  const showConversation = useCallback((conversation: Conversation, successMessage: string | null) => {
+  const showConversation = useCallback((conversation: Conversation) => {
     setOpenChats((prev) => {
       const existingIndex = prev.findIndex((chat) => chat.conversation.id === conversation.id)
       const withoutExisting = existingIndex >= 0 ? prev.filter((chat) => chat.conversation.id !== conversation.id) : prev
-      const next = [...withoutExisting, { conversation, successMessage, isMinimized: false }]
+      const next = [...withoutExisting, { conversation, isMinimized: false }]
       return next.length > MAX_OPEN_CHATS ? next.slice(next.length - MAX_OPEN_CHATS) : next
     })
     setUnreadConversationIds((prev) => {
@@ -90,13 +85,25 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           .then((conversations) => {
             const match = conversations.find((c) => c.lfgGroupId === group.id)
             if (match) {
-              showConversation(match, null)
+              showConversation(match)
             }
           })
           .catch(() => {
             /* the celebration + a manual "Öppna gruppchatten" fallback still work */
           })
       }
+    })
+  }, [user, token, showConversation])
+
+  useEffect(() => {
+    if (!user || !token) return
+    return onInvitationUpdated((invitation) => {
+      if (invitation.status !== 'Accepted' || invitation.senderUserId !== user.id) return
+      getOrCreateConversation(token, invitation.recipientUserId)
+        .then(showConversation)
+        .catch(() => {
+          // The conversation remains available from the messages page after a reload.
+        })
     })
   }, [user, token, showConversation])
 
@@ -136,7 +143,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
             .then((conversations) => {
               const match = conversations.find((c) => c.id === message.conversationId)
               if (match) {
-                showConversation(match, null)
+                showConversation(match)
               } else {
                 showConversation(
                   {
@@ -151,7 +158,6 @@ export function ChatProvider({ children }: { children: ReactNode }) {
                     participants: [senderParticipant],
                     lfgGroupId: null,
                   },
-                  null,
                 )
               }
             })
@@ -169,7 +175,6 @@ export function ChatProvider({ children }: { children: ReactNode }) {
                   participants: [senderParticipant],
                   lfgGroupId: null,
                 },
-                null,
               )
             })
         }
@@ -203,12 +208,12 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   }, [user, token, visibleChats, preferences, showConversation])
 
   const openChatWithUser = useCallback(
-    async (userId: string, options?: OpenChatOptions) => {
+    async (userId: string) => {
       if (!token) return
       setError(null)
       try {
         const conversation = await getOrCreateConversation(token, userId)
-        showConversation(conversation, options?.successMessage ?? null)
+        showConversation(conversation)
       } catch {
         setError('Failed to open chat.')
       }
@@ -219,7 +224,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const openConversation = useCallback(
     (conversation: Conversation) => {
       setError(null)
-      showConversation(conversation, null)
+      showConversation(conversation)
     },
     [showConversation],
   )
@@ -258,7 +263,6 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         <ChatWindow
           key={chat.conversation.id}
           conversation={chat.conversation}
-          successMessage={chat.successMessage}
           isMinimized={chat.isMinimized}
           onToggleMinimize={() => toggleMinimize(chat.conversation.id)}
           onClose={() => closeChat(chat.conversation.id)}
